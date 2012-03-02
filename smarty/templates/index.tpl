@@ -4,17 +4,22 @@
 <meta name="keywords" content="" />
 <meta name="description" content="" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<title>Active {$title|default:''}</title>
+<title>Active {$page|default:''}</title>
+<!--
 <link href="http://fonts.googleapis.com/css?family=Oswald" rel="stylesheet" type="text/css" />
 <link href='http://fonts.googleapis.com/css?family=Arvo' rel='stylesheet' type='text/css'>
+-->
 <link href="style.css" rel="stylesheet" type="text/css" media="screen" />
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="{$javascript|default:''}"></script>
+{$heading|default:''}
 </head>
 <body>
 <div id="wrapper">
 	<div id="header-wrapper">
 		<div id="header">
 			<div id="banner">
-				<div id="logo"></div>
+				<div id="logo"><a href="homepage"></a></div>
 				<h1><a href="#">Active</a></h1>
 				<p>Where being active really counts</p>
 			</div>
@@ -24,12 +29,13 @@
 	<div id="menu-wrapper">
 		<div id="menu">
 			<ul>
-				<li class="current_page_item"><a href="#">Homepage</a></li>
-				<li><a href="#">Blog</a></li>
-				<li><a href="#">Photos</a></li>
-				<li><a href="#">About</a></li>
-				<li><a href="#">Links</a></li>
-				<li><a href="#">Contact</a></li>
+				<li {if $page eq 'Homepage'}class="current_page_item"{/if}><a href="Homepage">Homepage</a></li>
+				<li {if $page eq 'Users'}class="current_page_item"{/if}><a href="Users">Users</a></li>
+				<li {if $page eq 'Workouts'}class="current_page_item"{/if}><a href="Workouts">Workouts</a></li>
+				<li {if $page eq 'Activities'}class="current_page_item"{/if}><a href="Activities">Activities</a></li>
+				<li {if $page eq 'About'}class="current_page_item"{/if}><a href="About">About</a></li>
+				<li {if $page eq 'Links'}class="current_page_item"{/if}><a href="Links">Links</a></li>
+				<li {if $page eq 'Contact'}class="current_page_item"{/if}><a href="Contact">Contact</a></li>
 			</ul>
 		</div>
 	</div>
@@ -45,7 +51,7 @@
 					<!-- end #content -->
 					<div id="sidebar">
 						<ul>
-							{$right|default:''}						
+							{$menu|default:''}						
 						</ul>
 					</div>
 					<!-- end #sidebar -->

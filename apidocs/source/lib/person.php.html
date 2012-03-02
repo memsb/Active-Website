@@ -1,0 +1,257 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Fri, 02 Mar 2012 20:57:29 +0000">
+
+<link rel="stylesheet" type="text/css" href="../../stylesheet.css">
+<link rel="start" href="../../overview-summary.html">
+
+<title>lib/Person.php (PHPDoctor)</title>
+
+</head>
+<body id="file" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../overview-files.html">Files</a></li>
+<li><a href="../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../todo-list.html">Todo</a></li>
+<li><a href="../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../index.html" target="_top">Frames</a>
+<a href="../../source/lib/person.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<h1>lib/Person.php</h1>
+<hr>
+
+<a name="line1"></a><pre><?php
+<a name="line2"></a>
+<a name="line3"></a>/*
+<a name="line4"></a>*	This class represents an individual on the website / web service.
+<a name="line5"></a>*
+<a name="line6"></a>*
+<a name="line7"></a>*/
+<a name="line8"></a>class Person{
+<a name="line9"></a>
+<a name="line10"></a>	protected $user_id;
+<a name="line11"></a>	protected $username;
+<a name="line12"></a>	protected $password;
+<a name="line13"></a>	protected $api_key;
+<a name="line14"></a>	protected $email;
+<a name="line15"></a>	protected $gender;
+<a name="line16"></a>	protected $age;
+<a name="line17"></a>	protected $weight;
+<a name="line18"></a>
+<a name="line19"></a>	protected $db;
+<a name="line20"></a>
+<a name="line21"></a>	public function __construct($db){
+<a name="line22"></a>		$this->db = $db;
+<a name="line23"></a>	}
+<a name="line24"></a>
+<a name="line25"></a>	public function __set($name, $value){
+<a name="line26"></a>		$this->$name = $value;
+<a name="line27"></a>	}
+<a name="line28"></a>
+<a name="line29"></a>	public function __get($name){
+<a name="line30"></a>		return $this->$name;
+<a name="line31"></a>	}
+<a name="line32"></a>
+<a name="line33"></a>	public function parse($xmlstr){
+<a name="line34"></a>		$data = new SimpleXMLElement($xmlstr);
+<a name="line35"></a>		$this->assign_data($data);
+<a name="line36"></a>	}
+<a name="line37"></a>
+<a name="line38"></a>	public function assign_data($data){
+<a name="line39"></a>		$this->user_id = 	intval($data->user_id);
+<a name="line40"></a>		$this->gender = 	strval($data->gender);	
+<a name="line41"></a>		$this->age = 		intval($data->age);
+<a name="line42"></a>		$this->weight = 	(float)$data->weight;
+<a name="line43"></a>		$this->username = 	strval($data->username);
+<a name="line44"></a>	}
+<a name="line45"></a>
+<a name="line46"></a>	public function parse_registration($xmlstr){
+<a name="line47"></a>		$data = new SimpleXMLElement($xmlstr);
+<a name="line48"></a>		$this->api_key = $data->api_key;
+<a name="line49"></a>		$this->user_id = $data->user_id;
+<a name="line50"></a>	}
+<a name="line51"></a>
+<a name="line52"></a>	public function create($data){
+<a name="line53"></a>		$this->username = 	$data['username'];
+<a name="line54"></a>		$this->password = 	$data['password'];
+<a name="line55"></a>		$this->email = 		$data['email'];
+<a name="line56"></a>		$this->gender = 	$data['gender'];	
+<a name="line57"></a>		$this->age = 		$data['age'];
+<a name="line58"></a>		$this->weight = 	$data['weight'];		
+<a name="line59"></a>	}
+<a name="line60"></a>
+<a name="line61"></a>	public function update(){
+<a name="line62"></a>		$user_id = 	$this->db->clean($this->user_id);
+<a name="line63"></a>		$username = 	$this->db->clean($this->username);
+<a name="line64"></a>		$password = 	$this->get_hash();
+<a name="line65"></a>		$email = 	$this->db->clean($this->email);
+<a name="line66"></a>		$api_key = 	$this->db->clean($this->api_key);
+<a name="line67"></a>		$result = $this->db->query("UPDATE Users SET 	Username	= '$username', 
+<a name="line68"></a>								Password	= '$password', 
+<a name="line69"></a>								Email		= '$email',									
+<a name="line70"></a>								API_Key		= '$api_key'
+<a name="line71"></a>								WHERE User_ID	= '$user_id'");
+<a name="line72"></a>	}
+<a name="line73"></a>
+<a name="line74"></a>	public function save(){
+<a name="line75"></a>		$user_id = 	$this->db->clean($this->user_id);
+<a name="line76"></a>		$username = 	$this->db->clean($this->username);
+<a name="line77"></a>		$password = 	$this->get_hash();
+<a name="line78"></a>		$email = 	$this->db->clean($this->email);
+<a name="line79"></a>		$api_key = 	$this->db->clean($this->api_key);
+<a name="line80"></a>		$result = $this->db->query("INSERT INTO Users (	User_ID,
+<a name="line81"></a>								Username, 
+<a name="line82"></a>								Password, 
+<a name="line83"></a>								Email,									
+<a name="line84"></a>								API_Key
+<a name="line85"></a>								) VALUES (	
+<a name="line86"></a>								'$user_id',
+<a name="line87"></a>								'$username',
+<a name="line88"></a>								'$password',
+<a name="line89"></a>								'$email',									
+<a name="line90"></a>								'$api_key'
+<a name="line91"></a>								)");
+<a name="line92"></a>		$this->id = $this->db->insert_id();
+<a name="line93"></a>	}
+<a name="line94"></a>
+<a name="line95"></a>	public function delete(){
+<a name="line96"></a>		$user_id = $this->db->clean($this->user_id);		
+<a name="line97"></a>		$result = $this->db->query("DELETE FROM Users WHERE User_ID=$user_id");
+<a name="line98"></a>	}
+<a name="line99"></a>
+<a name="line100"></a>	public function load($theID){
+<a name="line101"></a>		$id = $this->db->clean($theID);
+<a name="line102"></a>		$result = $this->db->query("SELECT * FROM Users WHERE User_ID=$id");
+<a name="line103"></a>
+<a name="line104"></a>		if( count($result) == 0 )
+<a name="line105"></a>			throw new Exception('User not found.');
+<a name="line106"></a>
+<a name="line107"></a>		$row = $result[0];
+<a name="line108"></a>		$this->user_id = 	$row['User_ID'];
+<a name="line109"></a>		$this->username = 	$row['Username'];
+<a name="line110"></a>		$this->password = 	$row['Password'];
+<a name="line111"></a>		$this->api_key = 	$row['API_Key'];
+<a name="line112"></a>		$this->email = 		$row['Email'];
+<a name="line113"></a>	}
+<a name="line114"></a>
+<a name="line115"></a>	public function load_from_email($theEmail){
+<a name="line116"></a>		$email = $this->db->clean($theEmail);
+<a name="line117"></a>		$result = $this->db->query("SELECT User_ID FROM Users WHERE Email='$email'");
+<a name="line118"></a>
+<a name="line119"></a>		if( count($result) == 0 )
+<a name="line120"></a>			throw new Exception('User not found');
+<a name="line121"></a>
+<a name="line122"></a>		$row = $result[0];
+<a name="line123"></a>		$this->load($row['User_ID']);
+<a name="line124"></a>	}
+<a name="line125"></a>
+<a name="line126"></a>	protected function get_hash(){
+<a name="line127"></a>		return hash('sha256', $this->email . $this->password);
+<a name="line128"></a>	}
+<a name="line129"></a>
+<a name="line130"></a>	public static function exists($db, $email){
+<a name="line131"></a>		$result = $db->query("SELECT User_ID FROM Users WHERE Email='$email'");
+<a name="line132"></a>		if( count($result) == 0 )
+<a name="line133"></a>			return False;
+<a name="line134"></a>		return True;
+<a name="line135"></a>	}
+<a name="line136"></a>
+<a name="line137"></a>	public function set_password($password, $activation){
+<a name="line138"></a>		$user_id = 	$this->db->clean($this->user_id);
+<a name="line139"></a>		$password = 	$this->db->clean($thePassword);
+<a name="line140"></a>		$activation = 	$this->db->clean($theActivation);
+<a name="line141"></a>		$result = $this->db->query("UPDATE Users SET 	Password	= '$password', 
+<a name="line142"></a>								Activation	= NULL
+<a name="line143"></a>								WHERE User_ID	= '$user_id'
+<a name="line144"></a>								AND Activation	= '$activation' ");
+<a name="line145"></a>	}
+<a name="line146"></a>
+<a name="line147"></a>	public function getXML(){
+<a name="line148"></a>		$writer = new XMLWriter();
+<a name="line149"></a>		$writer->openMemory();
+<a name="line150"></a>		$writer->setIndent(true);
+<a name="line151"></a>		$writer->setIndentString(' ');
+<a name="line152"></a>
+<a name="line153"></a>		// builds xml document	
+<a name="line154"></a>		$writer->startDocument('1.0', 'UTF-8');
+<a name="line155"></a>		
+<a name="line156"></a>		$writer->startElement('user');
+<a name="line157"></a>
+<a name="line158"></a>		$writer->startElement('username');
+<a name="line159"></a>		$writer->text($this->username);
+<a name="line160"></a>		$writer->endElement();
+<a name="line161"></a>		
+<a name="line162"></a>		$writer->startElement('age');
+<a name="line163"></a>		$writer->text($this->age);
+<a name="line164"></a>		$writer->endElement();
+<a name="line165"></a>
+<a name="line166"></a>		$writer->startElement('weight');
+<a name="line167"></a>		$writer->text($this->weight);
+<a name="line168"></a>		$writer->endElement();
+<a name="line169"></a>
+<a name="line170"></a>		$writer->startElement('gender');
+<a name="line171"></a>		$writer->text($this->gender);
+<a name="line172"></a>		$writer->endElement();
+<a name="line173"></a>
+<a name="line174"></a>		$writer->endElement();
+<a name="line175"></a>
+<a name="line176"></a>		$writer->endDocument();
+<a name="line177"></a>		
+<a name="line178"></a>		return $writer->outputMemory();
+<a name="line179"></a>	}
+<a name="line180"></a>
+<a name="line181"></a>	public function display($template){
+<a name="line182"></a>		$template->assign('username', $this->username);
+<a name="line183"></a>		$template->assign('age', $this->age);
+<a name="line184"></a>		$template->assign('weight', $this->weight);
+<a name="line185"></a>		$template->assign('gender', $this->gender);
+<a name="line186"></a>		return $template->fetch();
+<a name="line187"></a>	}
+<a name="line188"></a>
+<a name="line189"></a>	public function display_list($template){
+<a name="line190"></a>		$template->assign('id', $this->user_id);
+<a name="line191"></a>		$template->assign('username', $this->username);
+<a name="line192"></a>		return $template->fetch();
+<a name="line193"></a>	}
+<a name="line194"></a>
+<a name="line195"></a>}
+<a name="line196"></a>?>
+<a name="line197"></a></pre>
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../overview-files.html">Files</a></li>
+<li><a href="../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../todo-list.html">Todo</a></li>
+<li><a href="../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../index.html" target="_top">Frames</a>
+<a href="../../source/lib/person.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

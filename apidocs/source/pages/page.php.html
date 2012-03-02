@@ -1,0 +1,233 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Fri, 02 Mar 2012 20:57:29 +0000">
+
+<link rel="stylesheet" type="text/css" href="../../stylesheet.css">
+<link rel="start" href="../../overview-summary.html">
+
+<title>pages/Page.php (PHPDoctor)</title>
+
+</head>
+<body id="file" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../overview-files.html">Files</a></li>
+<li><a href="../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../todo-list.html">Todo</a></li>
+<li><a href="../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../index.html" target="_top">Frames</a>
+<a href="../../source/pages/page.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<h1>pages/Page.php</h1>
+<hr>
+
+<a name="line1"></a><pre><?php
+<a name="line2"></a>
+<a name="line3"></a>require_once LIB . 'User.php';
+<a name="line4"></a>require_once LIB . 'DBA.php';
+<a name="line5"></a>
+<a name="line6"></a>/*
+<a name="line7"></a> * @author Martin Buckley - MBuckley@gmail.com
+<a name="line8"></a> * A base class for all pages
+<a name="line9"></a> */
+<a name="line10"></a>class Page {
+<a name="line11"></a>
+<a name="line12"></a>	/*
+<a name="line13"></a>	 * Page name
+<a name="line14"></a>	 * Printed in page title and used to link to this page
+<a name="line15"></a>	 */
+<a name="line16"></a>	const PAGE_NAME = '';
+<a name="line17"></a>
+<a name="line18"></a>	protected $user;
+<a name="line19"></a>	protected $db;
+<a name="line20"></a>
+<a name="line21"></a>	private $headers = array(
+<a name="line22"></a>		'Accept: application/xml',
+<a name="line23"></a>		'Content-Type: application/xml',
+<a name="line24"></a>	);
+<a name="line25"></a>
+<a name="line26"></a>	/*
+<a name="line27"></a>	 * Page constructor
+<a name="line28"></a>	 * Calls constructor on Page
+<a name="line29"></a>	 */
+<a name="line30"></a>	public function __construct(){
+<a name="line31"></a>		if( ! isset($_COOKIE[ini_get('session.name')]) ){
+<a name="line32"></a>			session_start();
+<a name="line33"></a>		}
+<a name="line34"></a>		$this->db = new Database();
+<a name="line35"></a>		$this->db->connect();
+<a name="line36"></a>		$this->user = new User($this->db);
+<a name="line37"></a>	}
+<a name="line38"></a>
+<a name="line39"></a>	/*
+<a name="line40"></a>	 * Passes a refference to smarty to use to load templates
+<a name="line41"></a>	 * @param Smarty instance
+<a name="line42"></a>	 */
+<a name="line43"></a>	public function setSmarty($smarty){
+<a name="line44"></a>		$this->smarty = $smarty;
+<a name="line45"></a>	}
+<a name="line46"></a>
+<a name="line47"></a>	/*
+<a name="line48"></a>	 * Get request on page
+<a name="line49"></a>	 * @param Array of parameters
+<a name="line50"></a>	 */
+<a name="line51"></a>	public function get($data){}
+<a name="line52"></a>
+<a name="line53"></a>	/*
+<a name="line54"></a>	 * Post request on page
+<a name="line55"></a>	 * @param Array of parameters
+<a name="line56"></a>	 */
+<a name="line57"></a>	public function post($data){}
+<a name="line58"></a>
+<a name="line59"></a>	/*
+<a name="line60"></a>	 * Standard page visit
+<a name="line61"></a>	 * Displays a list of activities
+<a name="line62"></a>	 */
+<a name="line63"></a>	public function visit(){}
+<a name="line64"></a>
+<a name="line65"></a>	/*
+<a name="line66"></a>	 * Checks if a passed argument is set
+<a name="line67"></a>	 * @param String
+<a name="line68"></a>	 * @return Boolean True if valid
+<a name="line69"></a>	 */
+<a name="line70"></a>	protected function valid_arg($arg){
+<a name="line71"></a>		if( isset($arg) && strlen($arg) > 0 )
+<a name="line72"></a>			return True;
+<a name="line73"></a>		return False;
+<a name="line74"></a>	}
+<a name="line75"></a>
+<a name="line76"></a>	/*
+<a name="line77"></a>	 * Checks if the user is logged in or not and displays the apropriate sub menu
+<a name="line78"></a>	 * @return String the menu
+<a name="line79"></a>	 */
+<a name="line80"></a>	protected function userMenu(){
+<a name="line81"></a>		if( $this->user->isLoggedIn() ){
+<a name="line82"></a>			$menu = $this->smarty->createTemplate('menu.tpl');
+<a name="line83"></a>		}else{		
+<a name="line84"></a>			$menu = $this->smarty->createTemplate('login.tpl');
+<a name="line85"></a>			$menu->assign('action', 'login');
+<a name="line86"></a>			$menu->assign('reffer', $this::PAGE_NAME);			
+<a name="line87"></a>		}
+<a name="line88"></a>		return $menu;
+<a name="line89"></a>	}
+<a name="line90"></a>
+<a name="line91"></a>	/*
+<a name="line92"></a>	 * Performs a GET request on the specified URI
+<a name="line93"></a>	 * @param String the resource address
+<a name="line94"></a>	 * @return Array response
+<a name="line95"></a>	 */
+<a name="line96"></a>	protected function xmlGET($uri){
+<a name="line97"></a>		$ch = curl_init($uri . '.xml' );
+<a name="line98"></a>		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+<a name="line99"></a>		curl_setopt($ch, CURLOPT_HEADER, 0);
+<a name="line100"></a>		$xmlstr = curl_exec($ch);
+<a name="line101"></a>		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+<a name="line102"></a>		curl_close($ch);
+<a name="line103"></a>		return array(	'code' => $httpCode, 
+<a name="line104"></a>				'body' => $xmlstr
+<a name="line105"></a>			 );
+<a name="line106"></a>	}
+<a name="line107"></a>
+<a name="line108"></a>	/*
+<a name="line109"></a>	 * Performs a POST request on the specified URI
+<a name="line110"></a>	 * @param String the resource address
+<a name="line111"></a>	 * @param String the document to POST
+<a name="line112"></a>	 * @return Array response
+<a name="line113"></a>	 */
+<a name="line114"></a>	protected function xmlPOST($uri, $xml_send_str){
+<a name="line115"></a>		$ch = curl_init($uri . '.xml' );
+<a name="line116"></a>		curl_setopt($ch, CURLOPT_POSTFIELDS,  $xml_send_str);
+<a name="line117"></a>		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+<a name="line118"></a>		curl_setopt($ch, CURLOPT_HEADER, 0);		
+<a name="line119"></a>		$xmlstr = curl_exec($ch);
+<a name="line120"></a>		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+<a name="line121"></a>		curl_close($ch);
+<a name="line122"></a>		return array(	'code' => $httpCode, 
+<a name="line123"></a>				'body' => $xmlstr
+<a name="line124"></a>			 );
+<a name="line125"></a>	}
+<a name="line126"></a>	
+<a name="line127"></a>	/*
+<a name="line128"></a>	 * Performs a PUT request on the specified URI
+<a name="line129"></a>	 * @param String the resource address
+<a name="line130"></a>	 * @param String the document to PUT
+<a name="line131"></a>	 * @return Array response
+<a name="line132"></a>	 */
+<a name="line133"></a>	protected function xmlPUT($uri, $xml_send_str){
+<a name="line134"></a>		$ch = curl_init($uri . '.xml' );
+<a name="line135"></a>		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->headers);
+<a name="line136"></a>		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+<a name="line137"></a>		$user = $this->user->user_id;
+<a name="line138"></a>		$pass = $this->user->api_key;
+<a name="line139"></a>		curl_setopt($ch, CURLOPT_USERPWD, "$user:$pass");
+<a name="line140"></a>		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+<a name="line141"></a>		curl_setopt($ch, CURLOPT_POSTFIELDS, $xml_send_str);		
+<a name="line142"></a>		$xmlstr = curl_exec($ch);
+<a name="line143"></a>		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+<a name="line144"></a>		curl_close($ch);
+<a name="line145"></a>		return array(	'code' => $httpCode, 
+<a name="line146"></a>				'body' => $xmlstr
+<a name="line147"></a>			 );
+<a name="line148"></a>	}
+<a name="line149"></a>
+<a name="line150"></a>	/*
+<a name="line151"></a>	 * Performs a DELETE request on the specified URI
+<a name="line152"></a>	 * @param String the resource address
+<a name="line153"></a>	 * @return Array response
+<a name="line154"></a>	 */
+<a name="line155"></a>	protected function xmlDELETE($uri){
+<a name="line156"></a>		$ch = curl_init($uri . '.xml' );
+<a name="line157"></a>		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->headers);
+<a name="line158"></a>		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+<a name="line159"></a>		$user = $this->user->user_id;
+<a name="line160"></a>		$pass = $this->user->api_key;
+<a name="line161"></a>		curl_setopt($ch, CURLOPT_USERPWD, "$user:$pass");
+<a name="line162"></a>		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");		
+<a name="line163"></a>		$xmlstr = curl_exec($ch);
+<a name="line164"></a>		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+<a name="line165"></a>		curl_close($ch);
+<a name="line166"></a>		return array(	'code' => $httpCode, 
+<a name="line167"></a>				'body' => $xmlstr
+<a name="line168"></a>			 );
+<a name="line169"></a>	}
+<a name="line170"></a>}
+<a name="line171"></a>
+<a name="line172"></a>?>
+<a name="line173"></a></pre>
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../overview-files.html">Files</a></li>
+<li><a href="../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../todo-list.html">Todo</a></li>
+<li><a href="../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../index.html" target="_top">Frames</a>
+<a href="../../source/pages/page.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

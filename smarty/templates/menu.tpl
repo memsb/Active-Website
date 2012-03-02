@@ -1,11 +1,10 @@
 <li>
-	<h2>Categories</h2>
+	<h2>Options</h2>
 	<ul>
-		<li><a href="#">Aliquam libero</a></li>
-		<li><a href="#">Consectetuer adipiscing elit</a></li>
-		<li><a href="#">Metus aliquam pellentesque</a></li>
-		<li><a href="#">Suspendisse iaculis mauris</a></li>
-		<li><a href="#">Urnanet non molestie semper</a></li>
-		<li><a href="#">Proin gravida orci porttitor</a></li>
+		<li><a href="Profile">Update My Details</a></li>
+		<li><a href="Profile_Password">Change Password</a></li>
+		<li><a href="Profile_Email">Change Email Address</a></li>
+		<li><a href="Delete_Profile">Delete Account</a></li>
+		<li><a href="Logout">Log Out</a></li>
 	</ul>
 </li>
