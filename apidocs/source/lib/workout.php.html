@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Fri, 02 Mar 2012 20:57:29 +0000">
+<meta name="when" content="Sat, 03 Mar 2012 22:05:48 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
 <link rel="start" href="../../overview-summary.html">
@@ -39,46 +39,92 @@
 <a name="line1"></a><pre><?php
 <a name="line2"></a>/*
 <a name="line3"></a> * @author Martin Buckley - MBuckley@gmail.com
-<a name="line4"></a> *
-<a name="line5"></a> *
-<a name="line6"></a> */
-<a name="line7"></a>class Workout{
-<a name="line8"></a>
-<a name="line9"></a>	public function parse($xmlstr){
-<a name="line10"></a>		$data = new SimpleXMLElement($xmlstr);
-<a name="line11"></a>		$this->assign_data($data);
-<a name="line12"></a>	}
-<a name="line13"></a>
-<a name="line14"></a>	public function assign_data($data){
-<a name="line15"></a>		$this->id =		intval($data->workout_id);
-<a name="line16"></a>		$this->username = 	strval($data->username);
-<a name="line17"></a>		$this->user_id = 	intval($data->user_id);
-<a name="line18"></a>		$this->activity_id = 	intval($data->activity_id);
-<a name="line19"></a>		$this->activity_name = 	strval($data->activity_name);
-<a name="line20"></a>		$this->start = 		intval($data->start);
-<a name="line21"></a>		$this->duration = 	intval($data->duration);
-<a name="line22"></a>		$this->kcal = 		intval($data->kcal);
-<a name="line23"></a>	}
-<a name="line24"></a>
-<a name="line25"></a>	public function display($template){
-<a name="line26"></a>		$template->assign('username', $this->username);
-<a name="line27"></a>		$template->assign('activity', $this->activity_name);
-<a name="line28"></a>		$template->assign('start', date('d-m-Y h:m', $this->start) );
-<a name="line29"></a>		$template->assign('duration', $this->duration);
-<a name="line30"></a>		$template->assign('kcal', $this->kcal);
-<a name="line31"></a>		return $template->fetch();
-<a name="line32"></a>	}
-<a name="line33"></a>
-<a name="line34"></a>	public function display_list($template){
-<a name="line35"></a>		$template->assign('start', date('d-m-Y h:m', $this->start));
-<a name="line36"></a>		$template->assign('activity', $this->activity_name);
-<a name="line37"></a>		$template->assign('duration', $this->duration);
-<a name="line38"></a>		$template->assign('kcal', $this->kcal);
-<a name="line39"></a>		return $template->fetch();
-<a name="line40"></a>	}
-<a name="line41"></a>}
-<a name="line42"></a>?>
-<a name="line43"></a></pre>
+<a name="line4"></a> * Workout encapulates the methods and attributes for a workout
+<a name="line5"></a> */
+<a name="line6"></a>class Workout {
+<a name="line7"></a>
+<a name="line8"></a>	/*
+<a name="line9"></a>	 * Parses an XML document containing an activity
+<a name="line10"></a>	 * @param String the XML document
+<a name="line11"></a>	 */
+<a name="line12"></a>	public function parse($xmlstr){
+<a name="line13"></a>		$data = new SimpleXMLElement($xmlstr);
+<a name="line14"></a>		$this->assign_data($data);
+<a name="line15"></a>	}
+<a name="line16"></a>
+<a name="line17"></a>	/*
+<a name="line18"></a>	 * Transfers the parsed XML into the internal structure
+<a name="line19"></a>	 * @param SimpleXML Object
+<a name="line20"></a>	 */
+<a name="line21"></a>	public function assign_data($data){
+<a name="line22"></a>		$this->id =		intval($data->workout_id);
+<a name="line23"></a>		$this->username = 	strval($data->username);
+<a name="line24"></a>		$this->user_id = 	intval($data->user_id);
+<a name="line25"></a>		$this->activity_id = 	intval($data->activity_id);
+<a name="line26"></a>		$this->activity_name = 	strval($data->activity_name);
+<a name="line27"></a>		$this->start = 		intval($data->start);
+<a name="line28"></a>		$this->duration = 	intval($data->duration);
+<a name="line29"></a>		$this->kcal = 		intval($data->kcal);
+<a name="line30"></a>	}
+<a name="line31"></a>
+<a name="line32"></a>	/*
+<a name="line33"></a>	 * returns an XML representation of the object
+<a name="line34"></a>	 * @return String XML 
+<a name="line35"></a>	 */
+<a name="line36"></a>	public function getXML(){
+<a name="line37"></a>		$writer = new XMLWriter();
+<a name="line38"></a>		$writer->openMemory();
+<a name="line39"></a>		$writer->setIndent(true);
+<a name="line40"></a>		$writer->setIndentString(' ');
+<a name="line41"></a>
+<a name="line42"></a>		// builds xml document	
+<a name="line43"></a>		$writer->startDocument('1.0', 'UTF-8');
+<a name="line44"></a>		
+<a name="line45"></a>		$writer->startElement('workout');
+<a name="line46"></a>
+<a name="line47"></a>		$writer->startElement('workout_id');
+<a name="line48"></a>		$writer->text($this->id);
+<a name="line49"></a>		$writer->endElement();
+<a name="line50"></a>
+<a name="line51"></a>		$writer->startElement('user_id');
+<a name="line52"></a>		$writer->text($this->user_id);
+<a name="line53"></a>		$writer->endElement();
+<a name="line54"></a>		
+<a name="line55"></a>		$writer->startElement('activity_id');
+<a name="line56"></a>		$writer->text($this->activity_id);
+<a name="line57"></a>		$writer->endElement();
+<a name="line58"></a>
+<a name="line59"></a>		$writer->startElement('start');
+<a name="line60"></a>		$writer->text($this->start);
+<a name="line61"></a>		$writer->endElement();
+<a name="line62"></a>
+<a name="line63"></a>		$writer->startElement('duration');
+<a name="line64"></a>		$writer->text($this->duration);
+<a name="line65"></a>		$writer->endElement();
+<a name="line66"></a>
+<a name="line67"></a>		$writer->endElement();
+<a name="line68"></a>
+<a name="line69"></a>		$writer->endDocument();
+<a name="line70"></a>		
+<a name="line71"></a>		return $writer->outputMemory();
+<a name="line72"></a>	}
+<a name="line73"></a>
+<a name="line74"></a>	/*
+<a name="line75"></a>	 * Prints out the Workout into a template
+<a name="line76"></a>	 * @param Smarty Template
+<a name="line77"></a>	 * @return String the output text
+<a name="line78"></a>	 */
+<a name="line79"></a>	public function display($template){
+<a name="line80"></a>		$template->assign('username', $this->username);
+<a name="line81"></a>		$template->assign('activity', $this->activity_name);
+<a name="line82"></a>		$template->assign('start', date('d-m-Y h:i', $this->start) );
+<a name="line83"></a>		$template->assign('duration', $this->duration);
+<a name="line84"></a>		$template->assign('kcal', $this->kcal);
+<a name="line85"></a>		return $template->fetch();
+<a name="line86"></a>	}
+<a name="line87"></a>}
+<a name="line88"></a>?>
+<a name="line89"></a></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

@@ -40,6 +40,10 @@ class Home_page extends Page{
 		$page->display();
 	}
 
+	/*
+	 * Displays a message to not logged in users.
+	 * @return String the message
+	 */
 	private function logged_out(){
 		$welcome = $this->smarty->createTemplate('welcome.tpl');
 		return $welcome->fetch();

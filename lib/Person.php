@@ -1,11 +1,11 @@
 <?php
 
 /*
-*	This class represents an individual on the website / web service.
-*
-*
-*/
-class Person{
+ * @author Martin Buckley - MBuckley@gmail.com
+ * A Person is a signed up user on the web service.
+ * This class provides the complicated account management methods.
+ */
+class Person {
 
 	protected $user_id;
 	protected $username;
@@ -18,23 +18,41 @@ class Person{
 
 	protected $db;
 
+	/*
+	 * Constructor requires a Database object
+	 * @param Database
+	 */
 	public function __construct($db){
 		$this->db = $db;
 	}
 
+	/*
+	 * Magic method setter
+	 */
 	public function __set($name, $value){
 		$this->$name = $value;
 	}
 
+	/*
+	 * Magic method getter
+	 */
 	public function __get($name){
 		return $this->$name;
 	}
 
+	/*
+	 * Parses an XML document containing an Person
+	 * @param String the XML document
+	 */
 	public function parse($xmlstr){
 		$data = new SimpleXMLElement($xmlstr);
 		$this->assign_data($data);
 	}
 
+	/*
+	 * Transfers the parsed XML into the internal structure
+	 * @param SimpleXML Object
+	 */
 	public function assign_data($data){
 		$this->user_id = 	intval($data->user_id);
 		$this->gender = 	strval($data->gender);	
@@ -43,12 +61,20 @@ class Person{
 		$this->username = 	strval($data->username);
 	}
 
+	/*
+	 * Parses the registration confirmation document
+	 * @param String XML document
+	 */
 	public function parse_registration($xmlstr){
 		$data = new SimpleXMLElement($xmlstr);
 		$this->api_key = $data->api_key;
 		$this->user_id = $data->user_id;
 	}
 
+	/*
+	 * Creates a new user from the data given
+	 * @param Array of person data
+	 */
 	public function create($data){
 		$this->username = 	$data['username'];
 		$this->password = 	$data['password'];
@@ -58,6 +84,9 @@ class Person{
 		$this->weight = 	$data['weight'];		
 	}
 
+	/*
+	 * Updates the current Person on the database
+	 */
 	public function update(){
 		$user_id = 	$this->db->clean($this->user_id);
 		$username = 	$this->db->clean($this->username);
@@ -71,6 +100,9 @@ class Person{
 								WHERE User_ID	= '$user_id'");
 	}
 
+	/*
+	 * Adds the current Person to the database
+	 */
 	public function save(){
 		$user_id = 	$this->db->clean($this->user_id);
 		$username = 	$this->db->clean($this->username);
@@ -92,11 +124,18 @@ class Person{
 		$this->id = $this->db->insert_id();
 	}
 
+	/*
+	 * Deletes the Person from the database
+	 */
 	public function delete(){
 		$user_id = $this->db->clean($this->user_id);		
 		$result = $this->db->query("DELETE FROM Users WHERE User_ID=$user_id");
 	}
 
+	/*
+	 * Loads in the details of the specified Person
+	 * @param Int the user ID
+	 */
 	public function load($theID){
 		$id = $this->db->clean($theID);
 		$result = $this->db->query("SELECT * FROM Users WHERE User_ID=$id");
@@ -112,6 +151,10 @@ class Person{
 		$this->email = 		$row['Email'];
 	}
 
+	/*
+	 * Loads a Person based on their email address
+	 * @param String the email address
+	 */
 	public function load_from_email($theEmail){
 		$email = $this->db->clean($theEmail);
 		$result = $this->db->query("SELECT User_ID FROM Users WHERE Email='$email'");
@@ -123,10 +166,31 @@ class Person{
 		$this->load($row['User_ID']);
 	}
 
-	protected function get_hash(){
-		return hash('sha256', $this->email . $this->password);
+	/*
+	 * Returns the hash code for the current Person
+	 * @return String hash code
+	 */
+	private function get_hash(){
+		return $this->hash($this->email . $this->password);
 	}
 
+	/*
+	 * returns a new password has from the given email and password
+	 * @param String email address
+	 * @param String password
+	 * @return String hash code
+	 */
+	protected function hash($email, $password){
+		return hash('sha256', $email . $password);
+	}
+
+	/*
+	 * Checks if a person with that email address exists on the system
+	 * Static method which can be called without an instance of Person
+	 * @param Database
+	 * @param String email address
+	 * @return Boolean does the person exist
+	 */
 	public static function exists($db, $email){
 		$result = $db->query("SELECT User_ID FROM Users WHERE Email='$email'");
 		if( count($result) == 0 )
@@ -134,6 +198,11 @@ class Person{
 		return True;
 	}
 
+	/*
+	 * Updates the password for a Person provided they have requested it
+	 * @param String the new password
+	 * @param String the activation code
+	 */
 	public function set_password($password, $activation){
 		$user_id = 	$this->db->clean($this->user_id);
 		$password = 	$this->db->clean($thePassword);
@@ -144,6 +213,10 @@ class Person{
 								AND Activation	= '$activation' ");
 	}
 
+	/*
+	 * returns an XML representation of the object
+	 * @return String XML 
+	 */
 	public function getXML(){
 		$writer = new XMLWriter();
 		$writer->openMemory();
@@ -178,6 +251,11 @@ class Person{
 		return $writer->outputMemory();
 	}
 
+	/*
+	 * Prints out the Person into a template
+	 * @param Smarty Template
+	 * @return String the output text
+	 */
 	public function display($template){
 		$template->assign('username', $this->username);
 		$template->assign('age', $this->age);
@@ -185,12 +263,5 @@ class Person{
 		$template->assign('gender', $this->gender);
 		return $template->fetch();
 	}
-
-	public function display_list($template){
-		$template->assign('id', $this->user_id);
-		$template->assign('username', $this->username);
-		return $template->fetch();
-	}
-
 }
 ?>

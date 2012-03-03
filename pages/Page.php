@@ -28,12 +28,14 @@ class Page {
 	 * Calls constructor on Page
 	 */
 	public function __construct(){
-		if( ! isset($_COOKIE[ini_get('session.name')]) ){
+		//if( ! isset($_COOKIE[ini_get('session.name')]) ){
 			session_start();
-		}
+		//}
 		$this->db = new Database();
 		$this->db->connect();
 		$this->user = new User($this->db);
+		if( $this->user->isLoggedIn() )
+			$this->user = $_SESSION['user'];
 	}
 
 	/*
@@ -113,6 +115,10 @@ class Page {
 	 */
 	protected function xmlPOST($uri, $xml_send_str){
 		$ch = curl_init($uri . '.xml' );
+		$user = $this->user->user_id;
+		$pass = $this->user->api_key;
+		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+		curl_setopt($ch, CURLOPT_USERPWD, "$user:$pass");
 		curl_setopt($ch, CURLOPT_POSTFIELDS,  $xml_send_str);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_HEADER, 0);		
@@ -132,13 +138,15 @@ class Page {
 	 */
 	protected function xmlPUT($uri, $xml_send_str){
 		$ch = curl_init($uri . '.xml' );
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->headers);
-		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->headers);		
 		$user = $this->user->user_id;
 		$pass = $this->user->api_key;
+		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
 		curl_setopt($ch, CURLOPT_USERPWD, "$user:$pass");
 		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $xml_send_str);		
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $xml_send_str);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);	
+		curl_setopt($ch, CURLOPT_HEADER, 0);	
 		$xmlstr = curl_exec($ch);
 		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		curl_close($ch);

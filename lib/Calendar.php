@@ -1,5 +1,9 @@
 <?php
 
+/*
+ * @author Martin Buckley - MBuckley@gmail.com
+ * Calendar stores a representation of the month along with any events occuring
+ */
 class Calendar {
 
 	const COMPACT = 1;
@@ -11,6 +15,11 @@ class Calendar {
 	private $year = "";
 	private $smarty;
 
+	/*
+	 * Constructor generates a new Calendar for the given offset in months. Uses smarty templates
+	 * @param Smarty Instance
+	 * @param Int the month offset
+	 */
 	function __construct($smarty, $month=0){
 		$this->smarty = $smarty;
 		$this->calendar_template = $this->smarty->createTemplate('calendar/calendar.tpl');
@@ -21,6 +30,10 @@ class Calendar {
 		$this->create($month);
 	}
 
+	/*
+	 * Generates a new Calendar for the specified month
+	 * @param Int the offset in months from the current month
+	 */
 	public function create($month_offset){
 		// Links to previous and next month
 		$this->prev = $month_offset-1;
@@ -70,6 +83,10 @@ class Calendar {
 		}
 	}
 
+	/*
+	 * Adds an Event to the calendar
+	 * @param Event to add
+	 */
 	public function addEvent($event){
 		$y = $event->getYear();
 		$m = $event->getMonth();
@@ -80,6 +97,11 @@ class Calendar {
 			$this->events[$y][$m][$d] = array($event);
 	}
 
+	/*
+	 * Prints out the Calendar
+	 * @param Enum the calendar size
+	 * @return String the calendar
+	 */
 	public function draw($size = Calendar::FULL){		
 		$this->heading_template->assign('title', "$this->month_name $this->year");
 		$heading = $this->heading_template->fetch();
@@ -122,52 +144,90 @@ class Calendar {
 		return $this->calendar_template->fetch();
 	}
 
+	/*
+	 * Prints out a single day as a part of the calendar
+	 * @param Array the day parameters
+	 * @param String the event Text
+	 * @return String the day
+	 */
 	private function print_day($day, $event_text=''){
 		$date = $day['day'];
 		$tpl = $this->day_template;
 
-		if( $day['today'] )
-			$tpl = $this->current_day_template;
-
 		if( $day['current_month'] )
 			$tpl = $this->current_month_template;
+
+		if( $day['today'] )
+			$tpl = $this->current_day_template;		
 
 		$tpl->assign('body', "$date<br>$event_text");
 		return $tpl->fetch();
 	}
 }
 
-class Event{
+/*
+ * @author Martin Buckley - MBuckley@gmail.com
+ * Event class stores text and a timestamp for an event
+ */
+class Event {
+
 	private $timestamp = 0;
 	private $text = '';
 
+	/*
+	 * Sets the timestamp of the event
+	 * @param Int the timestamp
+	 */
 	public function setTime($timestamp){
 		$this->timestamp = $timestamp;
 	}
 	
+	/*
+	 * Sets the text to represent the event
+	 * @param String the text
+	 */
 	public function setText($text){
 		$this->text = $text;
 	}
 
+	/*
+	 * Gets the unix timestamp of the event
+	 * @return Int the timestamp
+	 */
 	public function getTime(){
 		return $this->timestamp;
 	}
 	
+	/*
+	 * Gets the year on which an event occurs
+	 * @return Int the year
+	 */
 	public function getYear(){
 		$year = intval(date('Y', $this->timestamp));
 		return $year;
 	}
 
+	/*
+	 * Gets the month on which an event occurs
+	 * @return Int the month
+	 */
 	public function getMonth(){
 		$month = intval(date('m', $this->timestamp));
 		return $month;
 	}
 	
+	/*
+	 * Gets the day on which an event occurs
+	 * @return Int the day
+	 */
 	public function getDay(){
-		$day = intval(date('d', $this->timestamp));
-		return $day;
+		return intval(date('d', $this->timestamp));
 	}
 	
+	/*
+	 * Gets the text representation of the event
+	 * @return String the event
+	 */
 	public function getText(){
 		return $this->text;
 	}

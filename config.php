@@ -5,6 +5,7 @@ define('LIB', ROOT . 'lib/', true);
 define('SMARTY', ROOT . 'smarty/', true);
 
 define('URI', '/active', true);
+define('SCRIPTS', 'scripts/', true);
 define('EXERCISER', 'http://localhost/exerciser/', true);
 define('NOT_FOUND', 'not_found.html', true);
 

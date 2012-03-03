@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Fri, 02 Mar 2012 20:57:29 +0000">
+<meta name="when" content="Sat, 03 Mar 2012 22:05:48 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
 <link rel="start" href="../../overview-summary.html">
@@ -39,71 +39,103 @@
 <a name="line1"></a><pre><?php
 <a name="line2"></a>require_once LIB . 'Activity.php';
 <a name="line3"></a>
-<a name="line4"></a>// Define the custom sort functions
-<a name="line5"></a>function name_asc($a,$b) {
-<a name="line6"></a>	return strcmp($a->name, $b->name);
-<a name="line7"></a>}
-<a name="line8"></a>function name_desc($a,$b) {
-<a name="line9"></a>	return strcmp($b->name, $a->name);
-<a name="line10"></a>}
-<a name="line11"></a>function compare($a, $b){
-<a name="line12"></a>	if($b == $a)
-<a name="line13"></a>		return 0;
-<a name="line14"></a>	else if($b < $a)
-<a name="line15"></a>		return 1;
-<a name="line16"></a>	else
-<a name="line17"></a>		return -1;
-<a name="line18"></a>}
-<a name="line19"></a>function kcal_asc($a,$b) {
-<a name="line20"></a>	return compare($a->kcal, $b->kcal);	
-<a name="line21"></a>}
-<a name="line22"></a>function kcal_desc($a,$b) {
-<a name="line23"></a>	return compare($b->kcal, $a->kcal);
-<a name="line24"></a>}
-<a name="line25"></a>
-<a name="line26"></a>class Activities{
+<a name="line4"></a>/*
+<a name="line5"></a> * Custom sorting functions
+<a name="line6"></a> */
+<a name="line7"></a>function name_asc($a,$b) {
+<a name="line8"></a>	return strcmp($a->name, $b->name);
+<a name="line9"></a>}
+<a name="line10"></a>
+<a name="line11"></a>function name_desc($a,$b) {
+<a name="line12"></a>	return strcmp($b->name, $a->name);
+<a name="line13"></a>}
+<a name="line14"></a>
+<a name="line15"></a>function compare($a, $b){
+<a name="line16"></a>	if($b == $a)
+<a name="line17"></a>		return 0;
+<a name="line18"></a>	else if($b < $a)
+<a name="line19"></a>		return 1;
+<a name="line20"></a>	else
+<a name="line21"></a>		return -1;
+<a name="line22"></a>}
+<a name="line23"></a>
+<a name="line24"></a>function kcal_asc($a,$b) {
+<a name="line25"></a>	return compare($a->kcal, $b->kcal);	
+<a name="line26"></a>}
 <a name="line27"></a>
-<a name="line28"></a>	public $activities = array();
-<a name="line29"></a>
-<a name="line30"></a>	public function parse($xmlstr){
-<a name="line31"></a>		try{
-<a name="line32"></a>			$data = new SimpleXMLElement($xmlstr);
-<a name="line33"></a>			foreach($data as $activity_data){
-<a name="line34"></a>				$activity = new Activity();
-<a name="line35"></a>				$activity->assign_data($activity_data);
-<a name="line36"></a>				$this->activities[] = $activity;			
-<a name="line37"></a>			}
-<a name="line38"></a>		}catch(Exception $e){
-<a name="line39"></a>		}
-<a name="line40"></a>	}
-<a name="line41"></a>
-<a name="line42"></a>	public function sort_asc_name(){
-<a name="line43"></a>		usort($this->activities, "name_asc");
-<a name="line44"></a>	}
-<a name="line45"></a>
-<a name="line46"></a>	public function sort_desc_name(){
-<a name="line47"></a>		usort($this->activities, "name_desc");
-<a name="line48"></a>	}
-<a name="line49"></a>
-<a name="line50"></a>	public function sort_asc_kcal(){
-<a name="line51"></a>		usort($this->activities, "kcal_asc");
-<a name="line52"></a>	}
-<a name="line53"></a>
-<a name="line54"></a>	public function sort_desc_kcal(){
-<a name="line55"></a>		usort($this->activities, "kcal_desc");
-<a name="line56"></a>	}
-<a name="line57"></a>
-<a name="line58"></a>	public function display($template_list, $template_item){
-<a name="line59"></a>		$content = '';
-<a name="line60"></a>		foreach($this->activities as $activity){
-<a name="line61"></a>			$content .= $activity->display($template_item);
-<a name="line62"></a>		}
-<a name="line63"></a>		$template_list->assign('list', $content);
-<a name="line64"></a>		return $template_list->fetch();
-<a name="line65"></a>	}
-<a name="line66"></a>}
-<a name="line67"></a>?>
-<a name="line68"></a></pre>
+<a name="line28"></a>function kcal_desc($a,$b) {
+<a name="line29"></a>	return compare($b->kcal, $a->kcal);
+<a name="line30"></a>}
+<a name="line31"></a>
+<a name="line32"></a>/*
+<a name="line33"></a> * @author Martin Buckley - MBuckley@gmail.com
+<a name="line34"></a> * Manages a list of Activity
+<a name="line35"></a> */
+<a name="line36"></a>class Activities{
+<a name="line37"></a>
+<a name="line38"></a>	public $activities = array();
+<a name="line39"></a>
+<a name="line40"></a>	/*
+<a name="line41"></a>	 * PArses and XML document containing a list of activities
+<a name="line42"></a>	 * @param String the XML document
+<a name="line43"></a>	 */
+<a name="line44"></a>	public function parse($xmlstr){
+<a name="line45"></a>		try{
+<a name="line46"></a>			$data = new SimpleXMLElement($xmlstr);
+<a name="line47"></a>			foreach($data as $activity_data){
+<a name="line48"></a>				$activity = new Activity();
+<a name="line49"></a>				$activity->assign_data($activity_data);
+<a name="line50"></a>				$this->activities[] = $activity;			
+<a name="line51"></a>			}
+<a name="line52"></a>		}catch(Exception $e){
+<a name="line53"></a>		}
+<a name="line54"></a>	}
+<a name="line55"></a>
+<a name="line56"></a>	/*
+<a name="line57"></a>	 * Sorts the activities in to Ascending order by name
+<a name="line58"></a>	 */
+<a name="line59"></a>	public function sort_asc_name(){
+<a name="line60"></a>		usort($this->activities, "name_asc");
+<a name="line61"></a>	}
+<a name="line62"></a>
+<a name="line63"></a>	/*
+<a name="line64"></a>	 * Sorts the activities in to Descending order by name
+<a name="line65"></a>	 */
+<a name="line66"></a>	public function sort_desc_name(){
+<a name="line67"></a>		usort($this->activities, "name_desc");
+<a name="line68"></a>	}
+<a name="line69"></a>
+<a name="line70"></a>	/*
+<a name="line71"></a>	 * Sorts the activities in to Ascending order by kcal
+<a name="line72"></a>	 */
+<a name="line73"></a>	public function sort_asc_kcal(){
+<a name="line74"></a>		usort($this->activities, "kcal_asc");
+<a name="line75"></a>	}
+<a name="line76"></a>
+<a name="line77"></a>	/*
+<a name="line78"></a>	 * Sorts the activities in to Descending order by kcal
+<a name="line79"></a>	 */
+<a name="line80"></a>	public function sort_desc_kcal(){
+<a name="line81"></a>		usort($this->activities, "kcal_desc");
+<a name="line82"></a>	}
+<a name="line83"></a>
+<a name="line84"></a>	/*
+<a name="line85"></a>	 * Iterates over all activities printing them out
+<a name="line86"></a>	 * @param Smarty Template for the list
+<a name="line87"></a>	 * @param Smarty Template for each item
+<a name="line88"></a>	 * @return String containing the output text
+<a name="line89"></a>	 */
+<a name="line90"></a>	public function display($template_list, $template_item){
+<a name="line91"></a>		$content = '';
+<a name="line92"></a>		foreach($this->activities as $activity){
+<a name="line93"></a>			$content .= $activity->display($template_item);
+<a name="line94"></a>		}
+<a name="line95"></a>		$template_list->assign('list', $content);
+<a name="line96"></a>		return $template_list->fetch();
+<a name="line97"></a>	}
+<a name="line98"></a>}
+<a name="line99"></a>?>
+<a name="line100"></a></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

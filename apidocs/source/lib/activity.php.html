@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Fri, 02 Mar 2012 20:57:29 +0000">
+<meta name="when" content="Sat, 03 Mar 2012 22:05:48 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
 <link rel="start" href="../../overview-summary.html">
@@ -39,49 +39,65 @@
 <a name="line1"></a><pre><?php
 <a name="line2"></a>
 <a name="line3"></a>/**
-<a name="line4"></a>* A test class description
-<a name="line5"></a>* @Author MARTIN
-<a name="line6"></a>* @author martin
-<a name="line7"></a>*/
-<a name="line8"></a>class Activity{
-<a name="line9"></a>
-<a name="line10"></a>	private $id;
-<a name="line11"></a>	private $name;
-<a name="line12"></a>	private $description;
-<a name="line13"></a>	private $kcal;	
-<a name="line14"></a>
-<a name="line15"></a>	public function __construct(){
-<a name="line16"></a>	}
-<a name="line17"></a>
-<a name="line18"></a>	public function __set($name, $value){
-<a name="line19"></a>		$this->$name = $value;
-<a name="line20"></a>	}
-<a name="line21"></a>
-<a name="line22"></a>	public function __get($name){
-<a name="line23"></a>		return $this->$name;
-<a name="line24"></a>	}
-<a name="line25"></a>
-<a name="line26"></a>	public function parse($xmlstr){
-<a name="line27"></a>		$data = new SimpleXMLElement($xmlstr);
-<a name="line28"></a>		$this->assign_data($data);
-<a name="line29"></a>	}
-<a name="line30"></a>
-<a name="line31"></a>	public function assign_data($data){	
-<a name="line32"></a>		$this->id = 		intval($data->activity_id);
-<a name="line33"></a>		$this->name = 		strval($data->activity_name);
-<a name="line34"></a>		$this->description = 	strval($data->description);
-<a name="line35"></a>		$this->kcal = 		intval($data->kcal_hour);
-<a name="line36"></a>	}
-<a name="line37"></a>
-<a name="line38"></a>	public function display($template){
-<a name="line39"></a>		$template->assign('name', $this->name);
-<a name="line40"></a>		$template->assign('kcal', $this->kcal);
-<a name="line41"></a>		$template->assign('description', $this->description);
-<a name="line42"></a>		return $template->fetch();
-<a name="line43"></a>	}
-<a name="line44"></a>}
-<a name="line45"></a>?>
-<a name="line46"></a></pre>
+<a name="line4"></a> * @author Martin Buckley - MBuckley@gmail.com
+<a name="line5"></a> * Activity encapsulates the properties and functions of an activity
+<a name="line6"></a> */
+<a name="line7"></a>class Activity{
+<a name="line8"></a>
+<a name="line9"></a>	private $id;
+<a name="line10"></a>	private $name;
+<a name="line11"></a>	private $description;
+<a name="line12"></a>	private $kcal;	
+<a name="line13"></a>
+<a name="line14"></a>	/*
+<a name="line15"></a>	 * Magic method setter
+<a name="line16"></a>	 */
+<a name="line17"></a>	public function __set($name, $value){
+<a name="line18"></a>		$this->$name = $value;
+<a name="line19"></a>	}
+<a name="line20"></a>
+<a name="line21"></a>	/*
+<a name="line22"></a>	 * Magic method getter
+<a name="line23"></a>	 */
+<a name="line24"></a>	public function __get($name){
+<a name="line25"></a>		return $this->$name;
+<a name="line26"></a>	}
+<a name="line27"></a>
+<a name="line28"></a>	/*
+<a name="line29"></a>	 * Parses an XML document containing an activity
+<a name="line30"></a>	 * @param String the XML document
+<a name="line31"></a>	 */
+<a name="line32"></a>	public function parse($xmlstr){
+<a name="line33"></a>		$data = new SimpleXMLElement($xmlstr);
+<a name="line34"></a>		$this->assign_data($data);
+<a name="line35"></a>	}
+<a name="line36"></a>
+<a name="line37"></a>	/*
+<a name="line38"></a>	 * Transfers the parsed XML into the internal structure
+<a name="line39"></a>	 * @param SimpleXML Object
+<a name="line40"></a>	 */
+<a name="line41"></a>	public function assign_data($data){	
+<a name="line42"></a>		$this->id = 		intval($data->activity_id);
+<a name="line43"></a>		$this->name = 		strval($data->activity_name);
+<a name="line44"></a>		$this->description = 	strval($data->description);
+<a name="line45"></a>		$this->kcal = 		intval($data->kcal_hour);
+<a name="line46"></a>	}
+<a name="line47"></a>
+<a name="line48"></a>	/*
+<a name="line49"></a>	 * Prints out the Activity into a template
+<a name="line50"></a>	 * @param Smarty Template
+<a name="line51"></a>	 * @return String the output text
+<a name="line52"></a>	 */
+<a name="line53"></a>	public function display($template){
+<a name="line54"></a>		$template->assign('id', $this->id);
+<a name="line55"></a>		$template->assign('name', $this->name);
+<a name="line56"></a>		$template->assign('kcal', $this->kcal);
+<a name="line57"></a>		$template->assign('description', $this->description);
+<a name="line58"></a>		return $template->fetch();
+<a name="line59"></a>	}
+<a name="line60"></a>}
+<a name="line61"></a>?>
+<a name="line62"></a></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

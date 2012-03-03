@@ -48,9 +48,9 @@ class Calendar_page extends Page{
 			$e = new Event();
 			$e->setTime($workout->start);
 			$name = $workout->activity_name;
-			$id = $workout->activity_id;
-			$e->setText("<a href=\"Workouts?id=$id\">$name</a>");
-			$cal->addEvent($e);
+			$id = $workout->id;
+			$e->setText("<a href=\"Workout?id=$id\">$name</a>");
+			$this->calendar->addEvent($e);
 		}
 		return $this->calendar->draw(Calendar::COMPACT);
 	}

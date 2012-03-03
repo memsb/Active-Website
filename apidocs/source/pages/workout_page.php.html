@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Fri, 02 Mar 2012 20:57:29 +0000">
+<meta name="when" content="Sat, 03 Mar 2012 22:05:48 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
 <link rel="start" href="../../overview-summary.html">
@@ -40,26 +40,26 @@
 <a name="line2"></a>
 <a name="line3"></a>require_once PAGES . 'Page.php';
 <a name="line4"></a>require_once LIB . 'Workout.php';
-<a name="line5"></a>require_once LIB . 'Activity.php';
-<a name="line6"></a>
+<a name="line5"></a>require_once LIB . 'Activities.php';
+<a name="line6"></a>require_once LIB . 'Activity.php';
 <a name="line7"></a>
 <a name="line8"></a>/*
 <a name="line9"></a> * @author Martin Buckley - MBuckley@gmail.com
-<a name="line10"></a> * Workout page is non functional
-<a name="line11"></a> *
-<a name="line12"></a> */
-<a name="line13"></a>class Workout_page extends Page{
-<a name="line14"></a>
-<a name="line15"></a>	/*
-<a name="line16"></a>	 * Page name
-<a name="line17"></a>	 * Printed in page title and used to link to this page
-<a name="line18"></a>	 */
-<a name="line19"></a>	const PAGE_NAME = 'Workout';
-<a name="line20"></a>
-<a name="line21"></a>	private $workout;
-<a name="line22"></a>	private $activity;
-<a name="line23"></a>	private $id = -1;
-<a name="line24"></a>	private $edit;
+<a name="line10"></a> * Allows a user to view a workout and to edit if it is theirs
+<a name="line11"></a> */
+<a name="line12"></a>class Workout_page extends Page{
+<a name="line13"></a>
+<a name="line14"></a>	/*
+<a name="line15"></a>	 * Page name
+<a name="line16"></a>	 * Printed in page title and used to link to this page
+<a name="line17"></a>	 */
+<a name="line18"></a>	const PAGE_NAME = 'Workout';
+<a name="line19"></a>
+<a name="line20"></a>	private $workout;
+<a name="line21"></a>	private $activity;
+<a name="line22"></a>	private $id = -1;
+<a name="line23"></a>	private $edit;
+<a name="line24"></a>	private $message = '';
 <a name="line25"></a>
 <a name="line26"></a>	/*
 <a name="line27"></a>	 * Page constructor
@@ -84,122 +84,146 @@
 <a name="line46"></a>
 <a name="line47"></a>	/*
 <a name="line48"></a>	 * Post request on page
-<a name="line49"></a>	 * 
+<a name="line49"></a>	 * Allows a user to update a workout
 <a name="line50"></a>	 * @param Array of parameters
 <a name="line51"></a>	 */
 <a name="line52"></a>	public function post($data){
-<a name="line53"></a>		//update workout
-<a name="line54"></a>		die(var_dump($data['id']));
-<a name="line55"></a>
-<a name="line56"></a>		try{
-<a name="line57"></a>			$this->validate($data);
-<a name="line58"></a>		}catch(Exception $e){
-<a name="line59"></a>			$this->message = $e->getMessage();
-<a name="line60"></a>			return;
-<a name="line61"></a>		}
-<a name="line62"></a>		if( 1 ) {//$this->user->isLoggedIn() ){
-<a name="line63"></a>			$this->workout = $this->load_workout($id);
-<a name="line64"></a>			foreach( $this->required as $field )
-<a name="line65"></a>				$this->workout->$field = $data[$field];
-<a name="line66"></a>			$xml_doc = $this->workout->getXML();
-<a name="line67"></a>			$response = $this->xmlPUT(EXERCISER . "workouts/$id", $xml_doc);
-<a name="line68"></a>		}
+<a name="line53"></a>		if ( ! $this->valid_arg( $data['Start_date'] ) ){
+<a name="line54"></a>			$this->message = 'Please select a date.<br/>';
+<a name="line55"></a>			return;
+<a name="line56"></a>		}	
+<a name="line57"></a>		$workout = new Workout();
+<a name="line58"></a>		$workout->id =		$this->id;
+<a name="line59"></a>		$workout->user_id = 	$this->user->user_id;
+<a name="line60"></a>		$workout->activity_id = intval($data['Activity']);
+<a name="line61"></a>		
+<a name="line62"></a>		$start_hours = 		intval($data['Start_time_hours']);
+<a name="line63"></a>		$start_mins = 		str_pad($data['Start_time_mins'], 2, "0", STR_PAD_LEFT);
+<a name="line64"></a>		$date = 		$data['Start_date'];
+<a name="line65"></a>		$start = 		DateTime::createFromFormat('m/d/Y G i', "$date $start_hours  $start_mins");		
+<a name="line66"></a>
+<a name="line67"></a>		$duration_hours = 	intval($data['Duration_hours']);
+<a name="line68"></a>		$duration_mins = 	intval($data['Duration_mins']);
 <a name="line69"></a>
-<a name="line70"></a>		//on update success show user workout
-<a name="line71"></a>		header("Location: Workout?id=$this->id");
-<a name="line72"></a>		exit();
-<a name="line73"></a>	}
-<a name="line74"></a>
-<a name="line75"></a>	/*
-<a name="line76"></a>	Show workout details	
-<a name="line77"></a>	if logged in let them edit
-<a name="line78"></a>	*/
-<a name="line79"></a>	/*
-<a name="line80"></a>	 * Standard page visit
-<a name="line81"></a>	 * Displays a list of activities
-<a name="line82"></a>	 */
-<a name="line83"></a>	public function visit(){
-<a name="line84"></a>		$page = $this->smarty->createTemplate('index.tpl');
-<a name="line85"></a>		$page->assign('page', $this::PAGE_NAME);
-<a name="line86"></a>
-<a name="line87"></a>		$menu  = $this->userMenu();
-<a name="line88"></a>		$page->assign('menu', $menu->fetch());
-<a name="line89"></a>
-<a name="line90"></a>		$content = '';		
-<a name="line91"></a>		
-<a name="line92"></a>		//if( $this->user->isLoggedIn() && $this->edit ){
-<a name="line93"></a>		if( $this->edit ){
-<a name="line94"></a>			$content = $this->edit_workout($this->id);
-<a name="line95"></a>		}else{
-<a name="line96"></a>			$content = $this->display_workout($this->id);
-<a name="line97"></a>		}
-<a name="line98"></a>	
-<a name="line99"></a>		$page->assign('content', $content);
-<a name="line100"></a>		$page->display();
-<a name="line101"></a>	}
-<a name="line102"></a>
-<a name="line103"></a>	private function edit_workout($id){
-<a name="line104"></a>		try{
-<a name="line105"></a>			$this->load_workout($id);
-<a name="line106"></a>		}catch(Exception $e){
-<a name="line107"></a>			return $e->getMessage();
-<a name="line108"></a>		}
-<a name="line109"></a>		$edit_template = $this->smarty->createTemplate('workout/edit_workout.tpl');
-<a name="line110"></a>		$edit_template->assign('action', $this::PAGE_NAME);
-<a name="line111"></a>		$edit_template->assign('activity', $this->activity->name);
-<a name="line112"></a>		$edit_template->assign('start', $this->workout->start);
-<a name="line113"></a>		$edit_template->assign('duration', $this->workout->duration);
-<a name="line114"></a>		$edit_template->assign('id', $id);
-<a name="line115"></a>		return $edit_template->fetch();
-<a name="line116"></a>	}
-<a name="line117"></a>
-<a name="line118"></a>	private function display_workout($id){
-<a name="line119"></a>		try{
-<a name="line120"></a>			$this->load_workout($id);
-<a name="line121"></a>		}catch(Exception $e){
-<a name="line122"></a>			return $e->getMessage();
-<a name="line123"></a>		}
-<a name="line124"></a>		$content = '';
-<a name="line125"></a>		if( $this->user->isLoggedIn() && $this->workout->user_id == $this->user->user_id ){
-<a name="line126"></a>			$editable_template = $this->smarty->createTemplate('workout/editable.tpl');
-<a name="line127"></a>			$editable_template->assign('link', $this::PAGE_NAME . "?id=$id&edit=1");
-<a name="line128"></a>			$content .= $editable_template->fetch();
-<a name="line129"></a>		}
-<a name="line130"></a>			
-<a name="line131"></a>		$workout_template = $this->smarty->createTemplate('workout/workout.tpl');
-<a name="line132"></a>		$activity_template = $this->smarty->createTemplate('activity/activity.tpl');
-<a name="line133"></a>		$content .= $this->workout->display($workout_template);
-<a name="line134"></a>		$content .= $this->activity->display($activity_template);
-<a name="line135"></a>		return $content;
-<a name="line136"></a>	}
-<a name="line137"></a>
-<a name="line138"></a>	private function load_workout($id){
-<a name="line139"></a>		$this->workout = new Workout();
-<a name="line140"></a>		$response = $this->xmlGET(EXERCISER . "workouts/$id");		
-<a name="line141"></a>		switch ($response['code']) {
-<a name="line142"></a>			case 200:
-<a name="line143"></a>				$this->workout->parse($response['body']);
-<a name="line144"></a>				break;
-<a name="line145"></a>			default:
-<a name="line146"></a>				throw new Exception('Unable to load workout');
-<a name="line147"></a>				break;
-<a name="line148"></a>		}
-<a name="line149"></a>		
-<a name="line150"></a>		$this->activity = new Activity();
-<a name="line151"></a>		$response = $this->xmlGET(EXERCISER . "activities/" . $this->workout->activity_id);
-<a name="line152"></a>		switch ($response['code']) {
-<a name="line153"></a>			case 200:
-<a name="line154"></a>				$this->activity->parse($response['body']);
-<a name="line155"></a>				break;
-<a name="line156"></a>			default:
-<a name="line157"></a>				throw new Exception('Unable to load workout activity');
-<a name="line158"></a>				break;
-<a name="line159"></a>		}
-<a name="line160"></a>	}
-<a name="line161"></a>}
-<a name="line162"></a>
-<a name="line163"></a>?>
-<a name="line164"></a></pre>
+<a name="line70"></a>		$workout->start = 	$start->getTimestamp();
+<a name="line71"></a>		$workout->duration = 	($duration_hours * 60) + $duration_mins;
+<a name="line72"></a>
+<a name="line73"></a>		$xml_doc = $workout->getXML();		
+<a name="line74"></a>		$response = $this->xmlPUT(EXERCISER . "workouts/$this->id", $xml_doc);
+<a name="line75"></a>		//on update success show user workout
+<a name="line76"></a>		header("Location: " . Workout_page::PAGE_NAME . "?id=$this->id");
+<a name="line77"></a>		exit();
+<a name="line78"></a>	}
+<a name="line79"></a>
+<a name="line80"></a>	/*
+<a name="line81"></a>	 * Show workout details	
+<a name="line82"></a>	 * if logged in let them edit
+<a name="line83"></a>	 */
+<a name="line84"></a>	public function visit(){
+<a name="line85"></a>		$page = $this->smarty->createTemplate('index.tpl');
+<a name="line86"></a>		$page->assign('page', $this::PAGE_NAME);
+<a name="line87"></a>
+<a name="line88"></a>		$menu  = $this->userMenu();
+<a name="line89"></a>		$page->assign('menu', $menu->fetch());
+<a name="line90"></a>
+<a name="line91"></a>		$content = '';		
+<a name="line92"></a>		
+<a name="line93"></a>		//if( $this->user->isLoggedIn() && $this->edit ){
+<a name="line94"></a>		if( $this->edit ){
+<a name="line95"></a>			$page->assign('javascript', SCRIPTS . 'workouts_page.js');
+<a name="line96"></a>			$content = $this->edit_workout($this->id);
+<a name="line97"></a>		}else{
+<a name="line98"></a>			$content = $this->display_workout($this->id);
+<a name="line99"></a>		}
+<a name="line100"></a>	
+<a name="line101"></a>		$page->assign('content', $content);
+<a name="line102"></a>		$page->display();
+<a name="line103"></a>	}
+<a name="line104"></a>
+<a name="line105"></a>	/*
+<a name="line106"></a>	 * Allows a user to modify the workout using a form
+<a name="line107"></a>	 * @param Int the workout ID
+<a name="line108"></a>	 * @return String the form
+<a name="line109"></a>	 */
+<a name="line110"></a>	private function edit_workout($id){
+<a name="line111"></a>		try{
+<a name="line112"></a>			$this->load_workout($id);
+<a name="line113"></a>		}catch(Exception $e){
+<a name="line114"></a>			return $e->getMessage();
+<a name="line115"></a>		}
+<a name="line116"></a>		$activities = new Activities();
+<a name="line117"></a>		$response = $this->xmlGET(EXERCISER . 'activities/');
+<a name="line118"></a>		switch ($response['code']) {
+<a name="line119"></a>			case 200:
+<a name="line120"></a>				$activities->parse($response['body']);
+<a name="line121"></a>				break;
+<a name="line122"></a>			default:
+<a name="line123"></a>				break;
+<a name="line124"></a>		}
+<a name="line125"></a>		$template = $this->smarty->createTemplate('workout/workout_form.tpl');
+<a name="line126"></a>		$template_list = $this->smarty->createTemplate('activity/select.tpl'); 
+<a name="line127"></a>		$template_item = $this->smarty->createTemplate('activity/select_item.tpl');
+<a name="line128"></a>		$template->assign('action', $this::PAGE_NAME .  "?id=$this->id");
+<a name="line129"></a>		$template->assign('activities', $this->message . $activities->display($template_list, $template_item));
+<a name="line130"></a>		return $template->fetch();
+<a name="line131"></a>	}
+<a name="line132"></a>
+<a name="line133"></a>	/*
+<a name="line134"></a>	 * Displays a workout based on the ID given
+<a name="line135"></a>	 * @param Int the workout ID
+<a name="line136"></a>	 * @return String the workout
+<a name="line137"></a>	 */
+<a name="line138"></a>	private function display_workout($id){
+<a name="line139"></a>		try{
+<a name="line140"></a>			$this->load_workout($id);
+<a name="line141"></a>		}catch(Exception $e){
+<a name="line142"></a>			return $e->getMessage();
+<a name="line143"></a>		}
+<a name="line144"></a>		$content = '';
+<a name="line145"></a>		if( $this->user->isLoggedIn() && $this->workout->user_id == $this->user->user_id ){
+<a name="line146"></a>			$editable_template = $this->smarty->createTemplate('workout/editable.tpl');
+<a name="line147"></a>			$editable_template->assign('link', $this::PAGE_NAME . "?id=$id&edit=1");
+<a name="line148"></a>			$content .= $editable_template->fetch();
+<a name="line149"></a>		}
+<a name="line150"></a>			
+<a name="line151"></a>		$workout_template = $this->smarty->createTemplate('workout/workout.tpl');
+<a name="line152"></a>		$activity_template = $this->smarty->createTemplate('activity/activity.tpl');
+<a name="line153"></a>		$content .= $this->workout->display($workout_template);
+<a name="line154"></a>		$content .= $this->activity->display($activity_template);
+<a name="line155"></a>		return $content;
+<a name="line156"></a>	}
+<a name="line157"></a>
+<a name="line158"></a>	/*
+<a name="line159"></a>	 * Loads a workout based on the ID given
+<a name="line160"></a>	 * @param Int the workout ID
+<a name="line161"></a>	 */
+<a name="line162"></a>	private function load_workout($id){
+<a name="line163"></a>		$this->workout = new Workout();
+<a name="line164"></a>		$response = $this->xmlGET(EXERCISER . "workouts/$id");		
+<a name="line165"></a>		switch ($response['code']) {
+<a name="line166"></a>			case 200:
+<a name="line167"></a>				$this->workout->parse($response['body']);
+<a name="line168"></a>				break;
+<a name="line169"></a>			default:
+<a name="line170"></a>				throw new Exception('Unable to load workout');
+<a name="line171"></a>				break;
+<a name="line172"></a>		}
+<a name="line173"></a>		
+<a name="line174"></a>		$this->activity = new Activity();
+<a name="line175"></a>		$response = $this->xmlGET(EXERCISER . "activities/" . $this->workout->activity_id);
+<a name="line176"></a>		switch ($response['code']) {
+<a name="line177"></a>			case 200:
+<a name="line178"></a>				$this->activity->parse($response['body']);
+<a name="line179"></a>				break;
+<a name="line180"></a>			default:
+<a name="line181"></a>				throw new Exception('Unable to load workout activity');
+<a name="line182"></a>				break;
+<a name="line183"></a>		}
+<a name="line184"></a>	}
+<a name="line185"></a>}
+<a name="line186"></a>
+<a name="line187"></a>?>
+<a name="line188"></a></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

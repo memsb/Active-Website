@@ -2,13 +2,12 @@
 
 require_once PAGES . 'Page.php';
 require_once LIB . 'Workout.php';
+require_once LIB . 'Activities.php';
 require_once LIB . 'Activity.php';
-
 
 /*
  * @author Martin Buckley - MBuckley@gmail.com
- * Workout page is non functional
- *
+ * Allows a user to view a workout and to edit if it is theirs
  */
 class Workout_page extends Page{
 
@@ -22,6 +21,7 @@ class Workout_page extends Page{
 	private $activity;
 	private $id = -1;
 	private $edit;
+	private $message = '';
 
 	/*
 	 * Page constructor
@@ -46,39 +46,40 @@ class Workout_page extends Page{
 
 	/*
 	 * Post request on page
-	 * 
+	 * Allows a user to update a workout
 	 * @param Array of parameters
 	 */
 	public function post($data){
-		//update workout
-		die(var_dump($data['id']));
-
-		try{
-			$this->validate($data);
-		}catch(Exception $e){
-			$this->message = $e->getMessage();
+		if ( ! $this->valid_arg( $data['Start_date'] ) ){
+			$this->message = 'Please select a date.<br/>';
 			return;
-		}
-		if( 1 ) {//$this->user->isLoggedIn() ){
-			$this->workout = $this->load_workout($id);
-			foreach( $this->required as $field )
-				$this->workout->$field = $data[$field];
-			$xml_doc = $this->workout->getXML();
-			$response = $this->xmlPUT(EXERCISER . "workouts/$id", $xml_doc);
-		}
+		}	
+		$workout = new Workout();
+		$workout->id =		$this->id;
+		$workout->user_id = 	$this->user->user_id;
+		$workout->activity_id = intval($data['Activity']);
+		
+		$start_hours = 		intval($data['Start_time_hours']);
+		$start_mins = 		str_pad($data['Start_time_mins'], 2, "0", STR_PAD_LEFT);
+		$date = 		$data['Start_date'];
+		$start = 		DateTime::createFromFormat('m/d/Y G i', "$date $start_hours  $start_mins");		
 
+		$duration_hours = 	intval($data['Duration_hours']);
+		$duration_mins = 	intval($data['Duration_mins']);
+
+		$workout->start = 	$start->getTimestamp();
+		$workout->duration = 	($duration_hours * 60) + $duration_mins;
+
+		$xml_doc = $workout->getXML();		
+		$response = $this->xmlPUT(EXERCISER . "workouts/$this->id", $xml_doc);
 		//on update success show user workout
-		header("Location: Workout?id=$this->id");
+		header("Location: " . Workout_page::PAGE_NAME . "?id=$this->id");
 		exit();
 	}
 
 	/*
-	Show workout details	
-	if logged in let them edit
-	*/
-	/*
-	 * Standard page visit
-	 * Displays a list of activities
+	 * Show workout details	
+	 * if logged in let them edit
 	 */
 	public function visit(){
 		$page = $this->smarty->createTemplate('index.tpl');
@@ -91,6 +92,7 @@ class Workout_page extends Page{
 		
 		//if( $this->user->isLoggedIn() && $this->edit ){
 		if( $this->edit ){
+			$page->assign('javascript', SCRIPTS . 'workouts_page.js');
 			$content = $this->edit_workout($this->id);
 		}else{
 			$content = $this->display_workout($this->id);
@@ -100,21 +102,39 @@ class Workout_page extends Page{
 		$page->display();
 	}
 
+	/*
+	 * Allows a user to modify the workout using a form
+	 * @param Int the workout ID
+	 * @return String the form
+	 */
 	private function edit_workout($id){
 		try{
 			$this->load_workout($id);
 		}catch(Exception $e){
 			return $e->getMessage();
 		}
-		$edit_template = $this->smarty->createTemplate('workout/edit_workout.tpl');
-		$edit_template->assign('action', $this::PAGE_NAME);
-		$edit_template->assign('activity', $this->activity->name);
-		$edit_template->assign('start', $this->workout->start);
-		$edit_template->assign('duration', $this->workout->duration);
-		$edit_template->assign('id', $id);
-		return $edit_template->fetch();
+		$activities = new Activities();
+		$response = $this->xmlGET(EXERCISER . 'activities/');
+		switch ($response['code']) {
+			case 200:
+				$activities->parse($response['body']);
+				break;
+			default:
+				break;
+		}
+		$template = $this->smarty->createTemplate('workout/workout_form.tpl');
+		$template_list = $this->smarty->createTemplate('activity/select.tpl'); 
+		$template_item = $this->smarty->createTemplate('activity/select_item.tpl');
+		$template->assign('action', $this::PAGE_NAME .  "?id=$this->id");
+		$template->assign('activities', $this->message . $activities->display($template_list, $template_item));
+		return $template->fetch();
 	}
 
+	/*
+	 * Displays a workout based on the ID given
+	 * @param Int the workout ID
+	 * @return String the workout
+	 */
 	private function display_workout($id){
 		try{
 			$this->load_workout($id);
@@ -135,6 +155,10 @@ class Workout_page extends Page{
 		return $content;
 	}
 
+	/*
+	 * Loads a workout based on the ID given
+	 * @param Int the workout ID
+	 */
 	private function load_workout($id){
 		$this->workout = new Workout();
 		$response = $this->xmlGET(EXERCISER . "workouts/$id");		

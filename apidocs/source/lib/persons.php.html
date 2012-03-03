@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Fri, 02 Mar 2012 20:57:29 +0000">
+<meta name="when" content="Sat, 03 Mar 2012 22:05:48 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
 <link rel="start" href="../../overview-summary.html">
@@ -40,56 +40,78 @@
 <a name="line2"></a>
 <a name="line3"></a>require_once LIB . 'Person.php';
 <a name="line4"></a>
-<a name="line5"></a>class Persons{
-<a name="line6"></a>
-<a name="line7"></a>	private $persons = array();
-<a name="line8"></a>	private $db;
-<a name="line9"></a>
-<a name="line10"></a>	public function __construct($db){
-<a name="line11"></a>		$this->db = $db;
-<a name="line12"></a>	}
+<a name="line5"></a>/**
+<a name="line6"></a> * @author Martin Buckley - MBuckley@gmail.com
+<a name="line7"></a> * Persons stores an internal list of Person
+<a name="line8"></a> */
+<a name="line9"></a>class Persons {
+<a name="line10"></a>
+<a name="line11"></a>	private $persons = array();
+<a name="line12"></a>	private $db;
 <a name="line13"></a>
-<a name="line14"></a>	public function parse($xmlstr){
-<a name="line15"></a>		$data = new SimpleXMLElement($xmlstr);
-<a name="line16"></a>		foreach($data->user as $person_data){
-<a name="line17"></a>			$person = new Person($this->db);
-<a name="line18"></a>			$person->assign_data($person_data);
-<a name="line19"></a>			$this->persons[] = $person;
-<a name="line20"></a>		}
-<a name="line21"></a>	}
-<a name="line22"></a>
-<a name="line23"></a>	public function size(){
-<a name="line24"></a>		return count($this->persons);
-<a name="line25"></a>	}
-<a name="line26"></a>
-<a name="line27"></a>	public function display($list_template, $template, $start=0, $count=5){
-<a name="line28"></a>		$content = '';
-<a name="line29"></a>
-<a name="line30"></a>		$start = intval($start);
-<a name="line31"></a>		$count = intval($count);
-<a name="line32"></a>
-<a name="line33"></a>		if( $start < 0 )
-<a name="line34"></a>			$start = 0;
-<a name="line35"></a>
-<a name="line36"></a>		if( $count < 0 )
-<a name="line37"></a>			$count = 0;
-<a name="line38"></a>		
-<a name="line39"></a>		$end = $start + $count;
-<a name="line40"></a>		if( $start > count($this->persons) )
-<a name="line41"></a>			$start = count($this->persons);
+<a name="line14"></a>	/*
+<a name="line15"></a>	 * Constructor requires a Database object to pass to each Person
+<a name="line16"></a>	 * @param Database
+<a name="line17"></a>	 */
+<a name="line18"></a>	public function __construct($db){
+<a name="line19"></a>		$this->db = $db;
+<a name="line20"></a>	}
+<a name="line21"></a>
+<a name="line22"></a>	/*
+<a name="line23"></a>	 * Parses an XML document containing a Person
+<a name="line24"></a>	 * @param String the XML document
+<a name="line25"></a>	 */
+<a name="line26"></a>	public function parse($xmlstr){
+<a name="line27"></a>		$data = new SimpleXMLElement($xmlstr);
+<a name="line28"></a>		foreach($data->user as $person_data){
+<a name="line29"></a>			$person = new Person($this->db);
+<a name="line30"></a>			$person->assign_data($person_data);
+<a name="line31"></a>			$this->persons[] = $person;
+<a name="line32"></a>		}
+<a name="line33"></a>	}
+<a name="line34"></a>
+<a name="line35"></a>	/*
+<a name="line36"></a>	 * Returns the number of internally stored Persons
+<a name="line37"></a>	 * @param Int the number of workouts
+<a name="line38"></a>	 */
+<a name="line39"></a>	public function size(){
+<a name="line40"></a>		return count($this->persons);
+<a name="line41"></a>	}
 <a name="line42"></a>
-<a name="line43"></a>		if( $end > count($this->persons) )
-<a name="line44"></a>			$end = count($this->persons);
-<a name="line45"></a>
-<a name="line46"></a>		for($i=$start; $i<$end; $i++){
-<a name="line47"></a>			$content .= $this->persons[$i]->display_list($template);
-<a name="line48"></a>		}
-<a name="line49"></a>		$list_template->assign('list', $content);
-<a name="line50"></a>		return $list_template->fetch();
-<a name="line51"></a>	}
-<a name="line52"></a>}
-<a name="line53"></a>?>
-<a name="line54"></a></pre>
+<a name="line43"></a>	/*
+<a name="line44"></a>	 * Iterates over all Persons printing them out
+<a name="line45"></a>	 * @param Smarty Template for the list
+<a name="line46"></a>	 * @param Smarty Template for each item
+<a name="line47"></a>	 * @return String containing the output text
+<a name="line48"></a>	 */
+<a name="line49"></a>	public function display($list_template, $template, $start=0, $count=5){
+<a name="line50"></a>		$content = '';
+<a name="line51"></a>
+<a name="line52"></a>		$start = intval($start);
+<a name="line53"></a>		$count = intval($count);
+<a name="line54"></a>
+<a name="line55"></a>		if( $start < 0 )
+<a name="line56"></a>			$start = 0;
+<a name="line57"></a>
+<a name="line58"></a>		if( $count < 0 )
+<a name="line59"></a>			$count = 0;
+<a name="line60"></a>		
+<a name="line61"></a>		$end = $start + $count;
+<a name="line62"></a>		if( $start > count($this->persons) )
+<a name="line63"></a>			$start = count($this->persons);
+<a name="line64"></a>
+<a name="line65"></a>		if( $end > count($this->persons) )
+<a name="line66"></a>			$end = count($this->persons);
+<a name="line67"></a>
+<a name="line68"></a>		for($i=$start; $i<$end; $i++){
+<a name="line69"></a>			$content .= $this->persons[$i]->display($template);
+<a name="line70"></a>		}
+<a name="line71"></a>		$list_template->assign('list', $content);
+<a name="line72"></a>		return $list_template->fetch();
+<a name="line73"></a>	}
+<a name="line74"></a>}
+<a name="line75"></a>?>
+<a name="line76"></a></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

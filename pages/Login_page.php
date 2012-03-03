@@ -6,7 +6,7 @@ require_once PAGES . 'Page.php';
  * @author Martin Buckley - MBuckley@gmail.com
  * Login page handles login attempts and displays an error message with login box on login failure
  */
-class Login_page extends Page{
+class Login_page extends Page {
 
 	/*
 	 * Page name

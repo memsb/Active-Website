@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Fri, 02 Mar 2012 20:57:29 +0000">
+<meta name="when" content="Sat, 03 Mar 2012 22:05:48 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
 <link rel="start" href="../../overview-summary.html">
@@ -40,36 +40,54 @@
 <a name="line2"></a>
 <a name="line3"></a>require_once LIB . 'Workout.php';
 <a name="line4"></a>
-<a name="line5"></a>class Workouts{
-<a name="line6"></a>
-<a name="line7"></a>	public $workouts = array();
-<a name="line8"></a>
-<a name="line9"></a>	public function parse($xmlstr){
-<a name="line10"></a>		$data = new SimpleXMLElement($xmlstr);
-<a name="line11"></a>		foreach($data->workout as $workout_data){
-<a name="line12"></a>			$workout = new Workout();
-<a name="line13"></a>			$workout->assign_data($workout_data);
-<a name="line14"></a>			$this->workouts[] = $workout;
-<a name="line15"></a>		}
-<a name="line16"></a>	}
-<a name="line17"></a>
-<a name="line18"></a>	public function size(){
-<a name="line19"></a>		return count($this->workouts);
-<a name="line20"></a>	}
-<a name="line21"></a>
-<a name="line22"></a>	public function display($template_list, $template_item){
-<a name="line23"></a>		$content = '';
-<a name="line24"></a>		foreach($this->workouts as $workout){
-<a name="line25"></a>			$content .= $workout->display_list($template_item);
-<a name="line26"></a>		}
-<a name="line27"></a>		if( $this->size() == 0 )
-<a name="line28"></a>			$content = 'No workouts present';
-<a name="line29"></a>		$template_list->assign('list', $content);
-<a name="line30"></a>		return $template_list->fetch();
-<a name="line31"></a>	}
-<a name="line32"></a>}
-<a name="line33"></a>?>
-<a name="line34"></a></pre>
+<a name="line5"></a>/*
+<a name="line6"></a> * @author Martin Buckley - MBuckley@gmail.com
+<a name="line7"></a> * Workouts stores an internal list of Workout
+<a name="line8"></a> */
+<a name="line9"></a>class Workouts{
+<a name="line10"></a>
+<a name="line11"></a>	public $workouts = array();
+<a name="line12"></a>
+<a name="line13"></a>	/*
+<a name="line14"></a>	 * Parses an XML document containing workouts
+<a name="line15"></a>	 * @param String the XML document
+<a name="line16"></a>	 */
+<a name="line17"></a>	public function parse($xmlstr){
+<a name="line18"></a>		$data = new SimpleXMLElement($xmlstr);
+<a name="line19"></a>		foreach($data->workout as $workout_data){
+<a name="line20"></a>			$workout = new Workout();
+<a name="line21"></a>			$workout->assign_data($workout_data);
+<a name="line22"></a>			$this->workouts[] = $workout;
+<a name="line23"></a>		}
+<a name="line24"></a>	}
+<a name="line25"></a>
+<a name="line26"></a>	/*
+<a name="line27"></a>	 * Returns the number of internally stored workouts
+<a name="line28"></a>	 * @param Int the number of workouts
+<a name="line29"></a>	 */
+<a name="line30"></a>	public function size(){
+<a name="line31"></a>		return count($this->workouts);
+<a name="line32"></a>	}
+<a name="line33"></a>
+<a name="line34"></a>	/*
+<a name="line35"></a>	 * Iterates over all workouts printing them out
+<a name="line36"></a>	 * @param Smarty Template for the list
+<a name="line37"></a>	 * @param Smarty Template for each item
+<a name="line38"></a>	 * @return String containing the output text
+<a name="line39"></a>	 */
+<a name="line40"></a>	public function display($template_list, $template_item){
+<a name="line41"></a>		$content = '';
+<a name="line42"></a>		foreach($this->workouts as $workout){
+<a name="line43"></a>			$content .= $workout->display($template_item);
+<a name="line44"></a>		}
+<a name="line45"></a>		if( $this->size() == 0 )
+<a name="line46"></a>			$content = 'No workouts present';
+<a name="line47"></a>		$template_list->assign('list', $content);
+<a name="line48"></a>		return $template_list->fetch();
+<a name="line49"></a>	}
+<a name="line50"></a>}
+<a name="line51"></a>?>
+<a name="line52"></a></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

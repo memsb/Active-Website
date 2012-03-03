@@ -4,13 +4,14 @@ require_once PAGES . 'Page.php';
 require_once LIB . 'Stats.php';
 require_once LIB . 'Workouts.php';
 require_once LIB . 'Workout.php';
+require_once LIB . 'Activities.php';
 require_once LIB . 'Activity.php';
 
 /*
  * @author Martin Buckley - MBuckley@gmail.com
  * Lets a user view and manage their workouts
  */
-class Workouts_page extends Page{
+class Workouts_page extends Page {
 
 	/*
 	 * Page name
@@ -18,12 +19,44 @@ class Workouts_page extends Page{
 	 */
 	const PAGE_NAME = 'Workouts';
 
+	private $message = '';
+
 	/*
 	 * Page constructor
 	 * Calls constructor on Page
 	 */
 	public function __construct(){
 		parent::__construct();
+	}
+
+	/*
+	 * Post request handler
+	 * Adds a new workout using the post data provided
+	 * @param Array of data
+	 */
+	public function Post($data){
+		if ( ! $this->valid_arg( $data['Start_date'] ) ){
+			$this->message = 'Please select a date.<br/>';
+			return;
+		}	
+		$workout = new Workout();
+		$workout->user_id = 	$this->user->user_id;
+		$workout->activity_id = intval($data['Activity']);
+		
+		$start_hours = 		intval($data['Start_time_hours']);
+		$start_mins = 		str_pad($data['Start_time_mins'], 2, "0", STR_PAD_LEFT);
+		$date = 		$data['Start_date'];
+		$start = 		DateTime::createFromFormat('m/d/Y G i', "$date $start_hours  $start_mins");		
+
+		$duration_hours = 	intval($data['Duration_hours']);
+		$duration_mins = 	intval($data['Duration_mins']);
+
+		$workout->start = 	$start->getTimestamp();
+		$workout->duration = 	($duration_hours * 60) + $duration_mins;
+		$id = 			$this->user->user_id;
+
+		$xml_doc = $workout->getXML();		
+		$response = $this->xmlPOST(EXERCISER . "users/$id/workouts/", $xml_doc);
 	}
 
 	/*
@@ -41,10 +74,11 @@ class Workouts_page extends Page{
 		$content = '';
 
 		if( $this->user->isLoggedIn() ){
-			$page->assign('javascript', 'scripts/home_page.js');
-			$content = $this->list_own_workouts($this->user->user_id);
+			$page->assign('javascript', SCRIPTS . 'workouts_page.js');
+			$content .= $this->add_workout();
+			$content .= $this->add_calendar();
 		}else{
-			$content = $this->display_stats();
+			$content .= $this->display_stats();
 		}
 		$page->assign('content', $content);
 		$page->display();
@@ -86,15 +120,34 @@ class Workouts_page extends Page{
 	}
 
 	/*
-	 * Loads a users own workouts
-	 * @param Int user ID
-	 * @return String formatted list of workouts
+	 * Loads int he form to add a workout from template
+	 * @return String add workout form
 	 */
-	private function list_own_workouts($uid){
-		$workouts = $this->load_workouts($uid);
-		$template_list = $this->smarty->createTemplate('workout/workout_list.tpl');
-		$template_item = $this->smarty->createTemplate('workout/workout_item.tpl');
-		return $workouts->display($template_list, $template_item);
+	private function add_workout(){
+		$activities = new Activities();
+		$response = $this->xmlGET(EXERCISER . 'activities/');
+		switch ($response['code']) {
+			case 200:
+				$activities->parse($response['body']);
+				break;
+			default:
+				break;
+		}
+		$template = $this->smarty->createTemplate('workout/workout_form.tpl');
+		$template_list = $this->smarty->createTemplate('activity/select.tpl'); 
+		$template_item = $this->smarty->createTemplate('activity/select_item.tpl');
+		$template->assign('action', $this::PAGE_NAME);
+		$template->assign('activities', $this->message . $activities->display($template_list, $template_item));
+		return $template->fetch();
+	}
+
+	/*
+	 * Loads in the form to add a workout from template
+	 * @return String add workout form
+	 */
+	private function add_calendar(){
+		$template = $this->smarty->createTemplate('calendar/calendar_area.tpl');
+		return $template->fetch();
 	}
 
 	/*
