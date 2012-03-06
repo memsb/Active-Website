@@ -1,4 +1,4 @@
-<?php /* Smarty version Smarty-3.1.7, created on 2012-03-03 19:08:35
+<?php /* Smarty version Smarty-3.1.7, created on 2012-03-04 16:25:36
          compiled from "/var/www/Active-Website/smarty/templates/index.tpl" */ ?>
 <?php /*%%SmartyHeaderCode:20615714814f20fde2b25192-61777664%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 $_valid = $_smarty_tpl->decodeProperties(array (
@@ -7,7 +7,7 @@ $_valid = $_smarty_tpl->decodeProperties(array (
     '8d3c8befaf81853addcafeb861ab9d708679c8da' => 
     array (
       0 => '/var/www/Active-Website/smarty/templates/index.tpl',
-      1 => 1330801615,
+      1 => 1330878331,
       2 => 'file',
     ),
   ),
@@ -41,11 +41,13 @@ $_valid = $_smarty_tpl->decodeProperties(array (
 -->
 <link href="css/style.css" rel="stylesheet" type="text/css" media="screen" />
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-<script type="text/javascript" src="<?php echo (($tmp = @$_smarty_tpl->tpl_vars['javascript']->value)===null||$tmp==='' ? '' : $tmp);?>
-"></script>
+
 <link type="text/css" href="jquery-ui/css/ui-lightness/jquery-ui-1.8.18.custom.css" rel="stylesheet" />	
 <script type="text/javascript" src="jquery-ui/js/jquery-1.7.1.min.js"></script>
 <script type="text/javascript" src="jquery-ui/js/jquery-ui-1.8.18.custom.min.js"></script>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript" src="<?php echo (($tmp = @$_smarty_tpl->tpl_vars['javascript']->value)===null||$tmp==='' ? '' : $tmp);?>
+"></script>
 <?php echo (($tmp = @$_smarty_tpl->tpl_vars['heading']->value)===null||$tmp==='' ? '' : $tmp);?>
 
 </head>

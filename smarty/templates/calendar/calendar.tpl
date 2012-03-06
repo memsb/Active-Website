@@ -1,1 +1,1 @@
-<table>{$body}</table>
+<table id="calendar_table">{$body}</table>

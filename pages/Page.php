@@ -96,7 +96,7 @@ class Page {
 	 * @return Array response
 	 */
 	protected function xmlGET($uri){
-		$ch = curl_init($uri . '.xml' );
+		$ch = curl_init($uri);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		$xmlstr = curl_exec($ch);
@@ -114,7 +114,7 @@ class Page {
 	 * @return Array response
 	 */
 	protected function xmlPOST($uri, $xml_send_str){
-		$ch = curl_init($uri . '.xml' );
+		$ch = curl_init($uri);
 		$user = $this->user->user_id;
 		$pass = $this->user->api_key;
 		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
@@ -137,7 +137,7 @@ class Page {
 	 * @return Array response
 	 */
 	protected function xmlPUT($uri, $xml_send_str){
-		$ch = curl_init($uri . '.xml' );
+		$ch = curl_init($uri);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->headers);		
 		$user = $this->user->user_id;
 		$pass = $this->user->api_key;
@@ -161,7 +161,7 @@ class Page {
 	 * @return Array response
 	 */
 	protected function xmlDELETE($uri){
-		$ch = curl_init($uri . '.xml' );
+		$ch = curl_init($uri);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->headers);
 		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
 		$user = $this->user->user_id;

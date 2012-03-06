@@ -4,6 +4,29 @@
  * Workout encapulates the methods and attributes for a workout
  */
 class Workout {
+	
+	private $id;
+	private $username;
+	private $user_id;
+	private $activity_id;
+	private $activity_name;
+	private $start;
+	private $duration;
+	private $kcal;
+
+	/*
+	 * Magic method setter
+	 */
+	public function __set($name, $value){
+		$this->$name = $value;
+	}
+
+	/*
+	 * Magic method getter
+	 */
+	public function __get($name){
+		return $this->$name;
+	}
 
 	/*
 	 * Parses an XML document containing an activity

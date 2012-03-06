@@ -31,11 +31,13 @@ class Home_page extends Page{
 	public function visit(){
 		$page = $this->smarty->createTemplate('index.tpl');
 		$page->assign('page', $this::PAGE_NAME);
+		$page->assign('javascript', SCRIPTS . 'home_page.js');
 
 		$menu  = $this->userMenu();
 		$page->assign('menu', $menu->fetch());
 
-		$content = $this->logged_out();	
+		$content = '';
+		$content .= $this->logged_out();	
 		$page->assign('content', $content);
 		$page->display();
 	}
@@ -48,7 +50,6 @@ class Home_page extends Page{
 		$welcome = $this->smarty->createTemplate('welcome.tpl');
 		return $welcome->fetch();
 	}
-
 }
 
 ?>

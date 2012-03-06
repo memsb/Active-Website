@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Sat, 03 Mar 2012 22:05:48 +0000">
+<meta name="when" content="Tue, 06 Mar 2012 13:16:02 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
 <link rel="start" href="../../overview-summary.html">
@@ -134,7 +134,7 @@
 <a name="line96"></a>	 * @return Array response
 <a name="line97"></a>	 */
 <a name="line98"></a>	protected function xmlGET($uri){
-<a name="line99"></a>		$ch = curl_init($uri . '.xml' );
+<a name="line99"></a>		$ch = curl_init($uri);
 <a name="line100"></a>		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 <a name="line101"></a>		curl_setopt($ch, CURLOPT_HEADER, 0);
 <a name="line102"></a>		$xmlstr = curl_exec($ch);
@@ -152,7 +152,7 @@
 <a name="line114"></a>	 * @return Array response
 <a name="line115"></a>	 */
 <a name="line116"></a>	protected function xmlPOST($uri, $xml_send_str){
-<a name="line117"></a>		$ch = curl_init($uri . '.xml' );
+<a name="line117"></a>		$ch = curl_init($uri);
 <a name="line118"></a>		$user = $this->user->user_id;
 <a name="line119"></a>		$pass = $this->user->api_key;
 <a name="line120"></a>		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
@@ -175,7 +175,7 @@
 <a name="line137"></a>	 * @return Array response
 <a name="line138"></a>	 */
 <a name="line139"></a>	protected function xmlPUT($uri, $xml_send_str){
-<a name="line140"></a>		$ch = curl_init($uri . '.xml' );
+<a name="line140"></a>		$ch = curl_init($uri);
 <a name="line141"></a>		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->headers);		
 <a name="line142"></a>		$user = $this->user->user_id;
 <a name="line143"></a>		$pass = $this->user->api_key;
@@ -199,7 +199,7 @@
 <a name="line161"></a>	 * @return Array response
 <a name="line162"></a>	 */
 <a name="line163"></a>	protected function xmlDELETE($uri){
-<a name="line164"></a>		$ch = curl_init($uri . '.xml' );
+<a name="line164"></a>		$ch = curl_init($uri);
 <a name="line165"></a>		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->headers);
 <a name="line166"></a>		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
 <a name="line167"></a>		$user = $this->user->user_id;

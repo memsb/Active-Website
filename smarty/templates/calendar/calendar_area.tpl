@@ -1,1 +1,1 @@
-<div id="calendar"></div>
+<div id="calendar"><img src="images/loading.gif" /></div>

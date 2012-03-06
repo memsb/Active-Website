@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Sat, 03 Mar 2012 22:05:48 +0000">
+<meta name="when" content="Tue, 06 Mar 2012 13:16:02 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
 <link rel="start" href="../../overview-summary.html">
@@ -69,28 +69,29 @@
 <a name="line31"></a>	public function visit(){
 <a name="line32"></a>		$page = $this->smarty->createTemplate('index.tpl');
 <a name="line33"></a>		$page->assign('page', $this::PAGE_NAME);
-<a name="line34"></a>
-<a name="line35"></a>		$menu  = $this->userMenu();
-<a name="line36"></a>		$page->assign('menu', $menu->fetch());
-<a name="line37"></a>
-<a name="line38"></a>		$content = $this->logged_out();	
-<a name="line39"></a>		$page->assign('content', $content);
-<a name="line40"></a>		$page->display();
-<a name="line41"></a>	}
-<a name="line42"></a>
-<a name="line43"></a>	/*
-<a name="line44"></a>	 * Displays a message to not logged in users.
-<a name="line45"></a>	 * @return String the message
-<a name="line46"></a>	 */
-<a name="line47"></a>	private function logged_out(){
-<a name="line48"></a>		$welcome = $this->smarty->createTemplate('welcome.tpl');
-<a name="line49"></a>		return $welcome->fetch();
-<a name="line50"></a>	}
-<a name="line51"></a>
-<a name="line52"></a>}
-<a name="line53"></a>
-<a name="line54"></a>?>
-<a name="line55"></a></pre>
+<a name="line34"></a>		$page->assign('javascript', SCRIPTS . 'home_page.js');
+<a name="line35"></a>
+<a name="line36"></a>		$menu  = $this->userMenu();
+<a name="line37"></a>		$page->assign('menu', $menu->fetch());
+<a name="line38"></a>
+<a name="line39"></a>		$content = '';
+<a name="line40"></a>		$content .= $this->logged_out();	
+<a name="line41"></a>		$page->assign('content', $content);
+<a name="line42"></a>		$page->display();
+<a name="line43"></a>	}
+<a name="line44"></a>
+<a name="line45"></a>	/*
+<a name="line46"></a>	 * Displays a message to not logged in users.
+<a name="line47"></a>	 * @return String the message
+<a name="line48"></a>	 */
+<a name="line49"></a>	private function logged_out(){
+<a name="line50"></a>		$welcome = $this->smarty->createTemplate('welcome.tpl');
+<a name="line51"></a>		return $welcome->fetch();
+<a name="line52"></a>	}
+<a name="line53"></a>}
+<a name="line54"></a>
+<a name="line55"></a>?>
+<a name="line56"></a></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

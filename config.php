@@ -33,7 +33,8 @@ $pages = array(
 		'profile_password' => 'Profile_Password_page',
 		'delete_profile' => 'Profile_Delete_page',
 		'users' => 'Users_page',
-		'calendar' => 'Calendar_page'
+		'calendar' => 'Calendar_page',
+		'graph' => 'Graph_page'
 		);
 
 ?>
