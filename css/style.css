@@ -14,10 +14,6 @@ body {
 	color: #181B20;
 }
 
-h1, h2 {
-	text-transform: uppercase;
-}
-
 h1, h2, h3 {
 	margin: 0;
 	padding: 0;
@@ -157,37 +153,22 @@ img.aligncenter {
 
 /* Search */
 
-#search {
+#login {
 	float: right;
 	width: 280px;
 	height: 100px;
 	padding: 0;
 }
 
-#search form {
+#login form {
 	height: 41px;
 	margin: 0;
-	padding: 60px 0 0 30px;
 }
 
-#search fieldset {
+#login fieldset {
 	margin: 0;
-	padding: 0;
+	padding: 100px;
 	border: none;
-}
-
-#search-text {
-	width: 195px;
-	padding: 6px 10px;
-	border: none;
-	background: #FFFFFF;
-	text-transform: lowercase;
-	font: normal 11px Arial, Helvetica, sans-serif;
-	color: #7F7F81;
-}
-
-#search-submit {
-	display: none;
 }
 
 /* Menu */
@@ -222,9 +203,9 @@ img.aligncenter {
 	margin: 0px;
 	padding: 0px 30px 0px 30px;
 	line-height: 56px;
+	text-transform: uppercase;
 	letter-spacing: 1px;
 	text-decoration: none;
-	text-transform: uppercase;
 	font-family: 'Oswald', sans-serif;
 	font-size: 14px;
 	font-weight: normal;
@@ -265,8 +246,8 @@ img.aligncenter {
 
 #content {
 	float: left;
-	width: 610px;
-	padding: 0px 0px 0px 0px;
+	width: 650px;
+	padding: 0px 0px 20px 0px;
 }
 
 .post {
@@ -311,9 +292,166 @@ img.aligncenter {
 	padding: 2px 0px 2px 0px;
 	background: #A53602;
 	text-align: center;
-	text-transform: uppercase;
 	font-size: 10px;
 	color: #FFFFFF;
+}
+
+#login {
+	margin-left: 0px;
+	width: 230px;
+}
+
+#login h4 {
+	padding: 0px;
+	margin: 0px
+}
+
+#contact {
+	margin-left: auto;
+	margin-right: auto;
+	width: 350px;
+}
+
+#activities #order {
+	margin-left: 5em;
+	margin-top: -2.5em;
+}
+
+#activities #order .order-option {
+	float: left;
+	margin-left: 10px;
+}
+
+.clear {
+	clear: both;
+}
+
+#activities ul {
+	width: 100%;
+	margin-left: -40px;
+	list-style: none;
+}
+
+#activities li {
+	width: 50%;
+	display:inline;
+	float:left;
+}
+
+.activity {
+	margin: 10px;
+	padding: 5px;
+	background-color: #88DD88;
+	box-shadow: 5px 5px 10px #222222;
+	border-radius: 2px;
+}
+
+.activity .name {
+	color: #000066;
+}
+
+#users ul {
+	width: 100%;
+	margin-left: -40px;
+	list-style: none;
+}
+
+#users li {
+	width: 33%;
+	float:left;
+	display:inline;
+}
+
+.user {
+	background-color: #CCCCFF;
+	margin: 10px;
+	padding: 5px;
+	box-shadow: 5px 5px 10px #222222;
+	border-radius: 2px;
+}
+
+.workout {
+	background-color: #FFF5EE;
+	margin: 10px;
+	padding: 5px;
+	box-shadow: 5px 5px 10px #222222;
+	border-radius: 2px;
+}
+
+#workouts ul {
+	width: 100%;
+	margin-left: -40px;
+	list-style: none;
+}
+
+#user_count {
+	padding-bottom: 2em;
+}
+
+#page_nav {
+	width: 220px;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 1em;
+	text-align: center;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12pt;
+}
+
+.chart {
+	float: left;
+}
+
+.buttons {
+	width: 200px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.buttons .date {
+	text-align: center;
+}
+
+.buttons button{
+	width: 200px;
+}
+
+.loading img {
+	width: 32px;
+	height: 32px;
+	padding: 50px;
+}
+
+#workout_details {
+	float: none;
+	padding-bottom: 10px;
+}
+
+.Date {
+	float: left;
+	width: 350px;
+}
+
+.Time {
+	float: left;
+	width: 150px;
+}
+
+.Slider {
+	float: left;
+	width: 50px;
+}
+
+.bar {
+	width: 15px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.text_box {
+	width: 35px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 /* Sidebar */
@@ -384,43 +522,57 @@ img.aligncenter {
 
 #calendar {
 	width: 600px;
+	border-radius:3px;
+	border:1px solid #CCCCCC;
+	background: #f2f2f2;
 }
 
+#calendar td, #calendar th {
+	width: 85px;
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
+	border:0px;
+	text-align: center;
+}
 
-#calendar th {
-	height: 20px;
-	width: 50px;
-	background: #f6f6f6;
-	box-shadow: 5px 5px 10px #222222;
-	border:0px solid;
-	border-radius:5px;
+#calendar #calendar_title {
+	height: 30px;
+	background: url(../images/calendar_top.png);
+	background-size: 100% 50px;
+	border:1px solid #e78f08;
+	border-radius:3px;		
+	
 }
 
 #calendar #title {
 	display: inline;
-	width: 200px;
-	background: #999999;
+	color: #ffffff;
+	vertical-align: middle;
+	font-size: 14pt;
+}
+
+.left {
+	float: left;
+}
+
+.right {
+	float: right;
 }
 
 #calendar td {
-	color: #AAAAAA;
-	width: 80px;
-	height: 50px;	
-	background: #FFFFFF;
-	box-shadow: 5px 5px 10px #222222;
-	border:1px solid;
-	border-style: #000000;
-	border-radius: 5px;
+	color: #a4cfdf;
+	height: 50px;		
 	vertical-align: top;
-	text-align: center;
+	font-weight: bold;		
 }
 
-#calendar .current {
-	color: #000000;
+#calendar .current, #calendar .today {
+	color: #1c94c4;
+	background: #f9f9f9;
+	border:1px solid #cccccc;
 }
 
 #calendar .today {
-	color: #3333AA;
 	text-decoration: underline;
 }
 

@@ -1,4 +1,6 @@
 <?php
+namespace active;
+
 require_once 'config.php';
 require_once 'lib/smarty.php';
 
@@ -10,7 +12,7 @@ function autoload($class_name) {
 	include PAGES . $class_name . '.php';
 }
 
-spl_autoload_register('autoload');
+spl_autoload_register(__NAMESPACE__ . '\autoload');
 
 /**
  * Parses the URI to find the requested page name

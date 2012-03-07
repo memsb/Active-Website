@@ -258,6 +258,7 @@ class Person {
 	 */
 	public function display($template){
 		$template->assign('username', $this->username);
+		$template->assign('id', $this->user_id);
 		$template->assign('age', $this->age);
 		$template->assign('weight', $this->weight);
 		$template->assign('gender', $this->gender);

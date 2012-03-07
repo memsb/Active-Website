@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Tue, 06 Mar 2012 13:16:02 +0000">
+<meta name="when" content="Wed, 07 Mar 2012 14:34:43 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
 <link rel="start" href="../../overview-summary.html">
@@ -140,14 +140,15 @@
 <a name="line102"></a>	public function display($template){
 <a name="line103"></a>		$template->assign('username', $this->username);
 <a name="line104"></a>		$template->assign('activity', $this->activity_name);
-<a name="line105"></a>		$template->assign('start', date('d-m-Y h:i', $this->start) );
-<a name="line106"></a>		$template->assign('duration', $this->duration);
-<a name="line107"></a>		$template->assign('kcal', $this->kcal);
-<a name="line108"></a>		return $template->fetch();
-<a name="line109"></a>	}
-<a name="line110"></a>}
-<a name="line111"></a>?>
-<a name="line112"></a></pre>
+<a name="line105"></a>		$template->assign('start', date('jS M Y', $this->start) );
+<a name="line106"></a>		$template->assign('time', date('H:iA', $this->start) );
+<a name="line107"></a>		$template->assign('duration', $this->duration);
+<a name="line108"></a>		$template->assign('kcal', $this->kcal);
+<a name="line109"></a>		return $template->fetch();
+<a name="line110"></a>	}
+<a name="line111"></a>}
+<a name="line112"></a>?>
+<a name="line113"></a></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

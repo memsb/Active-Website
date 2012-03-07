@@ -144,7 +144,8 @@ class Workout_page extends Page{
 		$content = '';
 		if( $this->user->isLoggedIn() && $this->workout->user_id == $this->user->user_id ){
 			$editable_template = $this->smarty->createTemplate('workout/editable.tpl');
-			$editable_template->assign('link', $this::PAGE_NAME . "?id=$id&edit=1");
+			$editable_template->assign('edit_link', $this::PAGE_NAME . "?id=$id&edit=1");
+			$editable_template->assign('delete_id', $id);
 			$content .= $editable_template->fetch();
 		}
 			

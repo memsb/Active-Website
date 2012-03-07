@@ -102,7 +102,8 @@ class Workout {
 	public function display($template){
 		$template->assign('username', $this->username);
 		$template->assign('activity', $this->activity_name);
-		$template->assign('start', date('d-m-Y h:i', $this->start) );
+		$template->assign('start', date('jS M Y', $this->start) );
+		$template->assign('time', date('H:iA', $this->start) );
 		$template->assign('duration', $this->duration);
 		$template->assign('kcal', $this->kcal);
 		return $template->fetch();

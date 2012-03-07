@@ -1,4 +1,4 @@
-<?php /* Smarty version Smarty-3.1.7, created on 2012-02-02 21:47:13
+<?php /* Smarty version Smarty-3.1.7, created on 2012-03-06 16:53:58
          compiled from "/var/www/Active-Website/smarty/templates/contact_form.tpl" */ ?>
 <?php /*%%SmartyHeaderCode:14632500594f24504cc18d06-53990117%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 $_valid = $_smarty_tpl->decodeProperties(array (
@@ -7,7 +7,7 @@ $_valid = $_smarty_tpl->decodeProperties(array (
     'e3aa74487c7a963581d159fd36a384f5658b0a28' => 
     array (
       0 => '/var/www/Active-Website/smarty/templates/contact_form.tpl',
-      1 => 1328219226,
+      1 => 1331052835,
       2 => 'file',
     ),
   ),
@@ -25,7 +25,7 @@ $_valid = $_smarty_tpl->decodeProperties(array (
   ),
   'has_nocache_code' => false,
 ),false); /*/%%SmartyHeaderCode%%*/?>
-<?php if ($_valid && !is_callable('content_4f24504cd557d')) {function content_4f24504cd557d($_smarty_tpl) {?><div class="post">
+<?php if ($_valid && !is_callable('content_4f24504cd557d')) {function content_4f24504cd557d($_smarty_tpl) {?><div id="contact">
 	<h2 class="title">Contact us</h2>
 	<div class="entry">
 		<form method="POST" action="<?php echo $_smarty_tpl->tpl_vars['action']->value;?>

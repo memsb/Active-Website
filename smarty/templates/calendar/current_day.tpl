@@ -1,1 +1,1 @@
-<td><div class="today">{$body}</div></td>
+<td class="today">{$body}</td>

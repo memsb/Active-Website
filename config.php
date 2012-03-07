@@ -28,6 +28,7 @@ $pages = array(
 		'recovery' => 'Recovery_page',
 		'workouts' => 'Workouts_page',
 		'workout' => 'Workout_page',
+		'delete_workout' => 'Workout_Delete_page',
 		'profile' => 'Profile_page',
 		'profile_email' => 'Profile_Email_page',
 		'profile_password' => 'Profile_Password_page',

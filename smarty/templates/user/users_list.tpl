@@ -1,4 +1,4 @@
-<div class="users">
+<div id="users">
 	<h3>Users</h3>
 	<ul>
 		{$list}

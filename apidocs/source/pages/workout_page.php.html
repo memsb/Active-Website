@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Tue, 06 Mar 2012 13:16:02 +0000">
+<meta name="when" content="Wed, 07 Mar 2012 14:34:43 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
 <link rel="start" href="../../overview-summary.html">
@@ -182,48 +182,49 @@
 <a name="line144"></a>		$content = '';
 <a name="line145"></a>		if( $this->user->isLoggedIn() && $this->workout->user_id == $this->user->user_id ){
 <a name="line146"></a>			$editable_template = $this->smarty->createTemplate('workout/editable.tpl');
-<a name="line147"></a>			$editable_template->assign('link', $this::PAGE_NAME . "?id=$id&edit=1");
-<a name="line148"></a>			$content .= $editable_template->fetch();
-<a name="line149"></a>		}
-<a name="line150"></a>			
-<a name="line151"></a>		$workout_template = $this->smarty->createTemplate('workout/workout.tpl');
-<a name="line152"></a>		$activity_template = $this->smarty->createTemplate('activity/activity.tpl');
-<a name="line153"></a>		$content .= $this->workout->display($workout_template);
-<a name="line154"></a>		$content .= $this->activity->display($activity_template);
-<a name="line155"></a>		return $content;
-<a name="line156"></a>	}
-<a name="line157"></a>
-<a name="line158"></a>	/*
-<a name="line159"></a>	 * Loads a workout based on the ID given
-<a name="line160"></a>	 * @param Int the workout ID
-<a name="line161"></a>	 */
-<a name="line162"></a>	private function load_workout($id){
-<a name="line163"></a>		$this->workout = new Workout();
-<a name="line164"></a>		$response = $this->xmlGET(EXERCISER . "workouts/$id");		
-<a name="line165"></a>		switch ($response['code']) {
-<a name="line166"></a>			case 200:
-<a name="line167"></a>				$this->workout->parse($response['body']);
-<a name="line168"></a>				break;
-<a name="line169"></a>			default:
-<a name="line170"></a>				throw new Exception('Unable to load workout');
-<a name="line171"></a>				break;
-<a name="line172"></a>		}
-<a name="line173"></a>		
-<a name="line174"></a>		$this->activity = new Activity();
-<a name="line175"></a>		$response = $this->xmlGET(EXERCISER . "activities/" . $this->workout->activity_id);
-<a name="line176"></a>		switch ($response['code']) {
-<a name="line177"></a>			case 200:
-<a name="line178"></a>				$this->activity->parse($response['body']);
-<a name="line179"></a>				break;
-<a name="line180"></a>			default:
-<a name="line181"></a>				throw new Exception('Unable to load workout activity');
-<a name="line182"></a>				break;
-<a name="line183"></a>		}
-<a name="line184"></a>	}
-<a name="line185"></a>}
-<a name="line186"></a>
-<a name="line187"></a>?>
-<a name="line188"></a></pre>
+<a name="line147"></a>			$editable_template->assign('edit_link', $this::PAGE_NAME . "?id=$id&edit=1");
+<a name="line148"></a>			$editable_template->assign('delete_id', $id);
+<a name="line149"></a>			$content .= $editable_template->fetch();
+<a name="line150"></a>		}
+<a name="line151"></a>			
+<a name="line152"></a>		$workout_template = $this->smarty->createTemplate('workout/workout.tpl');
+<a name="line153"></a>		$activity_template = $this->smarty->createTemplate('activity/activity.tpl');
+<a name="line154"></a>		$content .= $this->workout->display($workout_template);
+<a name="line155"></a>		$content .= $this->activity->display($activity_template);
+<a name="line156"></a>		return $content;
+<a name="line157"></a>	}
+<a name="line158"></a>
+<a name="line159"></a>	/*
+<a name="line160"></a>	 * Loads a workout based on the ID given
+<a name="line161"></a>	 * @param Int the workout ID
+<a name="line162"></a>	 */
+<a name="line163"></a>	private function load_workout($id){
+<a name="line164"></a>		$this->workout = new Workout();
+<a name="line165"></a>		$response = $this->xmlGET(EXERCISER . "workouts/$id");		
+<a name="line166"></a>		switch ($response['code']) {
+<a name="line167"></a>			case 200:
+<a name="line168"></a>				$this->workout->parse($response['body']);
+<a name="line169"></a>				break;
+<a name="line170"></a>			default:
+<a name="line171"></a>				throw new Exception('Unable to load workout');
+<a name="line172"></a>				break;
+<a name="line173"></a>		}
+<a name="line174"></a>		
+<a name="line175"></a>		$this->activity = new Activity();
+<a name="line176"></a>		$response = $this->xmlGET(EXERCISER . "activities/" . $this->workout->activity_id);
+<a name="line177"></a>		switch ($response['code']) {
+<a name="line178"></a>			case 200:
+<a name="line179"></a>				$this->activity->parse($response['body']);
+<a name="line180"></a>				break;
+<a name="line181"></a>			default:
+<a name="line182"></a>				throw new Exception('Unable to load workout activity');
+<a name="line183"></a>				break;
+<a name="line184"></a>		}
+<a name="line185"></a>	}
+<a name="line186"></a>}
+<a name="line187"></a>
+<a name="line188"></a>?>
+<a name="line189"></a></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

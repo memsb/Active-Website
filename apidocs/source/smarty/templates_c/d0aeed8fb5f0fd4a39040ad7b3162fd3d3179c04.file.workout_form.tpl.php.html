@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Tue, 06 Mar 2012 13:16:03 +0000">
+<meta name="when" content="Wed, 07 Mar 2012 14:34:43 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../../stylesheet.css">
 <link rel="start" href="../../../overview-summary.html">
@@ -36,7 +36,7 @@
 <h1>smarty/templates_c/d0aeed8fb5f0fd4a39040ad7b3162fd3d3179c04.file.workout_form.tpl.php</h1>
 <hr>
 
-<a name="line1"></a><pre><?php /* Smarty version Smarty-3.1.7, created on 2012-03-03 19:33:27
+<a name="line1"></a><pre><?php /* Smarty version Smarty-3.1.7, created on 2012-03-07 13:24:41
 <a name="line2"></a>         compiled from "/var/www/Active-Website/smarty/templates/workout/workout_form.tpl" */ ?>
 <a name="line3"></a><?php /*%%SmartyHeaderCode:11621756714f526f6c2cec50-12471976%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 <a name="line4"></a>$_valid = $_smarty_tpl->decodeProperties(array (
@@ -45,7 +45,7 @@
 <a name="line7"></a>    'd0aeed8fb5f0fd4a39040ad7b3162fd3d3179c04' => 
 <a name="line8"></a>    array (
 <a name="line9"></a>      0 => '/var/www/Active-Website/smarty/templates/workout/workout_form.tpl',
-<a name="line10"></a>      1 => 1330803195,
+<a name="line10"></a>      1 => 1331126680,
 <a name="line11"></a>      2 => 'file',
 <a name="line12"></a>    ),
 <a name="line13"></a>  ),
@@ -69,48 +69,69 @@
 <a name="line31"></a>		<?php echo $_smarty_tpl->tpl_vars['activities']->value;?>
 <a name="line32"></a>
 <a name="line33"></a>		<br>
-<a name="line34"></a>		<h3>Date</h3>
-<a name="line35"></a>		<div id="datepicker"></div>
-<a name="line36"></a>		<input type="hidden" id="Start_date" name="Start_date">
-<a name="line37"></a>		<br>
-<a name="line38"></a>
-<a name="line39"></a>		<h3>Time</h3>
-<a name="line40"></a>
-<a name="line41"></a>		<label for="Start_time_hours">Hours</label>
-<a name="line42"></a>		<br>
-<a name="line43"></a>		<input type="hidden" class="Start_time_hours" name="Start_time_hours">
-<a name="line44"></a>		<input type="text" class="Start_time_hours" name="Start_time_hours" size="2" disabled="disabled">
-<a name="line45"></a>		<div id="start-hours" style="height:100px;"></div>
-<a name="line46"></a>		<br>
-<a name="line47"></a>
-<a name="line48"></a>		<label for="Start_time_mins">Minutes</label>
-<a name="line49"></a>		<br>
-<a name="line50"></a>		<input type="hidden" class="Start_time_mins" name="Start_time_mins">
-<a name="line51"></a>		<input type="text" class="Start_time_mins" name="Start_time_mins" size="2" disabled="disabled">
-<a name="line52"></a>		<div id="start-mins" style="height:100px;"></div>
-<a name="line53"></a>		<br>
-<a name="line54"></a>
-<a name="line55"></a>		<h3>Duration</h3>
-<a name="line56"></a>
-<a name="line57"></a>		<label for="Duration_hours">Hours</label>
-<a name="line58"></a>		<br>
-<a name="line59"></a>		<input type="hidden" class="Duration_hours" name="Duration_hours">
-<a name="line60"></a>		<input type="text" class="Duration_hours" name="Duration_hours" size="2" disabled="disabled">
-<a name="line61"></a>		<div id="duration-hours" style="height:100px;"></div>
-<a name="line62"></a>		<br>
-<a name="line63"></a>
-<a name="line64"></a>		<label for="Duration_mins">Minutes</label>
-<a name="line65"></a>		<br>
-<a name="line66"></a>		<input type="hidden" class="Duration_mins" name="Duration_mins">
-<a name="line67"></a>		<input type="text" class="Duration_mins" name="Duration_mins" size="2" disabled="disabled">
-<a name="line68"></a>		<div id="duration-mins" style="height:100px;"></div>
-<a name="line69"></a>		<br>
-<a name="line70"></a>
-<a name="line71"></a>		<input type="submit" value="Submit" />
-<a name="line72"></a>	</form>
-<a name="line73"></a></div>
-<a name="line74"></a>
-<a name="line75"></a><?php }} ?></pre>
+<a name="line34"></a>		<div class="Date">
+<a name="line35"></a>			<h3>Date</h3>
+<a name="line36"></a>			<div id="datepicker"></div>
+<a name="line37"></a>			<input type="hidden" id="Start_date" name="Start_date">
+<a name="line38"></a>		</div>
+<a name="line39"></a>
+<a name="line40"></a>		<div class="Time">
+<a name="line41"></a>			<h3>Time</h3>
+<a name="line42"></a>
+<a name="line43"></a>			<div class="Slider">
+<a name="line44"></a>				<label for="Start_time_hours">Hours</label>
+<a name="line45"></a>				<div class="text_box">
+<a name="line46"></a>					<input type="hidden" class="Start_time_hours" name="Start_time_hours">
+<a name="line47"></a>					<input type="text" class="Start_time_hours" name="Start_time_hours" size="2" disabled="disabled">
+<a name="line48"></a>				</div>
+<a name="line49"></a>				<div class="bar">
+<a name="line50"></a>					<div id="start-hours" style="height:150px;"></div>
+<a name="line51"></a>				</div>
+<a name="line52"></a>			</div>
+<a name="line53"></a>			<div class="Slider">
+<a name="line54"></a>				<label for="Start_time_mins">Minutes</label>
+<a name="line55"></a>				<div class="text_box">
+<a name="line56"></a>					<input type="hidden" class="Start_time_mins" name="Start_time_mins">
+<a name="line57"></a>					<input type="text" class="Start_time_mins" name="Start_time_mins" size="2" disabled="disabled">
+<a name="line58"></a>				</div>
+<a name="line59"></a>				<div class="bar">
+<a name="line60"></a>					<div id="start-mins" style="height:150px;"></div>
+<a name="line61"></a>				</div>
+<a name="line62"></a>			</div>
+<a name="line63"></a>		</div>
+<a name="line64"></a>
+<a name="line65"></a>		<div class="Time">
+<a name="line66"></a>			<h3>Duration</h3>
+<a name="line67"></a>
+<a name="line68"></a>			<div class="Slider">
+<a name="line69"></a>				<label for="Duration_hours">Hours</label>
+<a name="line70"></a>				<div class="text_box">
+<a name="line71"></a>					<input type="hidden" class="Duration_hours" name="Duration_hours">
+<a name="line72"></a>					<input type="text" class="Duration_hours" name="Duration_hours" size="2" disabled="disabled">
+<a name="line73"></a>				</div>
+<a name="line74"></a>				<div class="bar">
+<a name="line75"></a>					<div id="duration-hours" style="height:150px;"></div>
+<a name="line76"></a>				</div>
+<a name="line77"></a>			</div>
+<a name="line78"></a>			<div class="Slider">
+<a name="line79"></a>				<label for="Duration_mins">Minutes</label>
+<a name="line80"></a>				<div class="text_box">
+<a name="line81"></a>					<input type="hidden" class="Duration_mins" name="Duration_mins">
+<a name="line82"></a>					<input type="text" class="Duration_mins" name="Duration_mins" size="2" disabled="disabled">
+<a name="line83"></a>				</div>
+<a name="line84"></a>				<div class="bar">
+<a name="line85"></a>					<div id="duration-mins" style="height:150px;"></div>
+<a name="line86"></a>				</div>
+<a name="line87"></a>			</div>
+<a name="line88"></a>		</div>
+<a name="line89"></a>
+<a name="line90"></a>		<div class="clear"></div>
+<a name="line91"></a>
+<a name="line92"></a>		<input type="submit" value="Submit" />
+<a name="line93"></a>	</form>
+<a name="line94"></a></div>
+<a name="line95"></a>
+<a name="line96"></a><?php }} ?></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

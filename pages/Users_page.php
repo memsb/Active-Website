@@ -16,7 +16,7 @@ class Users_page extends Page{
 	 */
 	const PAGE_NAME = 'Users';
 
-	const SIZE = 20;
+	const SIZE = 30;
 	private $start = 0;
 	private $persons;
 

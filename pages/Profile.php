@@ -27,6 +27,14 @@ class Profile extends Page {
 	protected function load_person($id){
 		$person = new Person($this->db);
 		$person->load($id);
+		$response = $this->xmlGET(EXERCISER . "users/$id");
+		switch ($response['code']) {
+			case 200:
+				$person->parse($response['body']);
+				break;
+			default:
+				break;
+		}
 		return $person;
 	}
 }

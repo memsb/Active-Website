@@ -202,6 +202,9 @@ class Graph_page extends Page {
 		foreach($activities as $key => $value)
 			$data[] = array($key, $value);
 
+		if( count($data) == 0 )
+			$data[] = array('Nothing', 1);
+
 		$chart = array(
 				'title' => $this->period,
 				'format' => array(
@@ -230,6 +233,9 @@ class Graph_page extends Page {
 		
 		foreach($activities as $key => $value)
 			$data[] = array($key, $value);
+
+		if( count($data) == 0 )
+			$data[] = array('Nothing', 1);
 
 		$chart = array(
 				'title' => $this->period,

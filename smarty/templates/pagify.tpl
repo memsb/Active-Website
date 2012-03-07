@@ -1,5 +1,6 @@
 <div class="pages">
 	{$list}
-<div class="page_nav">{$nav}</div>
+<div class="clear"></div>
+<div id="page_nav">{$nav}</div>
 </div>
 

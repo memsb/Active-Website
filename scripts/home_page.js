@@ -9,8 +9,8 @@ function chart1() {
 	var offset = week;
 	
 	var chart = new google.visualization.Gauge(document.getElementById('chart1_area'));
-	var plus_button = $('#chart1 #buttons .plus')[0];
-	var minus_button = $('#chart1 #buttons .minus')[0];
+	var plus_button = $('#chart1 .buttons .plus')[0];
+	var minus_button = $('#chart1 .buttons .minus')[0];
 	var options = {
 			width: 600, height: 180,
 			max: 5000, min: 0,			
@@ -31,7 +31,7 @@ function chart1() {
 				data.addColumn(json_data.format[i][0], json_data.format[i][1]);
 			}		
 			data.addRows(json_data.data);
-			$('#chart1 #buttons #date').html(json_data.title);						
+			$('#chart1 .buttons .date').html(json_data.title);						
 			chart.draw(data, options);
 		});
 	}
@@ -49,8 +49,8 @@ function chart2() {
 	var offset = week;
 	
 	var chart = new google.visualization.Gauge(document.getElementById('chart2_area'));
-	var plus_button = $('#chart2 #buttons .plus')[0];
-	var minus_button = $('#chart2 #buttons .minus')[0];
+	var plus_button = $('#chart2 .buttons .plus')[0];
+	var minus_button = $('#chart2 .buttons .minus')[0];
 	var options = {
 			width: 600, height: 180,
 			max: 7, min: 0,			
@@ -71,7 +71,7 @@ function chart2() {
 				data.addColumn(json_data.format[i][0], json_data.format[i][1]);
 			}		
 			data.addRows(json_data.data);
-			$('#chart2 #buttons #date').html(json_data.title);						
+			$('#chart2 .buttons .date').html(json_data.title);						
 			chart.draw(data, options);
 		});
 	}
@@ -88,8 +88,8 @@ function chart2() {
 function chart3() {
 	var offset = week;
 	var chart = new google.visualization.Gauge(document.getElementById('chart3_area'));
-	var plus_button = $('#chart3 #buttons .plus')[0];
-	var minus_button = $('#chart3 #buttons .minus')[0];
+	var plus_button = $('#chart3 .buttons .plus')[0];
+	var minus_button = $('#chart3 .buttons .minus')[0];
 	var options = {
 			width: 600, height: 180,
 			max: 240, min: 0,			
@@ -110,7 +110,7 @@ function chart3() {
 				data.addColumn(json_data.format[i][0], json_data.format[i][1]);
 			}
 			data.addRows(json_data.data);
-			$('#chart3 #buttons #date').html(json_data.title);
+			$('#chart3 .buttons .date').html(json_data.title);
 			chart.draw(data, options);
 		});
 	}
@@ -130,12 +130,13 @@ line chart showing kcal per day per week
 function chart4(){
 	var offset = week;
 	var chart = new google.visualization.LineChart(document.getElementById('chart4_area'));
-	var plus_button = $('#chart4 #buttons .plus')[0];
-	var minus_button = $('#chart4 #buttons .minus')[0];
+	var plus_button = $('#chart4 .buttons .plus')[0];
+	var minus_button = $('#chart4 .buttons .minus')[0];
 	var options = {	
 			'title': 'Kcal Per Day',
 			'width':400,
 			'height':300,
+			'legend': 'none',
 			animation:{
 				duration: 2000,
 				easing: 'out'
@@ -149,7 +150,7 @@ function chart4(){
 				data.addColumn(json_data.format[i][0], json_data.format[i][1]);
 			}
 			data.addRows(json_data.data);
-			$('#chart4 #buttons #date').html(json_data.title);
+			$('#chart4 .buttons .date').html(json_data.title);
 			chart.draw(data, options);
 		});
 	}
@@ -164,21 +165,19 @@ function chart4(){
 }
 
 /*
-bar chart showing workout counts per activity
+Pie chart showing workout counts per activity
 */
 function chart5(){
 	var offset = week;
-	var chart = new google.visualization.ColumnChart(document.getElementById('chart5_area'));
-	var plus_button = $('#chart5 #buttons .plus')[0];
-	var minus_button = $('#chart5 #buttons .minus')[0];
+	var chart = new google.visualization.PieChart(document.getElementById('chart5_area'));
+	var plus_button = $('#chart5 .buttons .plus')[0];
+	var minus_button = $('#chart5 .buttons .minus')[0];
 	var options = {	
-			'title': 'Workouts By Activity',
-			'width':400,
+			is3D: true,
+			'title': 'Activity By Workouts',
+			'width':300,
 			'height':300,
-			animation:{
-				duration: 2000,
-				easing: 'out'
-			}
+			'legend': 'none'
 	};
 
 	function drawChart(week_offset) {
@@ -188,7 +187,7 @@ function chart5(){
 				data.addColumn(json_data.format[i][0], json_data.format[i][1]);
 			}
 			data.addRows(json_data.data);
-			$('#chart5 #buttons #date').html(json_data.title);
+			$('#chart5 .buttons .date').html(json_data.title);
 			chart.draw(data, options);
 		});
 	}
@@ -207,18 +206,15 @@ pie chart showing total kcal per activity
 */
 function chart6(){
 	var offset = week;
-	var chart = new google.visualization.ColumnChart(document.getElementById('chart6_area'));
-	var plus_button = $('#chart6 #buttons .plus')[0];
-	var minus_button = $('#chart6 #buttons .minus')[0];
+	var chart = new google.visualization.PieChart(document.getElementById('chart6_area'));
+	var plus_button = $('#chart6 .buttons .plus')[0];
+	var minus_button = $('#chart6 .buttons .minus')[0];
 	var options = {	
 			is3D: true,
-			'title': 'Kcal Per Activity',
-			'width':400,
+			'title': 'Activity By Kcal',
+			'width':300,
 			'height':300,
-			animation:{
-				duration: 2000,
-				easing: 'out'
-			}
+			'legend': 'none'
 	};
 
 	function drawChart(week_offset) {
@@ -228,7 +224,7 @@ function chart6(){
 				data.addColumn(json_data.format[i][0], json_data.format[i][1]);
 			}
 			data.addRows(json_data.data);
-			$('#chart6 #buttons #date').html(json_data.title);
+			$('#chart6 .buttons .date').html(json_data.title);
 			chart.draw(data, options);
 		});
 	}

@@ -51,7 +51,7 @@
 				<div id="page-content">
 					<div id="content">
 						{$content}						
-						<div style="clear: both;">&nbsp;</div>
+						<div id="clear"></div>
 					</div>
 					<!-- end #content -->
 					<div id="sidebar">
@@ -61,7 +61,7 @@
 					</div>
 					<!-- end #sidebar -->
 				</div>
-				<div style="clear: both;">&nbsp;</div>
+				<div id="clear"></div>
 			</div>
 		</div>
 	</div>

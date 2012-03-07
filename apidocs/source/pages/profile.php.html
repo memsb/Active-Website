@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Tue, 06 Mar 2012 13:16:02 +0000">
+<meta name="when" content="Wed, 07 Mar 2012 14:34:43 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
 <link rel="start" href="../../overview-summary.html">
@@ -65,12 +65,20 @@
 <a name="line27"></a>	protected function load_person($id){
 <a name="line28"></a>		$person = new Person($this->db);
 <a name="line29"></a>		$person->load($id);
-<a name="line30"></a>		return $person;
-<a name="line31"></a>	}
-<a name="line32"></a>}
-<a name="line33"></a>
-<a name="line34"></a>?>
-<a name="line35"></a></pre>
+<a name="line30"></a>		$response = $this->xmlGET(EXERCISER . "users/$id");
+<a name="line31"></a>		switch ($response['code']) {
+<a name="line32"></a>			case 200:
+<a name="line33"></a>				$person->parse($response['body']);
+<a name="line34"></a>				break;
+<a name="line35"></a>			default:
+<a name="line36"></a>				break;
+<a name="line37"></a>		}
+<a name="line38"></a>		return $person;
+<a name="line39"></a>	}
+<a name="line40"></a>}
+<a name="line41"></a>
+<a name="line42"></a>?>
+<a name="line43"></a></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

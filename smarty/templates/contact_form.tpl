@@ -1,4 +1,4 @@
-<div class="post">
+<div id="contact">
 	<h2 class="title">Contact us</h2>
 	<div class="entry">
 		<form method="POST" action="{$action}">

@@ -1,0 +1,6 @@
+This site exists to demo the Exerciser web service.
+The site acts as a web front end for the service allowing site users to register and utilise the service.
+GET and some POST requests do not require authentication
+DELETE, PUT and some POST requests require Authentication using basic auth and a user api key.
+
+Configurables such as database username & password, and directory structure can be found in the config file.

@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Tue, 06 Mar 2012 13:16:02 +0000">
+<meta name="when" content="Wed, 07 Mar 2012 14:34:43 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../../stylesheet.css">
 <link rel="start" href="../../../overview-summary.html">
@@ -36,7 +36,7 @@
 <h1>smarty/templates_c/6618468e2634630ed5a405618afe444c100d4bc7.file.editable.tpl.php</h1>
 <hr>
 
-<a name="line1"></a><pre><?php /* Smarty version Smarty-3.1.7, created on 2012-03-01 21:38:32
+<a name="line1"></a><pre><?php /* Smarty version Smarty-3.1.7, created on 2012-03-07 12:56:21
 <a name="line2"></a>         compiled from "/var/www/Active-Website/smarty/templates/workout/editable.tpl" */ ?>
 <a name="line3"></a><?php /*%%SmartyHeaderCode:11905503974f4fec582437f8-66457468%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 <a name="line4"></a>$_valid = $_smarty_tpl->decodeProperties(array (
@@ -45,7 +45,7 @@
 <a name="line7"></a>    '6618468e2634630ed5a405618afe444c100d4bc7' => 
 <a name="line8"></a>    array (
 <a name="line9"></a>      0 => '/var/www/Active-Website/smarty/templates/workout/editable.tpl',
-<a name="line10"></a>      1 => 1330637794,
+<a name="line10"></a>      1 => 1331124977,
 <a name="line11"></a>      2 => 'file',
 <a name="line12"></a>    ),
 <a name="line13"></a>  ),
@@ -53,18 +53,27 @@
 <a name="line15"></a>  'function' => 
 <a name="line16"></a>  array (
 <a name="line17"></a>  ),
-<a name="line18"></a>  'variables' => 
-<a name="line19"></a>  array (
-<a name="line20"></a>    'link' => 0,
-<a name="line21"></a>  ),
-<a name="line22"></a>  'has_nocache_code' => false,
-<a name="line23"></a>  'version' => 'Smarty-3.1.7',
-<a name="line24"></a>  'unifunc' => 'content_4f4fec584988b',
-<a name="line25"></a>),false); /*/%%SmartyHeaderCode%%*/?>
-<a name="line26"></a><?php if ($_valid && !is_callable('content_4f4fec584988b')) {function content_4f4fec584988b($_smarty_tpl) {?><a href="<?php echo $_smarty_tpl->tpl_vars['link']->value;?>
-<a name="line27"></a>">Edit Workout</a>
-<a name="line28"></a>
-<a name="line29"></a><?php }} ?></pre>
+<a name="line18"></a>  'version' => 'Smarty-3.1.7',
+<a name="line19"></a>  'unifunc' => 'content_4f4fec584988b',
+<a name="line20"></a>  'variables' => 
+<a name="line21"></a>  array (
+<a name="line22"></a>    'edit_link' => 0,
+<a name="line23"></a>    'delete_id' => 0,
+<a name="line24"></a>  ),
+<a name="line25"></a>  'has_nocache_code' => false,
+<a name="line26"></a>),false); /*/%%SmartyHeaderCode%%*/?>
+<a name="line27"></a><?php if ($_valid && !is_callable('content_4f4fec584988b')) {function content_4f4fec584988b($_smarty_tpl) {?><div class="edit">
+<a name="line28"></a>	<a href="<?php echo $_smarty_tpl->tpl_vars['edit_link']->value;?>
+<a name="line29"></a>">Edit Workout</a>
+<a name="line30"></a></div>
+<a name="line31"></a><div class="delete">
+<a name="line32"></a>	<form method="POST" action="Delete_Workout">
+<a name="line33"></a>		<input type="hidden" id="id" name="id" value="<?php echo $_smarty_tpl->tpl_vars['delete_id']->value;?>
+<a name="line34"></a>">
+<a name="line35"></a>		<input type="submit" value="Delete Workout" />
+<a name="line36"></a>	</form>
+<a name="line37"></a></div>
+<a name="line38"></a><?php }} ?></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Tue, 06 Mar 2012 13:16:02 +0000">
+<meta name="when" content="Wed, 07 Mar 2012 14:34:43 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
 <link rel="start" href="../../overview-summary.html">
@@ -296,14 +296,15 @@
 <a name="line258"></a>	 */
 <a name="line259"></a>	public function display($template){
 <a name="line260"></a>		$template->assign('username', $this->username);
-<a name="line261"></a>		$template->assign('age', $this->age);
-<a name="line262"></a>		$template->assign('weight', $this->weight);
-<a name="line263"></a>		$template->assign('gender', $this->gender);
-<a name="line264"></a>		return $template->fetch();
-<a name="line265"></a>	}
-<a name="line266"></a>}
-<a name="line267"></a>?>
-<a name="line268"></a></pre>
+<a name="line261"></a>		$template->assign('id', $this->user_id);
+<a name="line262"></a>		$template->assign('age', $this->age);
+<a name="line263"></a>		$template->assign('weight', $this->weight);
+<a name="line264"></a>		$template->assign('gender', $this->gender);
+<a name="line265"></a>		return $template->fetch();
+<a name="line266"></a>	}
+<a name="line267"></a>}
+<a name="line268"></a>?>
+<a name="line269"></a></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Tue, 06 Mar 2012 13:16:02 +0000">
+<meta name="when" content="Wed, 07 Mar 2012 14:34:43 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
 <link rel="start" href="../../overview-summary.html">
@@ -240,80 +240,86 @@
 <a name="line202"></a>		foreach($activities as $key => $value)
 <a name="line203"></a>			$data[] = array($key, $value);
 <a name="line204"></a>
-<a name="line205"></a>		$chart = array(
-<a name="line206"></a>				'title' => $this->period,
-<a name="line207"></a>				'format' => array(
-<a name="line208"></a>						array('string', 'Activity'),
-<a name="line209"></a>						array('number', 'Workouts')
-<a name="line210"></a>						),
-<a name="line211"></a>				'data' => $data
-<a name="line212"></a>				);
-<a name="line213"></a>		return json_encode($chart);
-<a name="line214"></a>	}
-<a name="line215"></a>
-<a name="line216"></a>	/*
-<a name="line217"></a>	 * Pie chart showing total kcal per activity
-<a name="line218"></a>	 * @return JSON graph data
-<a name="line219"></a>	 */
-<a name="line220"></a>	private function chart6(){
-<a name="line221"></a>		$days = $this->workouts_by_date();
-<a name="line222"></a>		$data = array();
-<a name="line223"></a>		$activities = array();
-<a name="line224"></a>		foreach($days as $day => $workouts)
-<a name="line225"></a>			foreach($workouts as $workout)
-<a name="line226"></a>				if( isset($activities[$workout->activity_name]) )
-<a name="line227"></a>					$activities[$workout->activity_name] += $workout->kcal;
-<a name="line228"></a>				else
-<a name="line229"></a>					$activities[$workout->activity_name] = 0; 			
-<a name="line230"></a>		
-<a name="line231"></a>		foreach($activities as $key => $value)
-<a name="line232"></a>			$data[] = array($key, $value);
-<a name="line233"></a>
-<a name="line234"></a>		$chart = array(
-<a name="line235"></a>				'title' => $this->period,
-<a name="line236"></a>				'format' => array(
-<a name="line237"></a>						array('string', 'Activity'),
-<a name="line238"></a>						array('number', 'Kcal')
-<a name="line239"></a>						),
-<a name="line240"></a>				'data' => $data
-<a name="line241"></a>				);
-<a name="line242"></a>		return json_encode($chart);
-<a name="line243"></a>	}
-<a name="line244"></a>
-<a name="line245"></a>	private function workouts_by_date(){
-<a name="line246"></a>		$days = array();
-<a name="line247"></a>		foreach( $this->week_days as $week_day ){
-<a name="line248"></a>			$day = array();
-<a name="line249"></a>			$workouts = $this->load_workouts_date($this->uid, $week_day);
-<a name="line250"></a>			foreach( $workouts->workouts as $workout )
-<a name="line251"></a>				$day[] = $workout;
-<a name="line252"></a>			$days[date('D', $week_day )] = $day;
-<a name="line253"></a>		}
-<a name="line254"></a>		return $days;
-<a name="line255"></a>	}
-<a name="line256"></a>
-<a name="line257"></a>	/*
-<a name="line258"></a>	 * Loads workouts for a specified user
-<a name="line259"></a>	 * @param Int user id
-<a name="line260"></a>	 * @return Workouts instance
-<a name="line261"></a>	 */
-<a name="line262"></a>	private function load_workouts_date($id, $day){
-<a name="line263"></a>		$workouts = new Workouts();
-<a name="line264"></a>		$date = date('d-M-Y', $day );
-<a name="line265"></a>		$response = $this->xmlGET(EXERCISER . "users/$id/workouts?date=$date");
-<a name="line266"></a>		switch ($response['code']) {
-<a name="line267"></a>			case 200:
-<a name="line268"></a>				$workouts->parse($response['body']);
-<a name="line269"></a>				break;
-<a name="line270"></a>			default:
-<a name="line271"></a>				break;
-<a name="line272"></a>		}		
-<a name="line273"></a>		return $workouts;
-<a name="line274"></a>	}
-<a name="line275"></a>}
-<a name="line276"></a>
-<a name="line277"></a>?>
-<a name="line278"></a></pre>
+<a name="line205"></a>		if( count($data) == 0 )
+<a name="line206"></a>			$data[] = array('Nothing', 1);
+<a name="line207"></a>
+<a name="line208"></a>		$chart = array(
+<a name="line209"></a>				'title' => $this->period,
+<a name="line210"></a>				'format' => array(
+<a name="line211"></a>						array('string', 'Activity'),
+<a name="line212"></a>						array('number', 'Workouts')
+<a name="line213"></a>						),
+<a name="line214"></a>				'data' => $data
+<a name="line215"></a>				);
+<a name="line216"></a>		return json_encode($chart);
+<a name="line217"></a>	}
+<a name="line218"></a>
+<a name="line219"></a>	/*
+<a name="line220"></a>	 * Pie chart showing total kcal per activity
+<a name="line221"></a>	 * @return JSON graph data
+<a name="line222"></a>	 */
+<a name="line223"></a>	private function chart6(){
+<a name="line224"></a>		$days = $this->workouts_by_date();
+<a name="line225"></a>		$data = array();
+<a name="line226"></a>		$activities = array();
+<a name="line227"></a>		foreach($days as $day => $workouts)
+<a name="line228"></a>			foreach($workouts as $workout)
+<a name="line229"></a>				if( isset($activities[$workout->activity_name]) )
+<a name="line230"></a>					$activities[$workout->activity_name] += $workout->kcal;
+<a name="line231"></a>				else
+<a name="line232"></a>					$activities[$workout->activity_name] = 0; 			
+<a name="line233"></a>		
+<a name="line234"></a>		foreach($activities as $key => $value)
+<a name="line235"></a>			$data[] = array($key, $value);
+<a name="line236"></a>
+<a name="line237"></a>		if( count($data) == 0 )
+<a name="line238"></a>			$data[] = array('Nothing', 1);
+<a name="line239"></a>
+<a name="line240"></a>		$chart = array(
+<a name="line241"></a>				'title' => $this->period,
+<a name="line242"></a>				'format' => array(
+<a name="line243"></a>						array('string', 'Activity'),
+<a name="line244"></a>						array('number', 'Kcal')
+<a name="line245"></a>						),
+<a name="line246"></a>				'data' => $data
+<a name="line247"></a>				);
+<a name="line248"></a>		return json_encode($chart);
+<a name="line249"></a>	}
+<a name="line250"></a>
+<a name="line251"></a>	private function workouts_by_date(){
+<a name="line252"></a>		$days = array();
+<a name="line253"></a>		foreach( $this->week_days as $week_day ){
+<a name="line254"></a>			$day = array();
+<a name="line255"></a>			$workouts = $this->load_workouts_date($this->uid, $week_day);
+<a name="line256"></a>			foreach( $workouts->workouts as $workout )
+<a name="line257"></a>				$day[] = $workout;
+<a name="line258"></a>			$days[date('D', $week_day )] = $day;
+<a name="line259"></a>		}
+<a name="line260"></a>		return $days;
+<a name="line261"></a>	}
+<a name="line262"></a>
+<a name="line263"></a>	/*
+<a name="line264"></a>	 * Loads workouts for a specified user
+<a name="line265"></a>	 * @param Int user id
+<a name="line266"></a>	 * @return Workouts instance
+<a name="line267"></a>	 */
+<a name="line268"></a>	private function load_workouts_date($id, $day){
+<a name="line269"></a>		$workouts = new Workouts();
+<a name="line270"></a>		$date = date('d-M-Y', $day );
+<a name="line271"></a>		$response = $this->xmlGET(EXERCISER . "users/$id/workouts?date=$date");
+<a name="line272"></a>		switch ($response['code']) {
+<a name="line273"></a>			case 200:
+<a name="line274"></a>				$workouts->parse($response['body']);
+<a name="line275"></a>				break;
+<a name="line276"></a>			default:
+<a name="line277"></a>				break;
+<a name="line278"></a>		}		
+<a name="line279"></a>		return $workouts;
+<a name="line280"></a>	}
+<a name="line281"></a>}
+<a name="line282"></a>
+<a name="line283"></a>?>
+<a name="line284"></a></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

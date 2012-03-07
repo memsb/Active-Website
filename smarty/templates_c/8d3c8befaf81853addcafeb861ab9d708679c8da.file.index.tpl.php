@@ -1,4 +1,4 @@
-<?php /* Smarty version Smarty-3.1.7, created on 2012-03-04 16:25:36
+<?php /* Smarty version Smarty-3.1.7, created on 2012-03-06 17:59:59
          compiled from "/var/www/Active-Website/smarty/templates/index.tpl" */ ?>
 <?php /*%%SmartyHeaderCode:20615714814f20fde2b25192-61777664%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 $_valid = $_smarty_tpl->decodeProperties(array (
@@ -7,7 +7,7 @@ $_valid = $_smarty_tpl->decodeProperties(array (
     '8d3c8befaf81853addcafeb861ab9d708679c8da' => 
     array (
       0 => '/var/www/Active-Website/smarty/templates/index.tpl',
-      1 => 1330878331,
+      1 => 1331056717,
       2 => 'file',
     ),
   ),
@@ -84,7 +84,7 @@ $_valid = $_smarty_tpl->decodeProperties(array (
 					<div id="content">
 						<?php echo $_smarty_tpl->tpl_vars['content']->value;?>
 						
-						<div style="clear: both;">&nbsp;</div>
+						<div id="clear"></div>
 					</div>
 					<!-- end #content -->
 					<div id="sidebar">
@@ -95,7 +95,7 @@ $_valid = $_smarty_tpl->decodeProperties(array (
 					</div>
 					<!-- end #sidebar -->
 				</div>
-				<div style="clear: both;">&nbsp;</div>
+				<div id="clear"></div>
 			</div>
 		</div>
 	</div>

@@ -1,1 +1,1 @@
-<td><div class="current">{$body}</div></td>
+<td class="current">{$body}</td>
