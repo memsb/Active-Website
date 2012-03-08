@@ -1,7 +1,9 @@
 <?php
-/*
+
+/**
  * @author Martin Buckley - MBuckley@gmail.com
  * Workout encapulates the methods and attributes for a workout
+ * @namespace active
  */
 class Workout {
 	

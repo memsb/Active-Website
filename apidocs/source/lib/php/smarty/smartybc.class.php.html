@@ -1,0 +1,534 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
+
+<link rel="stylesheet" type="text/css" href="../../../../stylesheet.css">
+<link rel="start" href="../../../../overview-summary.html">
+
+<title>lib/php/Smarty/SmartyBC.class.php (PHPDoctor)</title>
+
+</head>
+<body id="file" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../index.html" target="_top">Frames</a>
+<a href="../../../../source/lib/php/smarty/smartybc.class.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<h1>lib/php/Smarty/SmartyBC.class.php</h1>
+<div class="comment" id="overview_description"><p>Project:     Smarty: the PHP compiling template engine
+File:        SmartyBC.class.php
+SVN:         $Id: $</p><p>This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.</p><p>This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.</p><p>You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</p><p>For questions, help, comments, discussion, etc., please join the
+Smarty mailing list. Send a blank e-mail to
+smarty-discussion-subscribe@googlegroups.com</p></div>
+
+<hr>
+
+<a name="line1"></a><pre><?php
+<a name="line2"></a>/**
+<a name="line3"></a> * Project:     Smarty: the PHP compiling template engine
+<a name="line4"></a> * File:        SmartyBC.class.php
+<a name="line5"></a> * SVN:         $Id: $
+<a name="line6"></a> *
+<a name="line7"></a> * This library is free software; you can redistribute it and/or
+<a name="line8"></a> * modify it under the terms of the GNU Lesser General Public
+<a name="line9"></a> * License as published by the Free Software Foundation; either
+<a name="line10"></a> * version 2.1 of the License, or (at your option) any later version.
+<a name="line11"></a> *
+<a name="line12"></a> * This library is distributed in the hope that it will be useful,
+<a name="line13"></a> * but WITHOUT ANY WARRANTY; without even the implied warranty of
+<a name="line14"></a> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+<a name="line15"></a> * Lesser General Public License for more details.
+<a name="line16"></a> *
+<a name="line17"></a> * You should have received a copy of the GNU Lesser General Public
+<a name="line18"></a> * License along with this library; if not, write to the Free Software
+<a name="line19"></a> * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+<a name="line20"></a> *
+<a name="line21"></a> * For questions, help, comments, discussion, etc., please join the
+<a name="line22"></a> * Smarty mailing list. Send a blank e-mail to
+<a name="line23"></a> * smarty-discussion-subscribe@googlegroups.com
+<a name="line24"></a> *
+<a name="line25"></a> * @link http://www.smarty.net/
+<a name="line26"></a> * @copyright 2008 New Digital Group, Inc.
+<a name="line27"></a> * @author Monte Ohrt <monte at ohrt dot com>
+<a name="line28"></a> * @author Uwe Tews
+<a name="line29"></a> * @author Rodney Rehm
+<a name="line30"></a> * @package Smarty
+<a name="line31"></a> */
+<a name="line32"></a>/**
+<a name="line33"></a> * @ignore
+<a name="line34"></a> */
+<a name="line35"></a>require(dirname(__FILE__) . '/Smarty.class.php');
+<a name="line36"></a>
+<a name="line37"></a>/**
+<a name="line38"></a> * Smarty Backward Compatability Wrapper Class
+<a name="line39"></a> *
+<a name="line40"></a> * @package Smarty
+<a name="line41"></a> */
+<a name="line42"></a>class SmartyBC extends Smarty {
+<a name="line43"></a>
+<a name="line44"></a>    /**
+<a name="line45"></a>     * Smarty 2 BC
+<a name="line46"></a>     * @var string
+<a name="line47"></a>     */
+<a name="line48"></a>    public $_version = self::SMARTY_VERSION;
+<a name="line49"></a>
+<a name="line50"></a>    /**
+<a name="line51"></a>     * Initialize new SmartyBC object
+<a name="line52"></a>     *
+<a name="line53"></a>     * @param array $options options to set during initialization, e.g. array( 'forceCompile' => false )
+<a name="line54"></a>     */
+<a name="line55"></a>    public function __construct(array $options=array())
+<a name="line56"></a>    {
+<a name="line57"></a>        parent::__construct($options);
+<a name="line58"></a>        // register {php} tag
+<a name="line59"></a>        $this->registerPlugin('block', 'php', 'smarty_php_tag');
+<a name="line60"></a>    }
+<a name="line61"></a>
+<a name="line62"></a>    /**
+<a name="line63"></a>     * wrapper for assign_by_ref
+<a name="line64"></a>     *
+<a name="line65"></a>     * @param string $tpl_var the template variable name
+<a name="line66"></a>     * @param mixed  &$value  the referenced value to assign
+<a name="line67"></a>     */
+<a name="line68"></a>    public function assign_by_ref($tpl_var, &$value)
+<a name="line69"></a>    {
+<a name="line70"></a>        $this->assignByRef($tpl_var, $value);
+<a name="line71"></a>    }
+<a name="line72"></a>
+<a name="line73"></a>    /**
+<a name="line74"></a>     * wrapper for append_by_ref
+<a name="line75"></a>     *
+<a name="line76"></a>     * @param string  $tpl_var the template variable name
+<a name="line77"></a>     * @param mixed   &$value  the referenced value to append
+<a name="line78"></a>     * @param boolean $merge   flag if array elements shall be merged
+<a name="line79"></a>     */
+<a name="line80"></a>    public function append_by_ref($tpl_var, &$value, $merge = false)
+<a name="line81"></a>    {
+<a name="line82"></a>        $this->appendByRef($tpl_var, $value, $merge);
+<a name="line83"></a>    }
+<a name="line84"></a>
+<a name="line85"></a>    /**
+<a name="line86"></a>     * clear the given assigned template variable.
+<a name="line87"></a>     *
+<a name="line88"></a>     * @param string $tpl_var the template variable to clear
+<a name="line89"></a>     */
+<a name="line90"></a>    public function clear_assign($tpl_var)
+<a name="line91"></a>    {
+<a name="line92"></a>        $this->clearAssign($tpl_var);
+<a name="line93"></a>    }
+<a name="line94"></a>
+<a name="line95"></a>    /**
+<a name="line96"></a>     * Registers custom function to be used in templates
+<a name="line97"></a>     *
+<a name="line98"></a>     * @param string $function      the name of the template function
+<a name="line99"></a>     * @param string $function_impl the name of the PHP function to register
+<a name="line100"></a>     * @param bool   $cacheable
+<a name="line101"></a>     * @param mixed  $cache_attrs
+<a name="line102"></a>     */
+<a name="line103"></a>    public function register_function($function, $function_impl, $cacheable=true, $cache_attrs=null)
+<a name="line104"></a>    {
+<a name="line105"></a>        $this->registerPlugin('function', $function, $function_impl, $cacheable, $cache_attrs);
+<a name="line106"></a>    }
+<a name="line107"></a>
+<a name="line108"></a>    /**
+<a name="line109"></a>     * Unregisters custom function
+<a name="line110"></a>     *
+<a name="line111"></a>     * @param string $function name of template function
+<a name="line112"></a>     */
+<a name="line113"></a>    public function unregister_function($function)
+<a name="line114"></a>    {
+<a name="line115"></a>        $this->unregisterPlugin('function', $function);
+<a name="line116"></a>    }
+<a name="line117"></a>
+<a name="line118"></a>    /**
+<a name="line119"></a>     * Registers object to be used in templates
+<a name="line120"></a>     *
+<a name="line121"></a>     * @param string  $object      name of template object
+<a name="line122"></a>     * @param object  $object_impl the referenced PHP object to register
+<a name="line123"></a>     * @param array   $allowed     list of allowed methods (empty = all)
+<a name="line124"></a>     * @param boolean $smarty_args smarty argument format, else traditional
+<a name="line125"></a>     * @param array   $block_functs list of methods that are block format
+<a name="line126"></a>     */
+<a name="line127"></a>    public function register_object($object, $object_impl, $allowed = array(), $smarty_args = true, $block_methods = array())
+<a name="line128"></a>    {
+<a name="line129"></a>        settype($allowed, 'array');
+<a name="line130"></a>        settype($smarty_args, 'boolean');
+<a name="line131"></a>        $this->registerObject($object, $object_impl, $allowed, $smarty_args, $block_methods);
+<a name="line132"></a>    }
+<a name="line133"></a>
+<a name="line134"></a>    /**
+<a name="line135"></a>     * Unregisters object
+<a name="line136"></a>     *
+<a name="line137"></a>     * @param string $object name of template object
+<a name="line138"></a>     */
+<a name="line139"></a>    public function unregister_object($object)
+<a name="line140"></a>    {
+<a name="line141"></a>        $this->unregisterObject($object);
+<a name="line142"></a>    }
+<a name="line143"></a>
+<a name="line144"></a>    /**
+<a name="line145"></a>     * Registers block function to be used in templates
+<a name="line146"></a>     *
+<a name="line147"></a>     * @param string $block      name of template block
+<a name="line148"></a>     * @param string $block_impl PHP function to register
+<a name="line149"></a>     * @param bool   $cacheable
+<a name="line150"></a>     * @param mixed  $cache_attrs
+<a name="line151"></a>     */
+<a name="line152"></a>    public function register_block($block, $block_impl, $cacheable=true, $cache_attrs=null)
+<a name="line153"></a>    {
+<a name="line154"></a>        $this->registerPlugin('block', $block, $block_impl, $cacheable, $cache_attrs);
+<a name="line155"></a>    }
+<a name="line156"></a>
+<a name="line157"></a>    /**
+<a name="line158"></a>     * Unregisters block function
+<a name="line159"></a>     *
+<a name="line160"></a>     * @param string $block name of template function
+<a name="line161"></a>     */
+<a name="line162"></a>    public function unregister_block($block)
+<a name="line163"></a>    {
+<a name="line164"></a>        $this->unregisterPlugin('block', $block);
+<a name="line165"></a>    }
+<a name="line166"></a>
+<a name="line167"></a>    /**
+<a name="line168"></a>     * Registers compiler function
+<a name="line169"></a>     *
+<a name="line170"></a>     * @param string $function      name of template function
+<a name="line171"></a>     * @param string $function_impl name of PHP function to register
+<a name="line172"></a>     * @param bool   $cacheable
+<a name="line173"></a>     */
+<a name="line174"></a>    public function register_compiler_function($function, $function_impl, $cacheable=true)
+<a name="line175"></a>    {
+<a name="line176"></a>        $this->registerPlugin('compiler', $function, $function_impl, $cacheable);
+<a name="line177"></a>    }
+<a name="line178"></a>
+<a name="line179"></a>    /**
+<a name="line180"></a>     * Unregisters compiler function
+<a name="line181"></a>     *
+<a name="line182"></a>     * @param string $function name of template function
+<a name="line183"></a>     */
+<a name="line184"></a>    public function unregister_compiler_function($function)
+<a name="line185"></a>    {
+<a name="line186"></a>        $this->unregisterPlugin('compiler', $function);
+<a name="line187"></a>    }
+<a name="line188"></a>
+<a name="line189"></a>    /**
+<a name="line190"></a>     * Registers modifier to be used in templates
+<a name="line191"></a>     *
+<a name="line192"></a>     * @param string $modifier name of template modifier
+<a name="line193"></a>     * @param string $modifier_impl name of PHP function to register
+<a name="line194"></a>     */
+<a name="line195"></a>    public function register_modifier($modifier, $modifier_impl)
+<a name="line196"></a>    {
+<a name="line197"></a>        $this->registerPlugin('modifier', $modifier, $modifier_impl);
+<a name="line198"></a>    }
+<a name="line199"></a>
+<a name="line200"></a>    /**
+<a name="line201"></a>     * Unregisters modifier
+<a name="line202"></a>     *
+<a name="line203"></a>     * @param string $modifier name of template modifier
+<a name="line204"></a>     */
+<a name="line205"></a>    public function unregister_modifier($modifier)
+<a name="line206"></a>    {
+<a name="line207"></a>        $this->unregisterPlugin('modifier', $modifier);
+<a name="line208"></a>    }
+<a name="line209"></a>
+<a name="line210"></a>    /**
+<a name="line211"></a>     * Registers a resource to fetch a template
+<a name="line212"></a>     *
+<a name="line213"></a>     * @param string $type      name of resource
+<a name="line214"></a>     * @param array  $functions array of functions to handle resource
+<a name="line215"></a>     */
+<a name="line216"></a>    public function register_resource($type, $functions)
+<a name="line217"></a>    {
+<a name="line218"></a>        $this->registerResource($type, $functions);
+<a name="line219"></a>    }
+<a name="line220"></a>
+<a name="line221"></a>    /**
+<a name="line222"></a>     * Unregisters a resource
+<a name="line223"></a>     *
+<a name="line224"></a>     * @param string $type name of resource
+<a name="line225"></a>     */
+<a name="line226"></a>    public function unregister_resource($type)
+<a name="line227"></a>    {
+<a name="line228"></a>        $this->unregisterResource($type);
+<a name="line229"></a>    }
+<a name="line230"></a>
+<a name="line231"></a>    /**
+<a name="line232"></a>     * Registers a prefilter function to apply
+<a name="line233"></a>     * to a template before compiling
+<a name="line234"></a>     *
+<a name="line235"></a>     * @param callable $function
+<a name="line236"></a>     */
+<a name="line237"></a>    public function register_prefilter($function)
+<a name="line238"></a>    {
+<a name="line239"></a>        $this->registerFilter('pre', $function);
+<a name="line240"></a>    }
+<a name="line241"></a>
+<a name="line242"></a>    /**
+<a name="line243"></a>     * Unregisters a prefilter function
+<a name="line244"></a>     *
+<a name="line245"></a>     * @param callable $function
+<a name="line246"></a>     */
+<a name="line247"></a>    public function unregister_prefilter($function)
+<a name="line248"></a>    {
+<a name="line249"></a>        $this->unregisterFilter('pre', $function);
+<a name="line250"></a>    }
+<a name="line251"></a>
+<a name="line252"></a>    /**
+<a name="line253"></a>     * Registers a postfilter function to apply
+<a name="line254"></a>     * to a compiled template after compilation
+<a name="line255"></a>     *
+<a name="line256"></a>     * @param callable $function
+<a name="line257"></a>     */
+<a name="line258"></a>    public function register_postfilter($function)
+<a name="line259"></a>    {
+<a name="line260"></a>        $this->registerFilter('post', $function);
+<a name="line261"></a>    }
+<a name="line262"></a>
+<a name="line263"></a>    /**
+<a name="line264"></a>     * Unregisters a postfilter function
+<a name="line265"></a>     *
+<a name="line266"></a>     * @param callable $function
+<a name="line267"></a>     */
+<a name="line268"></a>    public function unregister_postfilter($function)
+<a name="line269"></a>    {
+<a name="line270"></a>        $this->unregisterFilter('post', $function);
+<a name="line271"></a>    }
+<a name="line272"></a>
+<a name="line273"></a>    /**
+<a name="line274"></a>     * Registers an output filter function to apply
+<a name="line275"></a>     * to a template output
+<a name="line276"></a>     *
+<a name="line277"></a>     * @param callable $function
+<a name="line278"></a>     */
+<a name="line279"></a>    public function register_outputfilter($function)
+<a name="line280"></a>    {
+<a name="line281"></a>        $this->registerFilter('output', $function);
+<a name="line282"></a>    }
+<a name="line283"></a>
+<a name="line284"></a>    /**
+<a name="line285"></a>     * Unregisters an outputfilter function
+<a name="line286"></a>     *
+<a name="line287"></a>     * @param callable $function
+<a name="line288"></a>     */
+<a name="line289"></a>    public function unregister_outputfilter($function)
+<a name="line290"></a>    {
+<a name="line291"></a>        $this->unregisterFilter('output', $function);
+<a name="line292"></a>    }
+<a name="line293"></a>
+<a name="line294"></a>    /**
+<a name="line295"></a>     * load a filter of specified type and name
+<a name="line296"></a>     *
+<a name="line297"></a>     * @param string $type filter type
+<a name="line298"></a>     * @param string $name filter name
+<a name="line299"></a>     */
+<a name="line300"></a>    public function load_filter($type, $name)
+<a name="line301"></a>    {
+<a name="line302"></a>        $this->loadFilter($type, $name);
+<a name="line303"></a>    }
+<a name="line304"></a>
+<a name="line305"></a>    /**
+<a name="line306"></a>     * clear cached content for the given template and cache id
+<a name="line307"></a>     *
+<a name="line308"></a>     * @param string $tpl_file   name of template file
+<a name="line309"></a>     * @param string $cache_id   name of cache_id
+<a name="line310"></a>     * @param string $compile_id name of compile_id
+<a name="line311"></a>     * @param string $exp_time   expiration time
+<a name="line312"></a>     * @return boolean
+<a name="line313"></a>     */
+<a name="line314"></a>    public function clear_cache($tpl_file = null, $cache_id = null, $compile_id = null, $exp_time = null)
+<a name="line315"></a>    {
+<a name="line316"></a>        return $this->clearCache($tpl_file, $cache_id, $compile_id, $exp_time);
+<a name="line317"></a>    }
+<a name="line318"></a>
+<a name="line319"></a>    /**
+<a name="line320"></a>     * clear the entire contents of cache (all templates)
+<a name="line321"></a>     *
+<a name="line322"></a>     * @param string $exp_time expire time
+<a name="line323"></a>     * @return boolean
+<a name="line324"></a>     */
+<a name="line325"></a>    public function clear_all_cache($exp_time = null)
+<a name="line326"></a>    {
+<a name="line327"></a>        return $this->clearCache(null, null, null, $exp_time);
+<a name="line328"></a>    }
+<a name="line329"></a>
+<a name="line330"></a>    /**
+<a name="line331"></a>     * test to see if valid cache exists for this template
+<a name="line332"></a>     *
+<a name="line333"></a>     * @param string $tpl_file name of template file
+<a name="line334"></a>     * @param string $cache_id
+<a name="line335"></a>     * @param string $compile_id
+<a name="line336"></a>     * @return boolean
+<a name="line337"></a>     */
+<a name="line338"></a>    public function is_cached($tpl_file, $cache_id = null, $compile_id = null)
+<a name="line339"></a>    {
+<a name="line340"></a>        return $this->isCached($tpl_file, $cache_id, $compile_id);
+<a name="line341"></a>    }
+<a name="line342"></a>
+<a name="line343"></a>    /**
+<a name="line344"></a>     * clear all the assigned template variables.
+<a name="line345"></a>     */
+<a name="line346"></a>    public function clear_all_assign()
+<a name="line347"></a>    {
+<a name="line348"></a>        $this->clearAllAssign();
+<a name="line349"></a>    }
+<a name="line350"></a>
+<a name="line351"></a>    /**
+<a name="line352"></a>     * clears compiled version of specified template resource,
+<a name="line353"></a>     * or all compiled template files if one is not specified.
+<a name="line354"></a>     * This function is for advanced use only, not normally needed.
+<a name="line355"></a>     *
+<a name="line356"></a>     * @param string $tpl_file
+<a name="line357"></a>     * @param string $compile_id
+<a name="line358"></a>     * @param string $exp_time
+<a name="line359"></a>     * @return boolean results of {@link smarty_core_rm_auto()}
+<a name="line360"></a>     */
+<a name="line361"></a>    public function clear_compiled_tpl($tpl_file = null, $compile_id = null, $exp_time = null)
+<a name="line362"></a>    {
+<a name="line363"></a>        return $this->clearCompiledTemplate($tpl_file, $compile_id, $exp_time);
+<a name="line364"></a>    }
+<a name="line365"></a>
+<a name="line366"></a>    /**
+<a name="line367"></a>     * Checks whether requested template exists.
+<a name="line368"></a>     *
+<a name="line369"></a>     * @param string $tpl_file
+<a name="line370"></a>     * @return boolean
+<a name="line371"></a>     */
+<a name="line372"></a>    public function template_exists($tpl_file)
+<a name="line373"></a>    {
+<a name="line374"></a>        return $this->templateExists($tpl_file);
+<a name="line375"></a>    }
+<a name="line376"></a>
+<a name="line377"></a>    /**
+<a name="line378"></a>     * Returns an array containing template variables
+<a name="line379"></a>     *
+<a name="line380"></a>     * @param string $name
+<a name="line381"></a>     * @return array
+<a name="line382"></a>     */
+<a name="line383"></a>    public function get_template_vars($name=null)
+<a name="line384"></a>    {
+<a name="line385"></a>        return $this->getTemplateVars($name);
+<a name="line386"></a>    }
+<a name="line387"></a>
+<a name="line388"></a>    /**
+<a name="line389"></a>     * Returns an array containing config variables
+<a name="line390"></a>     *
+<a name="line391"></a>     * @param string $name
+<a name="line392"></a>     * @return array
+<a name="line393"></a>     */
+<a name="line394"></a>    public function get_config_vars($name=null)
+<a name="line395"></a>    {
+<a name="line396"></a>        return $this->getConfigVars($name);
+<a name="line397"></a>    }
+<a name="line398"></a>
+<a name="line399"></a>    /**
+<a name="line400"></a>     * load configuration values
+<a name="line401"></a>     *
+<a name="line402"></a>     * @param string $file
+<a name="line403"></a>     * @param string $section
+<a name="line404"></a>     * @param string $scope
+<a name="line405"></a>     */
+<a name="line406"></a>    public function config_load($file, $section = null, $scope = 'global')
+<a name="line407"></a>    {
+<a name="line408"></a>        $this->ConfigLoad($file, $section, $scope);
+<a name="line409"></a>    }
+<a name="line410"></a>
+<a name="line411"></a>    /**
+<a name="line412"></a>     * return a reference to a registered object
+<a name="line413"></a>     *
+<a name="line414"></a>     * @param string $name
+<a name="line415"></a>     * @return object
+<a name="line416"></a>     */
+<a name="line417"></a>    public function get_registered_object($name)
+<a name="line418"></a>    {
+<a name="line419"></a>        return $this->getRegisteredObject($name);
+<a name="line420"></a>    }
+<a name="line421"></a>
+<a name="line422"></a>    /**
+<a name="line423"></a>     * clear configuration values
+<a name="line424"></a>     *
+<a name="line425"></a>     * @param string $var
+<a name="line426"></a>     */
+<a name="line427"></a>    public function clear_config($var = null)
+<a name="line428"></a>    {
+<a name="line429"></a>        $this->clearConfig($var);
+<a name="line430"></a>    }
+<a name="line431"></a>
+<a name="line432"></a>    /**
+<a name="line433"></a>     * trigger Smarty error
+<a name="line434"></a>     *
+<a name="line435"></a>     * @param string $error_msg
+<a name="line436"></a>     * @param integer $error_type
+<a name="line437"></a>     */
+<a name="line438"></a>    public function trigger_error($error_msg, $error_type = E_USER_WARNING)
+<a name="line439"></a>    {
+<a name="line440"></a>        trigger_error("Smarty error: $error_msg", $error_type);
+<a name="line441"></a>    }
+<a name="line442"></a>
+<a name="line443"></a>}
+<a name="line444"></a>
+<a name="line445"></a>/**
+<a name="line446"></a> * Smarty {php}{/php} block function
+<a name="line447"></a> *
+<a name="line448"></a> * @param array   $params   parameter list
+<a name="line449"></a> * @param string  $content  contents of the block
+<a name="line450"></a> * @param object  $template template object
+<a name="line451"></a> * @param boolean &$repeat  repeat flag
+<a name="line452"></a> * @return string content re-formatted
+<a name="line453"></a> */
+<a name="line454"></a>function smarty_php_tag($params, $content, $template, &$repeat)
+<a name="line455"></a>{
+<a name="line456"></a>    eval($content);
+<a name="line457"></a>    return '';
+<a name="line458"></a>}
+<a name="line459"></a>
+<a name="line460"></a>?></pre>
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../index.html" target="_top">Frames</a>
+<a href="../../../../source/lib/php/smarty/smartybc.class.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

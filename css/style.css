@@ -147,7 +147,7 @@ img.aligncenter {
 #banner a {
 	border: none;
 	background: none;
-	text-decoration: none;
+	text-decoration: none;pos
 	color: #FFFFFF;
 }
 
@@ -277,14 +277,25 @@ img.aligncenter {
 }
 
 .post .entry {
-	text-align: justify;
 	margin-bottom: 25px;
 	padding: 10px 0px 0px 0px;
 }
 
-.post img{
-	float: right;
+.post img {
+	
 	padding: 10px;
+}
+.about {
+	float: left;
+	width: 100%;
+	display:block;
+}
+.about .about-info {
+	float: right;
+	padding: 10px;	
+}
+.about .about-link{
+	text-align: center;
 }
 .links {
 	display: block;

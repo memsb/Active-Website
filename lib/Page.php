@@ -3,9 +3,10 @@
 require_once LIB . 'User.php';
 require_once LIB . 'DBA.php';
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
  * A base class for all pages
+ * @namespace active
  */
 class Page {
 
@@ -28,9 +29,7 @@ class Page {
 	 * Calls constructor on Page
 	 */
 	public function __construct(){
-		//if( ! isset($_COOKIE[ini_get('session.name')]) ){
-			session_start();
-		//}
+		session_start();
 		$this->db = new Database();
 		$this->db->connect();
 		$this->user = new User($this->db);

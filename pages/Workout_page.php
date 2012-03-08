@@ -1,13 +1,14 @@
 <?php
 
-require_once PAGES . 'Page.php';
+require_once LIB . 'Page.php';
 require_once LIB . 'Workout.php';
 require_once LIB . 'Activities.php';
 require_once LIB . 'Activity.php';
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
  * Allows a user to view a workout and to edit if it is theirs
+ * @namespace active
  */
 class Workout_page extends Page{
 

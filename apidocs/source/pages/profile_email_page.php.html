@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Wed, 07 Mar 2012 14:34:43 +0000">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
 <link rel="start" href="../../overview-summary.html">
@@ -38,92 +38,93 @@
 
 <a name="line1"></a><pre><?php
 <a name="line2"></a>
-<a name="line3"></a>require_once PAGES . 'Profile.php';
+<a name="line3"></a>require_once LIB . 'Profile.php';
 <a name="line4"></a>require_once PAGES . 'Home_page.php';
 <a name="line5"></a>
-<a name="line6"></a>/*
+<a name="line6"></a>/**
 <a name="line7"></a> * @author Martin Buckley - MBuckley@gmail.com
 <a name="line8"></a> * Allows a user to update their email address
-<a name="line9"></a> */
-<a name="line10"></a>class Profile_Email_page extends Profile {
-<a name="line11"></a>
-<a name="line12"></a>	/*
-<a name="line13"></a>	 * Page name
-<a name="line14"></a>	 * Printed in page title and used to link to this page
-<a name="line15"></a>	 */
-<a name="line16"></a>	const PAGE_NAME = 'Profile_Email';
-<a name="line17"></a>	
-<a name="line18"></a>	/*
-<a name="line19"></a>	 * Page constructor
-<a name="line20"></a>	 * Calls constructor on Page
-<a name="line21"></a>	 */
-<a name="line22"></a>	public function __construct(){
-<a name="line23"></a>		parent::__construct();
-<a name="line24"></a>	}
-<a name="line25"></a>	
-<a name="line26"></a>	/*
-<a name="line27"></a>	 * Post request on page
-<a name="line28"></a>	 * Changes the users email address provided that the user is logged in and has provided their password.
-<a name="line29"></a>	 * A new password hash must be created using the users email address
-<a name="line30"></a>	 * @param Array of parameters
-<a name="line31"></a>	 */
-<a name="line32"></a>	public function post($data){
-<a name="line33"></a>		// User must have supplied a password
-<a name="line34"></a>		if( ! $this->valid_arg($data['password']) || ! $this->valid_arg($data['email']) ){
-<a name="line35"></a>			$this->message = 'Please provide an Email address and password';
-<a name="line36"></a>			return;
-<a name="line37"></a>		}
-<a name="line38"></a>		$email = $data['email'];
-<a name="line39"></a>		$pass = $data['password'];
-<a name="line40"></a>		
-<a name="line41"></a>		// User must be logged in
-<a name="line42"></a>		if( $this->user->isLoggedIn() ){
-<a name="line43"></a>			$uid = $this->user->user_id;
-<a name="line44"></a>			
-<a name="line45"></a>			try {
-<a name="line46"></a>				$person = $this->load_person($uid);
-<a name="line47"></a>				// Check password is correct
-<a name="line48"></a>				$this->user->login($person->email, $pass);
-<a name="line49"></a>				//update email
-<a name="line50"></a>				$person->email = $email;
-<a name="line51"></a>				$person->password = $pass;
-<a name="line52"></a>				$person->update();				
-<a name="line53"></a>			}catch(Exception $e){
-<a name="line54"></a>				$this->message = 'Password incorrect';
-<a name="line55"></a>				return;
-<a name="line56"></a>			}
-<a name="line57"></a>			$this->message = 'Email updated.';
-<a name="line58"></a>		}
-<a name="line59"></a>	}
-<a name="line60"></a>
-<a name="line61"></a>	/*
-<a name="line62"></a>	 * Standard page visit
-<a name="line63"></a>	 * Displays a form allowing the user to update their email address
-<a name="line64"></a>	 */
-<a name="line65"></a>	public function visit(){
-<a name="line66"></a>		// User must be logged in to view this page
-<a name="line67"></a>		if( ! $this->user->isLoggedIn() ){
-<a name="line68"></a>			header('Location: ' . Home_page::PAGE_NAME);
-<a name="line69"></a>			exit();
-<a name="line70"></a>		}
-<a name="line71"></a>
-<a name="line72"></a>		// Display text telling user what they are about to do
-<a name="line73"></a>		$page = $this->smarty->createTemplate('index.tpl');
-<a name="line74"></a>		$page->assign('page', $this::PAGE_NAME);
-<a name="line75"></a>
-<a name="line76"></a>		$menu  = $this->userMenu();
-<a name="line77"></a>		$page->assign('menu', $menu->fetch());
-<a name="line78"></a>
-<a name="line79"></a>		// Request new email address & password confirmation
-<a name="line80"></a>		$form = $this->smarty->createTemplate('change_email.tpl');
-<a name="line81"></a>		$form->assign('action', $this::PAGE_NAME);		
-<a name="line82"></a>		$page->assign('content', $this->message . $form->fetch());
-<a name="line83"></a>		$page->display();
-<a name="line84"></a>	}
-<a name="line85"></a>}
-<a name="line86"></a>
-<a name="line87"></a>?>
-<a name="line88"></a></pre>
+<a name="line9"></a> * @namespace active
+<a name="line10"></a> */
+<a name="line11"></a>class Profile_Email_page extends Profile {
+<a name="line12"></a>
+<a name="line13"></a>	/*
+<a name="line14"></a>	 * Page name
+<a name="line15"></a>	 * Printed in page title and used to link to this page
+<a name="line16"></a>	 */
+<a name="line17"></a>	const PAGE_NAME = 'Profile_Email';
+<a name="line18"></a>	
+<a name="line19"></a>	/*
+<a name="line20"></a>	 * Page constructor
+<a name="line21"></a>	 * Calls constructor on Page
+<a name="line22"></a>	 */
+<a name="line23"></a>	public function __construct(){
+<a name="line24"></a>		parent::__construct();
+<a name="line25"></a>	}
+<a name="line26"></a>	
+<a name="line27"></a>	/*
+<a name="line28"></a>	 * Post request on page
+<a name="line29"></a>	 * Changes the users email address provided that the user is logged in and has provided their password.
+<a name="line30"></a>	 * A new password hash must be created using the users email address
+<a name="line31"></a>	 * @param Array of parameters
+<a name="line32"></a>	 */
+<a name="line33"></a>	public function post($data){
+<a name="line34"></a>		// User must have supplied a password
+<a name="line35"></a>		if( ! $this->valid_arg($data['password']) || ! $this->valid_arg($data['email']) ){
+<a name="line36"></a>			$this->message = 'Please provide an Email address and password';
+<a name="line37"></a>			return;
+<a name="line38"></a>		}
+<a name="line39"></a>		$email = $data['email'];
+<a name="line40"></a>		$pass = $data['password'];
+<a name="line41"></a>		
+<a name="line42"></a>		// User must be logged in
+<a name="line43"></a>		if( $this->user->isLoggedIn() ){
+<a name="line44"></a>			$uid = $this->user->user_id;
+<a name="line45"></a>			
+<a name="line46"></a>			try {
+<a name="line47"></a>				$person = $this->load_person($uid);
+<a name="line48"></a>				// Check password is correct
+<a name="line49"></a>				$this->user->login($person->email, $pass);
+<a name="line50"></a>				//update email
+<a name="line51"></a>				$person->email = $email;
+<a name="line52"></a>				$person->password = $pass;
+<a name="line53"></a>				$person->update();				
+<a name="line54"></a>			}catch(Exception $e){
+<a name="line55"></a>				$this->message = 'Password incorrect';
+<a name="line56"></a>				return;
+<a name="line57"></a>			}
+<a name="line58"></a>			$this->message = 'Email updated.';
+<a name="line59"></a>		}
+<a name="line60"></a>	}
+<a name="line61"></a>
+<a name="line62"></a>	/*
+<a name="line63"></a>	 * Standard page visit
+<a name="line64"></a>	 * Displays a form allowing the user to update their email address
+<a name="line65"></a>	 */
+<a name="line66"></a>	public function visit(){
+<a name="line67"></a>		// User must be logged in to view this page
+<a name="line68"></a>		if( ! $this->user->isLoggedIn() ){
+<a name="line69"></a>			header('Location: ' . Home_page::PAGE_NAME);
+<a name="line70"></a>			exit();
+<a name="line71"></a>		}
+<a name="line72"></a>
+<a name="line73"></a>		// Display text telling user what they are about to do
+<a name="line74"></a>		$page = $this->smarty->createTemplate('index.tpl');
+<a name="line75"></a>		$page->assign('page', $this::PAGE_NAME);
+<a name="line76"></a>
+<a name="line77"></a>		$menu  = $this->userMenu();
+<a name="line78"></a>		$page->assign('menu', $menu->fetch());
+<a name="line79"></a>
+<a name="line80"></a>		// Request new email address & password confirmation
+<a name="line81"></a>		$form = $this->smarty->createTemplate('change_email.tpl');
+<a name="line82"></a>		$form->assign('action', $this::PAGE_NAME);		
+<a name="line83"></a>		$page->assign('content', $this->message . $form->fetch());
+<a name="line84"></a>		$page->display();
+<a name="line85"></a>	}
+<a name="line86"></a>}
+<a name="line87"></a>
+<a name="line88"></a>?>
+<a name="line89"></a></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

@@ -1,12 +1,13 @@
 <?php
 
-require_once PAGES . 'Page.php';
+require_once LIB . 'Page.php';
 require_once LIB . 'Person.php';
 require_once LIB . 'Persons.php';
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
  * Displays a full list of site users split in to multiple pages
+ * @namespace active
  */
 class Users_page extends Page{
 

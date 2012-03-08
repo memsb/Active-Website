@@ -1,0 +1,300 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:25 +0000">
+
+<link rel="stylesheet" type="text/css" href="../stylesheet.css">
+<link rel="start" href="../overview-summary.html">
+
+<title>Smarty_Template_Cached (PHPDoctor)</title>
+
+</head>
+<body id="definition" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../overview-summary.html">Overview</a></li>
+<li><a href="../smarty/package-summary.html">Namespace</a></li>
+<li class="active">Class</li>
+<li><a href="../smarty/package-tree.html">Tree</a></li>
+<li><a href="../overview-files.html">Files</a></li>
+<li><a href="../deprecated-list.html">Deprecated</a></li>
+<li><a href="../todo-list.html">Todo</a></li>
+<li><a href="../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../index.html" target="_top">Frames</a>
+<a href="../smarty/smarty_template_cached.html" target="_top">No frames</a>
+</div>
+<div class="small_links">
+Summary: <a href="#summary_field">Field</a> | <a href="#summary_method">Method</a> | <a href="#summary_constr">Constr</a>
+Detail: <a href="#detail_field">Field</a> | <a href="#detail_method">Method</a> | <a href="#summary_constr">Constr</a>
+</div>
+<hr>
+
+<div class="qualifiedName">Smarty\Smarty_Template_Cached</div>
+<a href="../source/lib/php/smarty/sysplugins/smarty_cacheresource.php.html#line205" class="location">lib/php/Smarty/sysplugins/smarty_cacheresource.php at line 205</a>
+
+<h1>Class Smarty_Template_Cached</h1>
+
+<pre class="tree"><strong>Smarty_Template_Cached</strong><br /></pre>
+
+<hr>
+
+<p class="signature">public  class <strong>Smarty_Template_Cached</strong></p>
+
+<div class="comment" id="overview_description"><p>Smarty Resource Data Object</p><p>Cache Data Container for Template Files</p></div>
+
+<dl>
+<dt>Subpackage:</dt>
+<dd>TemplateResources</dd>
+<dt>Author:</dt>
+<dd>Rodney Rehm</dd>
+</dl>
+<hr>
+
+<table id="summary_field">
+<tr><th colspan="2">Field Summary</th></tr>
+<tr>
+<td class="type"> string</td>
+<td class="description"><p class="name"><a href="#cache_id">$cache_id</a></p><p class="description">Template Cache Id (Smarty_Internal_Template::$cache_id)</p></td>
+</tr>
+<tr>
+<td class="type"> string</td>
+<td class="description"><p class="name"><a href="#compile_id">$compile_id</a></p><p class="description">Template Compile Id (Smarty_Internal_Template::$compile_id)</p></td>
+</tr>
+<tr>
+<td class="type"> string</td>
+<td class="description"><p class="name"><a href="#content">$content</a></p><p class="description">Source Content</p></td>
+</tr>
+<tr>
+<td class="type"> boolean</td>
+<td class="description"><p class="name"><a href="#exists">$exists</a></p><p class="description">Source Existance</p></td>
+</tr>
+<tr>
+<td class="type"> string</td>
+<td class="description"><p class="name"><a href="#filepath">$filepath</a></p><p class="description">Source Filepath</p></td>
+</tr>
+<tr>
+<td class="type"> <a href="../smarty/smarty_cacheresource.html">Smarty_CacheResource</a></td>
+<td class="description"><p class="name"><a href="#handler">$handler</a></p><p class="description">CacheResource Handler</p></td>
+</tr>
+<tr>
+<td class="type"> bool</td>
+<td class="description"><p class="name"><a href="#is_locked">$is_locked</a></p><p class="description">flag that cache is locked by this instance</p></td>
+</tr>
+<tr>
+<td class="type"> string</td>
+<td class="description"><p class="name"><a href="#lock_id">$lock_id</a></p><p class="description">Id for cache locking</p></td>
+</tr>
+<tr>
+<td class="type"> boolean</td>
+<td class="description"><p class="name"><a href="#processed">$processed</a></p><p class="description">Cache was processed</p></td>
+</tr>
+<tr>
+<td class="type"> <a href="../smarty/smarty_template_source.html">Smarty_Template_Source</a></td>
+<td class="description"><p class="name"><a href="#source">$source</a></p><p class="description">Source Object</p></td>
+</tr>
+<tr>
+<td class="type"> integer</td>
+<td class="description"><p class="name"><a href="#timestamp">$timestamp</a></p><p class="description">Source Timestamp</p></td>
+</tr>
+<tr>
+<td class="type"> boolean</td>
+<td class="description"><p class="name"><a href="#valid">$valid</a></p><p class="description">Cache Is Valid</p></td>
+</tr>
+</table>
+
+<table id="summary_constructor">
+<tr><th colspan="2">Constructor Summary</th></tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#__construct()">__construct</a>(<a href="../smarty/smarty_internal_template.html">Smarty_Internal_Template</a> _template)</p><p class="description">create Cached Object container</p></td>
+</tr>
+</table>
+
+<table id="summary_method">
+<tr><th colspan="2">Method Summary</th></tr>
+<tr>
+<td class="type"> boolean</td>
+<td class="description"><p class="name"><a href="#write()">write</a>(<a href="../smarty/smarty_internal_template.html">Smarty_Internal_Template</a> _template, string content)</p><p class="description">Write this cache object to handler</p></td>
+</tr>
+</table>
+
+<h2 id="detail_field">Field Detail</h2>
+<a href="../source/lib/php/smarty/sysplugins/smarty_cacheresource.php.html#line258" class="location">lib/php/Smarty/sysplugins/smarty_cacheresource.php at line 258</a>
+
+<h3 id="cache_id">cache_id</h3>
+<code class="signature">public  string <strong>$cache_id</strong> = null</code>
+<div class="details">
+<p>Template Cache Id (Smarty_Internal_Template::$cache_id)</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/sysplugins/smarty_cacheresource.php.html#line252" class="location">lib/php/Smarty/sysplugins/smarty_cacheresource.php at line 252</a>
+
+<h3 id="compile_id">compile_id</h3>
+<code class="signature">public  string <strong>$compile_id</strong> = null</code>
+<div class="details">
+<p>Template Compile Id (Smarty_Internal_Template::$compile_id)</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/sysplugins/smarty_cacheresource.php.html#line216" class="location">lib/php/Smarty/sysplugins/smarty_cacheresource.php at line 216</a>
+
+<h3 id="content">content</h3>
+<code class="signature">public  string <strong>$content</strong> = null</code>
+<div class="details">
+<p>Source Content</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/sysplugins/smarty_cacheresource.php.html#line228" class="location">lib/php/Smarty/sysplugins/smarty_cacheresource.php at line 228</a>
+
+<h3 id="exists">exists</h3>
+<code class="signature">public  boolean <strong>$exists</strong> = false</code>
+<div class="details">
+<p>Source Existance</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/sysplugins/smarty_cacheresource.php.html#line210" class="location">lib/php/Smarty/sysplugins/smarty_cacheresource.php at line 210</a>
+
+<h3 id="filepath">filepath</h3>
+<code class="signature">public  string <strong>$filepath</strong> = false</code>
+<div class="details">
+<p>Source Filepath</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/sysplugins/smarty_cacheresource.php.html#line246" class="location">lib/php/Smarty/sysplugins/smarty_cacheresource.php at line 246</a>
+
+<h3 id="handler">handler</h3>
+<code class="signature">public  <a href="../smarty/smarty_cacheresource.html">Smarty_CacheResource</a> <strong>$handler</strong> = null</code>
+<div class="details">
+<p>CacheResource Handler</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/sysplugins/smarty_cacheresource.php.html#line270" class="location">lib/php/Smarty/sysplugins/smarty_cacheresource.php at line 270</a>
+
+<h3 id="is_locked">is_locked</h3>
+<code class="signature">public  bool <strong>$is_locked</strong> = false</code>
+<div class="details">
+<p>flag that cache is locked by this instance</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/sysplugins/smarty_cacheresource.php.html#line264" class="location">lib/php/Smarty/sysplugins/smarty_cacheresource.php at line 264</a>
+
+<h3 id="lock_id">lock_id</h3>
+<code class="signature">public  string <strong>$lock_id</strong> = null</code>
+<div class="details">
+<p>Id for cache locking</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/sysplugins/smarty_cacheresource.php.html#line240" class="location">lib/php/Smarty/sysplugins/smarty_cacheresource.php at line 240</a>
+
+<h3 id="processed">processed</h3>
+<code class="signature">public  boolean <strong>$processed</strong> = false</code>
+<div class="details">
+<p>Cache was processed</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/sysplugins/smarty_cacheresource.php.html#line276" class="location">lib/php/Smarty/sysplugins/smarty_cacheresource.php at line 276</a>
+
+<h3 id="source">source</h3>
+<code class="signature">public  <a href="../smarty/smarty_template_source.html">Smarty_Template_Source</a> <strong>$source</strong> = null</code>
+<div class="details">
+<p>Source Object</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/sysplugins/smarty_cacheresource.php.html#line222" class="location">lib/php/Smarty/sysplugins/smarty_cacheresource.php at line 222</a>
+
+<h3 id="timestamp">timestamp</h3>
+<code class="signature">public  integer <strong>$timestamp</strong> = false</code>
+<div class="details">
+<p>Source Timestamp</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/sysplugins/smarty_cacheresource.php.html#line234" class="location">lib/php/Smarty/sysplugins/smarty_cacheresource.php at line 234</a>
+
+<h3 id="valid">valid</h3>
+<code class="signature">public  boolean <strong>$valid</strong> = false</code>
+<div class="details">
+<p>Cache Is Valid</p></div>
+
+<hr>
+
+<h2 id="detail_method">Constructor Detail</h2>
+<a href="../source/lib/php/smarty/sysplugins/smarty_cacheresource.php.html#line283" class="location">lib/php/Smarty/sysplugins/smarty_cacheresource.php at line 283</a>
+
+<h3 id="__construct()">__construct</h3>
+<code class="signature">public  void <strong>__construct</strong>(<a href="../smarty/smarty_internal_template.html">Smarty_Internal_Template</a> _template)</code>
+<div class="details">
+<p>create Cached Object container</p><dl>
+<dt>Parameters:</dt>
+<dd>_template - template object</dd>
+</dl>
+</div>
+
+<hr>
+
+<h2 id="detail_method">Method Detail</h2>
+<a href="../source/lib/php/smarty/sysplugins/smarty_cacheresource.php.html#line362" class="location">lib/php/Smarty/sysplugins/smarty_cacheresource.php at line 362</a>
+
+<h3 id="write()">write</h3>
+<code class="signature">public  boolean <strong>write</strong>(<a href="../smarty/smarty_internal_template.html">Smarty_Internal_Template</a> _template, string content)</code>
+<div class="details">
+<p>Write this cache object to handler</p><dl>
+<dt>Parameters:</dt>
+<dd>_template - template object</dd>
+<dd>content - content to cache</dd>
+<dt>Returns:</dt>
+<dd>success</dd>
+</dl>
+</div>
+
+<hr>
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../overview-summary.html">Overview</a></li>
+<li><a href="../smarty/package-summary.html">Namespace</a></li>
+<li class="active">Class</li>
+<li><a href="../smarty/package-tree.html">Tree</a></li>
+<li><a href="../overview-files.html">Files</a></li>
+<li><a href="../deprecated-list.html">Deprecated</a></li>
+<li><a href="../todo-list.html">Todo</a></li>
+<li><a href="../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../index.html" target="_top">Frames</a>
+<a href="../smarty/smarty_template_cached.html" target="_top">No frames</a>
+</div>
+<div class="small_links">
+Summary: <a href="#summary_field">Field</a> | <a href="#summary_method">Method</a> | <a href="#summary_constr">Constr</a>
+Detail: <a href="#detail_field">Field</a> | <a href="#detail_method">Method</a> | <a href="#summary_constr">Constr</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

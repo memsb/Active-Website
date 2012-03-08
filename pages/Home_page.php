@@ -1,10 +1,11 @@
 <?php
 
-require_once PAGES . 'Page.php';
+require_once LIB . 'Page.php';
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
- * The home page currently doesn't do very much and needs revision
+ * The home page displays graphs summerising a users week. Defaults to show user 1 if not logged in
+ * @namespace active
  */
 class Home_page extends Page{
 

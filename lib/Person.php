@@ -1,9 +1,10 @@
 <?php
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
  * A Person is a signed up user on the web service.
  * This class provides the complicated account management methods.
+ * @namespace active
  */
 class Person {
 

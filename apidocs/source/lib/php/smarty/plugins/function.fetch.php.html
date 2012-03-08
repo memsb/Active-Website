@@ -1,0 +1,276 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
+
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css">
+<link rel="start" href="../../../../../overview-summary.html">
+
+<title>lib/php/Smarty/plugins/function.fetch.php (PHPDoctor)</title>
+
+</head>
+<body id="file" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/plugins/function.fetch.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<h1>lib/php/Smarty/plugins/function.fetch.php</h1>
+<div class="comment" id="overview_description"><p>Smarty plugin</p></div>
+
+<hr>
+
+<a name="line1"></a><pre><?php
+<a name="line2"></a>/**
+<a name="line3"></a> * Smarty plugin
+<a name="line4"></a> *
+<a name="line5"></a> * @package Smarty
+<a name="line6"></a> * @subpackage PluginsFunction
+<a name="line7"></a> */
+<a name="line8"></a>
+<a name="line9"></a>/**
+<a name="line10"></a> * Smarty {fetch} plugin
+<a name="line11"></a> *
+<a name="line12"></a> * Type:     function<br>
+<a name="line13"></a> * Name:     fetch<br>
+<a name="line14"></a> * Purpose:  fetch file, web or ftp data and display results
+<a name="line15"></a> *
+<a name="line16"></a> * @link http://www.smarty.net/manual/en/language.function.fetch.php {fetch}
+<a name="line17"></a> *       (Smarty online manual)
+<a name="line18"></a> * @author Monte Ohrt <monte at ohrt dot com>
+<a name="line19"></a> * @param array                    $params   parameters
+<a name="line20"></a> * @param Smarty_Internal_Template $template template object
+<a name="line21"></a> * @return string|null if the assign parameter is passed, Smarty assigns the result to a template variable
+<a name="line22"></a> */
+<a name="line23"></a>function smarty_function_fetch($params, $template)
+<a name="line24"></a>{
+<a name="line25"></a>    if (empty($params['file'])) {
+<a name="line26"></a>        trigger_error("[plugin] fetch parameter 'file' cannot be empty",E_USER_NOTICE);
+<a name="line27"></a>        return;
+<a name="line28"></a>    }
+<a name="line29"></a>    
+<a name="line30"></a>    // strip file protocol
+<a name="line31"></a>    if (stripos($params['file'], 'file://') === 0) {
+<a name="line32"></a>        $params['file'] = substr($params['file'], 7);
+<a name="line33"></a>    }
+<a name="line34"></a>    
+<a name="line35"></a>    $protocol = strpos($params['file'], '://');
+<a name="line36"></a>    if ($protocol !== false) {
+<a name="line37"></a>        $protocol = strtolower(substr($params['file'], 0, $protocol));
+<a name="line38"></a>    }
+<a name="line39"></a>    
+<a name="line40"></a>    if (isset($template->smarty->security_policy)) {
+<a name="line41"></a>        if ($protocol) {
+<a name="line42"></a>            // remote resource (or php stream, …)
+<a name="line43"></a>            if(!$template->smarty->security_policy->isTrustedUri($params['file'])) {
+<a name="line44"></a>                return;
+<a name="line45"></a>            }
+<a name="line46"></a>        } else {
+<a name="line47"></a>            // local file
+<a name="line48"></a>            if(!$template->smarty->security_policy->isTrustedResourceDir($params['file'])) {
+<a name="line49"></a>                return;
+<a name="line50"></a>            }
+<a name="line51"></a>        }
+<a name="line52"></a>    }
+<a name="line53"></a>
+<a name="line54"></a>    $content = '';
+<a name="line55"></a>    if ($protocol == 'http') {
+<a name="line56"></a>        // http fetch
+<a name="line57"></a>        if($uri_parts = parse_url($params['file'])) {
+<a name="line58"></a>            // set defaults
+<a name="line59"></a>            $host = $server_name = $uri_parts['host'];
+<a name="line60"></a>            $timeout = 30;
+<a name="line61"></a>            $accept = "image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, */*";
+<a name="line62"></a>            $agent = "Smarty Template Engine ". Smarty::SMARTY_VERSION;
+<a name="line63"></a>            $referer = "";
+<a name="line64"></a>            $uri = !empty($uri_parts['path']) ? $uri_parts['path'] : '/';
+<a name="line65"></a>            $uri .= !empty($uri_parts['query']) ? '?' . $uri_parts['query'] : '';
+<a name="line66"></a>            $_is_proxy = false;
+<a name="line67"></a>            if(empty($uri_parts['port'])) {
+<a name="line68"></a>                $port = 80;
+<a name="line69"></a>            } else {
+<a name="line70"></a>                $port = $uri_parts['port'];
+<a name="line71"></a>            }
+<a name="line72"></a>            if(!empty($uri_parts['user'])) {
+<a name="line73"></a>                $user = $uri_parts['user'];
+<a name="line74"></a>            }
+<a name="line75"></a>            if(!empty($uri_parts['pass'])) {
+<a name="line76"></a>                $pass = $uri_parts['pass'];
+<a name="line77"></a>            }
+<a name="line78"></a>            // loop through parameters, setup headers
+<a name="line79"></a>            foreach($params as $param_key => $param_value) {
+<a name="line80"></a>                switch($param_key) {
+<a name="line81"></a>                    case "file":
+<a name="line82"></a>                    case "assign":
+<a name="line83"></a>                    case "assign_headers":
+<a name="line84"></a>                        break;
+<a name="line85"></a>                    case "user":
+<a name="line86"></a>                        if(!empty($param_value)) {
+<a name="line87"></a>                            $user = $param_value;
+<a name="line88"></a>                        }
+<a name="line89"></a>                        break;
+<a name="line90"></a>                    case "pass":
+<a name="line91"></a>                        if(!empty($param_value)) {
+<a name="line92"></a>                            $pass = $param_value;
+<a name="line93"></a>                        }
+<a name="line94"></a>                        break;
+<a name="line95"></a>                    case "accept":
+<a name="line96"></a>                        if(!empty($param_value)) {
+<a name="line97"></a>                            $accept = $param_value;
+<a name="line98"></a>                        }
+<a name="line99"></a>                        break;
+<a name="line100"></a>                    case "header":
+<a name="line101"></a>                        if(!empty($param_value)) {
+<a name="line102"></a>                            if(!preg_match('![\w\d-]+: .+!',$param_value)) {
+<a name="line103"></a>                                trigger_error("[plugin] invalid header format '".$param_value."'",E_USER_NOTICE);
+<a name="line104"></a>                                return;
+<a name="line105"></a>                            } else {
+<a name="line106"></a>                                $extra_headers[] = $param_value;
+<a name="line107"></a>                            }
+<a name="line108"></a>                        }
+<a name="line109"></a>                        break;
+<a name="line110"></a>                    case "proxy_host":
+<a name="line111"></a>                        if(!empty($param_value)) {
+<a name="line112"></a>                            $proxy_host = $param_value;
+<a name="line113"></a>                        }
+<a name="line114"></a>                        break;
+<a name="line115"></a>                    case "proxy_port":
+<a name="line116"></a>                        if(!preg_match('!\D!', $param_value)) {
+<a name="line117"></a>                            $proxy_port = (int) $param_value;
+<a name="line118"></a>                        } else {
+<a name="line119"></a>                            trigger_error("[plugin] invalid value for attribute '".$param_key."'",E_USER_NOTICE);
+<a name="line120"></a>                            return;
+<a name="line121"></a>                        }
+<a name="line122"></a>                        break;
+<a name="line123"></a>                    case "agent":
+<a name="line124"></a>                        if(!empty($param_value)) {
+<a name="line125"></a>                            $agent = $param_value;
+<a name="line126"></a>                        }
+<a name="line127"></a>                        break;
+<a name="line128"></a>                    case "referer":
+<a name="line129"></a>                        if(!empty($param_value)) {
+<a name="line130"></a>                            $referer = $param_value;
+<a name="line131"></a>                        }
+<a name="line132"></a>                        break;
+<a name="line133"></a>                    case "timeout":
+<a name="line134"></a>                        if(!preg_match('!\D!', $param_value)) {
+<a name="line135"></a>                            $timeout = (int) $param_value;
+<a name="line136"></a>                        } else {
+<a name="line137"></a>                            trigger_error("[plugin] invalid value for attribute '".$param_key."'",E_USER_NOTICE);
+<a name="line138"></a>                            return;
+<a name="line139"></a>                        }
+<a name="line140"></a>                        break;
+<a name="line141"></a>                    default:
+<a name="line142"></a>                        trigger_error("[plugin] unrecognized attribute '".$param_key."'",E_USER_NOTICE);
+<a name="line143"></a>                        return;
+<a name="line144"></a>                }
+<a name="line145"></a>            }
+<a name="line146"></a>            if(!empty($proxy_host) && !empty($proxy_port)) {
+<a name="line147"></a>                $_is_proxy = true;
+<a name="line148"></a>                $fp = fsockopen($proxy_host,$proxy_port,$errno,$errstr,$timeout);
+<a name="line149"></a>            } else {
+<a name="line150"></a>                $fp = fsockopen($server_name,$port,$errno,$errstr,$timeout);
+<a name="line151"></a>            }
+<a name="line152"></a>
+<a name="line153"></a>            if(!$fp) {
+<a name="line154"></a>                trigger_error("[plugin] unable to fetch: $errstr ($errno)",E_USER_NOTICE);
+<a name="line155"></a>                return;
+<a name="line156"></a>            } else {
+<a name="line157"></a>                if($_is_proxy) {
+<a name="line158"></a>                    fputs($fp, 'GET ' . $params['file'] . " HTTP/1.0\r\n");
+<a name="line159"></a>                } else {
+<a name="line160"></a>                    fputs($fp, "GET $uri HTTP/1.0\r\n");
+<a name="line161"></a>                }
+<a name="line162"></a>                if(!empty($host)) {
+<a name="line163"></a>                    fputs($fp, "Host: $host\r\n");
+<a name="line164"></a>                }
+<a name="line165"></a>                if(!empty($accept)) {
+<a name="line166"></a>                    fputs($fp, "Accept: $accept\r\n");
+<a name="line167"></a>                }
+<a name="line168"></a>                if(!empty($agent)) {
+<a name="line169"></a>                    fputs($fp, "User-Agent: $agent\r\n");
+<a name="line170"></a>                }
+<a name="line171"></a>                if(!empty($referer)) {
+<a name="line172"></a>                    fputs($fp, "Referer: $referer\r\n");
+<a name="line173"></a>                }
+<a name="line174"></a>                if(isset($extra_headers) && is_array($extra_headers)) {
+<a name="line175"></a>                    foreach($extra_headers as $curr_header) {
+<a name="line176"></a>                        fputs($fp, $curr_header."\r\n");
+<a name="line177"></a>                    }
+<a name="line178"></a>                }
+<a name="line179"></a>                if(!empty($user) && !empty($pass)) {
+<a name="line180"></a>                    fputs($fp, "Authorization: BASIC ".base64_encode("$user:$pass")."\r\n");
+<a name="line181"></a>                }
+<a name="line182"></a>
+<a name="line183"></a>                fputs($fp, "\r\n");
+<a name="line184"></a>                while(!feof($fp)) {
+<a name="line185"></a>                    $content .= fgets($fp,4096);
+<a name="line186"></a>                }
+<a name="line187"></a>                fclose($fp);
+<a name="line188"></a>                $csplit = preg_split("!\r\n\r\n!",$content,2);
+<a name="line189"></a>
+<a name="line190"></a>                $content = $csplit[1];
+<a name="line191"></a>
+<a name="line192"></a>                if(!empty($params['assign_headers'])) {
+<a name="line193"></a>                    $template->assign($params['assign_headers'],preg_split("!\r\n!",$csplit[0]));
+<a name="line194"></a>                }
+<a name="line195"></a>            }
+<a name="line196"></a>        } else {
+<a name="line197"></a>            trigger_error("[plugin fetch] unable to parse URL, check syntax",E_USER_NOTICE);
+<a name="line198"></a>            return;
+<a name="line199"></a>        }
+<a name="line200"></a>    } else {
+<a name="line201"></a>        $content = @file_get_contents($params['file']);
+<a name="line202"></a>        if ($content === false) {
+<a name="line203"></a>            throw new SmartyException("{fetch} cannot read resource '" . $params['file'] ."'");
+<a name="line204"></a>        }
+<a name="line205"></a>    }
+<a name="line206"></a>
+<a name="line207"></a>    if (!empty($params['assign'])) {
+<a name="line208"></a>        $template->assign($params['assign'], $content);
+<a name="line209"></a>    } else {
+<a name="line210"></a>        return $content;
+<a name="line211"></a>    }
+<a name="line212"></a>}
+<a name="line213"></a>
+<a name="line214"></a>?></pre>
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/plugins/function.fetch.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Wed, 07 Mar 2012 14:34:43 +0000">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
 <link rel="start" href="../../overview-summary.html">
@@ -45,69 +45,70 @@
 <a name="line7"></a>/**
 <a name="line8"></a> * @author Martin Buckley - MBuckley@gmail.com
 <a name="line9"></a> * Stats holds the statistics for the web service
-<a name="line10"></a> */
-<a name="line11"></a>class Stats {
-<a name="line12"></a>
-<a name="line13"></a>	private $user_count = 0;
-<a name="line14"></a>	private $longest_workout;
-<a name="line15"></a>	private $biggest_workout;
-<a name="line16"></a>	private $popular_activity;
-<a name="line17"></a>	private $most_kcal;
-<a name="line18"></a>
-<a name="line19"></a>	/*
-<a name="line20"></a>	 * Constructor requires a Database object, instantiates dependancies
-<a name="line21"></a>	 * @param Database
-<a name="line22"></a>	 */
-<a name="line23"></a>	public function __construct($db){
-<a name="line24"></a>		$this->longest_workout = new Workout();
-<a name="line25"></a>		$this->biggest_workout = new Workout();
-<a name="line26"></a>		$this->popular_activity = new Activity();
-<a name="line27"></a>		$this->most_kcal = new Person($db);
-<a name="line28"></a>	}
-<a name="line29"></a>
-<a name="line30"></a>	/*
-<a name="line31"></a>	 * Parses an XML document containing stats
-<a name="line32"></a>	 * @param String the XML document
-<a name="line33"></a>	 */
-<a name="line34"></a>	public function parse($xmlstr){
-<a name="line35"></a>		$data = new SimpleXMLElement($xmlstr);
-<a name="line36"></a>		$this->user_count = intval($data->user_count);
-<a name="line37"></a>		$this->longest_workout->assign_data($data->longest_workout->workout);
-<a name="line38"></a>		$this->biggest_workout->assign_data($data->biggest_workout->workout);
-<a name="line39"></a>		$this->popular_activity->assign_data($data->popular_activity->activity);
-<a name="line40"></a>		$this->most_kcal->assign_data($data->most_kcal->user);		
-<a name="line41"></a>	}
-<a name="line42"></a>
-<a name="line43"></a>	/*
-<a name="line44"></a>	 * Outputs the stats to a String using templates
-<a name="line45"></a>	 * @param Smarty Template for stats
-<a name="line46"></a>	 * @param Smarty Template for workout
-<a name="line47"></a>	 * @param Smarty Template for activity
-<a name="line48"></a>	 * @param Smarty Template for user
-<a name="line49"></a>	 * @return String
-<a name="line50"></a>	 */
-<a name="line51"></a>	public function display($stats_template, $workout_template, $activity_template, $user_template){
-<a name="line52"></a>		$stats_template->assign('user_count', $this->user_count);
-<a name="line53"></a>
-<a name="line54"></a>		$longest_workout_template = clone $workout_template;
-<a name="line55"></a>		$this->longest_workout->display($longest_workout_template);
-<a name="line56"></a>		$stats_template->assign('longest_workout', $longest_workout_template->fetch());
-<a name="line57"></a>
-<a name="line58"></a>		$biggest_workout_template = clone $workout_template;
-<a name="line59"></a>		$this->biggest_workout->display($biggest_workout_template);
-<a name="line60"></a>		$stats_template->assign('biggest_workout', $biggest_workout_template->fetch());
-<a name="line61"></a>
-<a name="line62"></a>		$this->popular_activity->display($activity_template);
-<a name="line63"></a>		$stats_template->assign('popular_activity', $activity_template->fetch());
-<a name="line64"></a>
-<a name="line65"></a>		$this->most_kcal->display($user_template);
-<a name="line66"></a>		$stats_template->assign('most_kcal', $user_template->fetch());
-<a name="line67"></a>
-<a name="line68"></a>		return $stats_template->fetch();
-<a name="line69"></a>	}
-<a name="line70"></a>}
-<a name="line71"></a>?>
-<a name="line72"></a></pre>
+<a name="line10"></a> * @namespace active
+<a name="line11"></a> */
+<a name="line12"></a>class Stats {
+<a name="line13"></a>
+<a name="line14"></a>	private $user_count = 0;
+<a name="line15"></a>	private $longest_workout;
+<a name="line16"></a>	private $biggest_workout;
+<a name="line17"></a>	private $popular_activity;
+<a name="line18"></a>	private $most_kcal;
+<a name="line19"></a>
+<a name="line20"></a>	/*
+<a name="line21"></a>	 * Constructor requires a Database object, instantiates dependancies
+<a name="line22"></a>	 * @param Database
+<a name="line23"></a>	 */
+<a name="line24"></a>	public function __construct($db){
+<a name="line25"></a>		$this->longest_workout = new Workout();
+<a name="line26"></a>		$this->biggest_workout = new Workout();
+<a name="line27"></a>		$this->popular_activity = new Activity();
+<a name="line28"></a>		$this->most_kcal = new Person($db);
+<a name="line29"></a>	}
+<a name="line30"></a>
+<a name="line31"></a>	/*
+<a name="line32"></a>	 * Parses an XML document containing stats
+<a name="line33"></a>	 * @param String the XML document
+<a name="line34"></a>	 */
+<a name="line35"></a>	public function parse($xmlstr){
+<a name="line36"></a>		$data = new SimpleXMLElement($xmlstr);
+<a name="line37"></a>		$this->user_count = intval($data->user_count);
+<a name="line38"></a>		$this->longest_workout->assign_data($data->longest_workout->workout);
+<a name="line39"></a>		$this->biggest_workout->assign_data($data->biggest_workout->workout);
+<a name="line40"></a>		$this->popular_activity->assign_data($data->popular_activity->activity);
+<a name="line41"></a>		$this->most_kcal->assign_data($data->most_kcal->user);		
+<a name="line42"></a>	}
+<a name="line43"></a>
+<a name="line44"></a>	/*
+<a name="line45"></a>	 * Outputs the stats to a String using templates
+<a name="line46"></a>	 * @param Smarty Template for stats
+<a name="line47"></a>	 * @param Smarty Template for workout
+<a name="line48"></a>	 * @param Smarty Template for activity
+<a name="line49"></a>	 * @param Smarty Template for user
+<a name="line50"></a>	 * @return String
+<a name="line51"></a>	 */
+<a name="line52"></a>	public function display($stats_template, $workout_template, $activity_template, $user_template){
+<a name="line53"></a>		$stats_template->assign('user_count', $this->user_count);
+<a name="line54"></a>
+<a name="line55"></a>		$longest_workout_template = clone $workout_template;
+<a name="line56"></a>		$this->longest_workout->display($longest_workout_template);
+<a name="line57"></a>		$stats_template->assign('longest_workout', $longest_workout_template->fetch());
+<a name="line58"></a>
+<a name="line59"></a>		$biggest_workout_template = clone $workout_template;
+<a name="line60"></a>		$this->biggest_workout->display($biggest_workout_template);
+<a name="line61"></a>		$stats_template->assign('biggest_workout', $biggest_workout_template->fetch());
+<a name="line62"></a>
+<a name="line63"></a>		$this->popular_activity->display($activity_template);
+<a name="line64"></a>		$stats_template->assign('popular_activity', $activity_template->fetch());
+<a name="line65"></a>
+<a name="line66"></a>		$this->most_kcal->display($user_template);
+<a name="line67"></a>		$stats_template->assign('most_kcal', $user_template->fetch());
+<a name="line68"></a>
+<a name="line69"></a>		return $stats_template->fetch();
+<a name="line70"></a>	}
+<a name="line71"></a>}
+<a name="line72"></a>?>
+<a name="line73"></a></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Wed, 07 Mar 2012 14:34:43 +0000">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
 <link rel="start" href="../../overview-summary.html">
@@ -43,9 +43,9 @@
 <a name="line5"></a>/**
 <a name="line6"></a> *	@author Martin Buckley - MBuckley@gmail.com
 <a name="line7"></a> *	DataBase Abstraction layer controlls access to the database.
-<a name="line8"></a> *	@namespace Exerciser
+<a name="line8"></a> *	@namespace active
 <a name="line9"></a> */
-<a name="line10"></a>class Database{
+<a name="line10"></a>class Database {
 <a name="line11"></a>
 <a name="line12"></a>	private $host = '';
 <a name="line13"></a>	private $database = '';
@@ -75,8 +75,8 @@
 <a name="line37"></a>
 <a name="line38"></a>	/**
 <a name="line39"></a>	 * Sanitises the variable to prevent SQL injection
-<a name="line40"></a>	 * @param String the value
-<a name="line41"></a>	 * @return String the sanitised value
+<a name="line40"></a>	 * @param String
+<a name="line41"></a>	 * @return String
 <a name="line42"></a>	 */
 <a name="line43"></a>	public function clean($value){
 <a name="line44"></a>		return mysql_real_escape_string($value);

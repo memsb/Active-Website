@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Wed, 07 Mar 2012 14:34:43 +0000">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:26 +0000">
 
 <link rel="stylesheet" type="text/css" href="../stylesheet.css">
 <link rel="start" href="../overview-summary.html">
@@ -81,7 +81,7 @@ Detail: <a href="#detail_global">Global</a>
 </table>
 
 <h2 id="detail_global">Global Detail</h2>
-<a href="../source/dispatch.php.html#line27" class="location">dispatch.php at line 27</a>
+<a href="../source/dispatch.php.html#line26" class="location">dispatch.php at line 26</a>
 
 <h3 id="_GET">_GET</h3>
 <code class="signature">public  mixed <strong>_GET</strong></code>
@@ -90,7 +90,7 @@ Detail: <a href="#detail_global">Global</a>
 
 <hr>
 
-<a href="../source/dispatch.php.html#line29" class="location">dispatch.php at line 29</a>
+<a href="../source/dispatch.php.html#line28" class="location">dispatch.php at line 28</a>
 
 <h3 id="_POST">_POST</h3>
 <code class="signature">public  mixed <strong>_POST</strong></code>
@@ -99,7 +99,7 @@ Detail: <a href="#detail_global">Global</a>
 
 <hr>
 
-<a href="../source/dispatch.php.html#line15" class="location">dispatch.php at line 15</a>
+<a href="../source/dispatch.php.html#line12" class="location">dispatch.php at line 12</a>
 
 <h3 id="_SERVER">_SERVER</h3>
 <code class="signature">public  mixed <strong>_SERVER</strong></code>
@@ -108,7 +108,7 @@ Detail: <a href="#detail_global">Global</a>
 
 <hr>
 
-<a href="../source/dispatch.php.html#line24" class="location">dispatch.php at line 24</a>
+<a href="../source/dispatch.php.html#line23" class="location">dispatch.php at line 23</a>
 
 <h3 id="controller">controller</h3>
 <code class="signature">public  mixed <strong>controller</strong> = new $pages[$page_requested]</code>
@@ -117,16 +117,16 @@ Detail: <a href="#detail_global">Global</a>
 
 <hr>
 
-<a href="../source/dispatch.php.html#line17" class="location">dispatch.php at line 17</a>
+<a href="../source/dispatch.php.html#line14" class="location">dispatch.php at line 14</a>
 
 <h3 id="page_requested">page_requested</h3>
-<code class="signature">public  mixed <strong>page_requested</strong> = strtolower(str_replace($root</code>
+<code class="signature">public  mixed <strong>page_requested</strong> = ''</code>
 <div class="details">
 </div>
 
 <hr>
 
-<a href="../source/dispatch.php.html#line20" class="location">dispatch.php at line 20</a>
+<a href="../source/dispatch.php.html#line19" class="location">dispatch.php at line 19</a>
 
 <h3 id="pages">pages</h3>
 <code class="signature">public  mixed <strong>pages</strong></code>
@@ -135,19 +135,19 @@ Detail: <a href="#detail_global">Global</a>
 
 <hr>
 
-<a href="../source/dispatch.php.html#line17" class="location">dispatch.php at line 17</a>
+<a href="../source/dispatch.php.html#line16" class="location">dispatch.php at line 16</a>
 
 <h3 id="root">root</h3>
-<code class="signature">public  mixed <strong>root</strong></code>
+<code class="signature">public  mixed <strong>root</strong> = strtolower( $uri['filename']</code>
 <div class="details">
 </div>
 
 <hr>
 
-<a href="../source/dispatch.php.html#line16" class="location">dispatch.php at line 16</a>
+<a href="../source/dispatch.php.html#line13" class="location">dispatch.php at line 13</a>
 
 <h3 id="uri">uri</h3>
-<code class="signature">public  mixed <strong>uri</strong> = $_SERVER['REDIRECT_URL']</code>
+<code class="signature">public  mixed <strong>uri</strong> = pathinfo($_SERVER['REDIRECT_URL']</code>
 <div class="details">
 </div>
 

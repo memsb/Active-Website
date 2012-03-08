@@ -1,0 +1,873 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
+
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css">
+<link rel="start" href="../../../../../overview-summary.html">
+
+<title>lib/php/Smarty/sysplugins/smarty_internal_templatebase.php (PHPDoctor)</title>
+
+</head>
+<body id="file" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_internal_templatebase.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<h1>lib/php/Smarty/sysplugins/smarty_internal_templatebase.php</h1>
+<div class="comment" id="overview_description"><p>Smarty Internal Plugin Smarty Template  Base</p><p>This file contains the basic shared methodes for template handling</p></div>
+
+<hr>
+
+<a name="line1"></a><pre><?php
+<a name="line2"></a>/**
+<a name="line3"></a> * Smarty Internal Plugin Smarty Template  Base
+<a name="line4"></a> *
+<a name="line5"></a> * This file contains the basic shared methodes for template handling
+<a name="line6"></a> *
+<a name="line7"></a> * @package Smarty
+<a name="line8"></a> * @subpackage Template
+<a name="line9"></a> * @author Uwe Tews
+<a name="line10"></a> */
+<a name="line11"></a>
+<a name="line12"></a>/**
+<a name="line13"></a> * Class with shared template methodes
+<a name="line14"></a> *
+<a name="line15"></a> * @package Smarty
+<a name="line16"></a> * @subpackage Template
+<a name="line17"></a> */
+<a name="line18"></a>abstract class Smarty_Internal_TemplateBase extends Smarty_Internal_Data {
+<a name="line19"></a>
+<a name="line20"></a>    /**
+<a name="line21"></a>     * fetches a rendered Smarty template
+<a name="line22"></a>     *
+<a name="line23"></a>     * @param string $template          the resource handle of the template file or template object
+<a name="line24"></a>     * @param mixed  $cache_id          cache id to be used with this template
+<a name="line25"></a>     * @param mixed  $compile_id        compile id to be used with this template
+<a name="line26"></a>     * @param object $parent            next higher level of Smarty variables
+<a name="line27"></a>     * @param bool   $display           true: display, false: fetch
+<a name="line28"></a>     * @param bool   $merge_tpl_vars    if true parent template variables merged in to local scope
+<a name="line29"></a>     * @param bool   $no_output_filter  if true do not run output filter
+<a name="line30"></a>     * @return string rendered template output
+<a name="line31"></a>     */
+<a name="line32"></a>    public function fetch($template = null, $cache_id = null, $compile_id = null, $parent = null, $display = false, $merge_tpl_vars = true, $no_output_filter = false)
+<a name="line33"></a>    {
+<a name="line34"></a>        if ($template === null && $this instanceof $this->template_class) {
+<a name="line35"></a>            $template = $this;
+<a name="line36"></a>        }
+<a name="line37"></a>        if (!empty($cache_id) && is_object($cache_id)) {
+<a name="line38"></a>            $parent = $cache_id;
+<a name="line39"></a>            $cache_id = null;
+<a name="line40"></a>        }
+<a name="line41"></a>        if ($parent === null && ($this instanceof Smarty || is_string($template))) {
+<a name="line42"></a>            $parent = $this;
+<a name="line43"></a>        }
+<a name="line44"></a>        // create template object if necessary
+<a name="line45"></a>        $_template = ($template instanceof $this->template_class)
+<a name="line46"></a>        ? $template
+<a name="line47"></a>        : $this->smarty->createTemplate($template, $cache_id, $compile_id, $parent, false);
+<a name="line48"></a>        // if called by Smarty object make sure we use current caching status
+<a name="line49"></a>        if ($this instanceof Smarty) {
+<a name="line50"></a>            $_template->caching = $this->caching;
+<a name="line51"></a>        }
+<a name="line52"></a>        // merge all variable scopes into template
+<a name="line53"></a>        if ($merge_tpl_vars) {
+<a name="line54"></a>            // save local variables
+<a name="line55"></a>            $save_tpl_vars = $_template->tpl_vars;
+<a name="line56"></a>            $save_config_vars = $_template->config_vars;
+<a name="line57"></a>            $ptr_array = array($_template);
+<a name="line58"></a>            $ptr = $_template;
+<a name="line59"></a>            while (isset($ptr->parent)) {
+<a name="line60"></a>                $ptr_array[] = $ptr = $ptr->parent;
+<a name="line61"></a>            }
+<a name="line62"></a>            $ptr_array = array_reverse($ptr_array);
+<a name="line63"></a>            $parent_ptr = reset($ptr_array);
+<a name="line64"></a>            $tpl_vars = $parent_ptr->tpl_vars;
+<a name="line65"></a>            $config_vars = $parent_ptr->config_vars;
+<a name="line66"></a>            while ($parent_ptr = next($ptr_array)) {
+<a name="line67"></a>                if (!empty($parent_ptr->tpl_vars)) {
+<a name="line68"></a>                    $tpl_vars = array_merge($tpl_vars, $parent_ptr->tpl_vars);
+<a name="line69"></a>                }
+<a name="line70"></a>                if (!empty($parent_ptr->config_vars)) {
+<a name="line71"></a>                    $config_vars = array_merge($config_vars, $parent_ptr->config_vars);
+<a name="line72"></a>                }
+<a name="line73"></a>            }
+<a name="line74"></a>            if (!empty(Smarty::$global_tpl_vars)) {
+<a name="line75"></a>                $tpl_vars = array_merge(Smarty::$global_tpl_vars, $tpl_vars);
+<a name="line76"></a>            }
+<a name="line77"></a>            $_template->tpl_vars = $tpl_vars;
+<a name="line78"></a>            $_template->config_vars = $config_vars;
+<a name="line79"></a>        }
+<a name="line80"></a>        // dummy local smarty variable
+<a name="line81"></a>        if (!isset($_template->tpl_vars['smarty'])) {
+<a name="line82"></a>            $_template->tpl_vars['smarty'] = new Smarty_Variable;
+<a name="line83"></a>        }
+<a name="line84"></a>        if (isset($this->smarty->error_reporting)) {
+<a name="line85"></a>            $_smarty_old_error_level = error_reporting($this->smarty->error_reporting);
+<a name="line86"></a>        }
+<a name="line87"></a>        // check URL debugging control
+<a name="line88"></a>        if (!$this->smarty->debugging && $this->smarty->debugging_ctrl == 'URL') {
+<a name="line89"></a>            if (isset($_SERVER['QUERY_STRING'])) {
+<a name="line90"></a>                $_query_string = $_SERVER['QUERY_STRING'];
+<a name="line91"></a>            } else {
+<a name="line92"></a>                $_query_string = '';
+<a name="line93"></a>            }
+<a name="line94"></a>            if (false !== strpos($_query_string, $this->smarty->smarty_debug_id)) {
+<a name="line95"></a>                if (false !== strpos($_query_string, $this->smarty->smarty_debug_id . '=on')) {
+<a name="line96"></a>                    // enable debugging for this browser session
+<a name="line97"></a>                    setcookie('SMARTY_DEBUG', true);
+<a name="line98"></a>                    $this->smarty->debugging = true;
+<a name="line99"></a>                } elseif (false !== strpos($_query_string, $this->smarty->smarty_debug_id . '=off')) {
+<a name="line100"></a>                    // disable debugging for this browser session
+<a name="line101"></a>                    setcookie('SMARTY_DEBUG', false);
+<a name="line102"></a>                    $this->smarty->debugging = false;
+<a name="line103"></a>                } else {
+<a name="line104"></a>                    // enable debugging for this page
+<a name="line105"></a>                    $this->smarty->debugging = true;
+<a name="line106"></a>                }
+<a name="line107"></a>            } else {
+<a name="line108"></a>                if (isset($_COOKIE['SMARTY_DEBUG'])) {
+<a name="line109"></a>                    $this->smarty->debugging = true;
+<a name="line110"></a>                }
+<a name="line111"></a>            }
+<a name="line112"></a>        }
+<a name="line113"></a>        // must reset merge template date
+<a name="line114"></a>        $_template->smarty->merged_templates_func = array();
+<a name="line115"></a>        // get rendered template
+<a name="line116"></a>        // disable caching for evaluated code
+<a name="line117"></a>        if ($_template->source->recompiled) {
+<a name="line118"></a>            $_template->caching = false;
+<a name="line119"></a>        }
+<a name="line120"></a>        // checks if template exists
+<a name="line121"></a>        if (!$_template->source->exists) {
+<a name="line122"></a>            if ($_template->parent instanceof Smarty_Internal_Template) {
+<a name="line123"></a>                $parent_resource = " in '{$_template->parent->template_resource}'";
+<a name="line124"></a>            } else {
+<a name="line125"></a>                $parent_resource = '';
+<a name="line126"></a>            }
+<a name="line127"></a>            throw new SmartyException("Unable to load template {$_template->source->type} '{$_template->source->name}'{$parent_resource}");
+<a name="line128"></a>        }
+<a name="line129"></a>        // read from cache or render
+<a name="line130"></a>        if (!($_template->caching == Smarty::CACHING_LIFETIME_CURRENT || $_template->caching == Smarty::CACHING_LIFETIME_SAVED) || !$_template->cached->valid) {
+<a name="line131"></a>            // render template (not loaded and not in cache)
+<a name="line132"></a>            if (!$_template->source->uncompiled) {
+<a name="line133"></a>                $_smarty_tpl = $_template;
+<a name="line134"></a>                if ($_template->source->recompiled) {
+<a name="line135"></a>                    if ($this->smarty->debugging) {
+<a name="line136"></a>                        Smarty_Internal_Debug::start_compile($_template);
+<a name="line137"></a>                    }
+<a name="line138"></a>                    $code = $_template->compiler->compileTemplate($_template);
+<a name="line139"></a>                    if ($this->smarty->debugging) {
+<a name="line140"></a>                        Smarty_Internal_Debug::end_compile($_template);
+<a name="line141"></a>                    }
+<a name="line142"></a>                    if ($this->smarty->debugging) {
+<a name="line143"></a>                        Smarty_Internal_Debug::start_render($_template);
+<a name="line144"></a>                    }
+<a name="line145"></a>                    try {
+<a name="line146"></a>                        ob_start();
+<a name="line147"></a>                        eval("?>" . $code);
+<a name="line148"></a>                        unset($code);
+<a name="line149"></a>                    } catch (Exception $e) {
+<a name="line150"></a>                        ob_get_clean();
+<a name="line151"></a>                        throw $e;
+<a name="line152"></a>                    }
+<a name="line153"></a>                } else {
+<a name="line154"></a>                    if (!$_template->compiled->exists || ($_template->smarty->force_compile && !$_template->compiled->isCompiled)) {
+<a name="line155"></a>                        $_template->compileTemplateSource();
+<a name="line156"></a>                    }
+<a name="line157"></a>                    if ($this->smarty->debugging) {
+<a name="line158"></a>                        Smarty_Internal_Debug::start_render($_template);
+<a name="line159"></a>                    }
+<a name="line160"></a>                    if (!$_template->compiled->loaded) {
+<a name="line161"></a>                        include($_template->compiled->filepath);
+<a name="line162"></a>                        if ($_template->mustCompile) {
+<a name="line163"></a>                            // recompile and load again
+<a name="line164"></a>                            $_template->compileTemplateSource();
+<a name="line165"></a>                            include($_template->compiled->filepath);
+<a name="line166"></a>                        }
+<a name="line167"></a>                        $_template->compiled->loaded = true;
+<a name="line168"></a>                    } else {
+<a name="line169"></a>                        $_template->decodeProperties($_template->compiled->_properties, false);
+<a name="line170"></a>                    }
+<a name="line171"></a>                    try {
+<a name="line172"></a>                        ob_start();
+<a name="line173"></a>                        if (empty($_template->properties['unifunc']) || !is_callable($_template->properties['unifunc'])) {
+<a name="line174"></a>                            throw new SmartyException("Invalid compiled template for '{$_template->template_resource}'");
+<a name="line175"></a>                        }
+<a name="line176"></a>                        array_unshift($_template->_capture_stack,array());
+<a name="line177"></a>                        //
+<a name="line178"></a>                        // render compiled template
+<a name="line179"></a>                        //
+<a name="line180"></a>                        $_template->properties['unifunc']($_template);
+<a name="line181"></a>                        // any unclosed {capture} tags ?
+<a name="line182"></a>                        if (isset($_template->_capture_stack[0][0])) {
+<a name="line183"></a>                            $_template->capture_error();
+<a name="line184"></a>                        }
+<a name="line185"></a>                        array_shift($_template->_capture_stack);
+<a name="line186"></a>                    } catch (Exception $e) {
+<a name="line187"></a>                        ob_get_clean();
+<a name="line188"></a>                        throw $e;
+<a name="line189"></a>                    }
+<a name="line190"></a>                }
+<a name="line191"></a>            } else {
+<a name="line192"></a>                if ($_template->source->uncompiled) {
+<a name="line193"></a>                    if ($this->smarty->debugging) {
+<a name="line194"></a>                        Smarty_Internal_Debug::start_render($_template);
+<a name="line195"></a>                    }
+<a name="line196"></a>                    try {
+<a name="line197"></a>                        ob_start();
+<a name="line198"></a>                        $_template->source->renderUncompiled($_template);
+<a name="line199"></a>                    } catch (Exception $e) {
+<a name="line200"></a>                        ob_get_clean();
+<a name="line201"></a>                        throw $e;
+<a name="line202"></a>                    }
+<a name="line203"></a>                } else {
+<a name="line204"></a>                    throw new SmartyException("Resource '$_template->source->type' must have 'renderUncompiled' method");
+<a name="line205"></a>                }
+<a name="line206"></a>            }
+<a name="line207"></a>            $_output = ob_get_clean();
+<a name="line208"></a>            if (!$_template->source->recompiled && empty($_template->properties['file_dependency'][$_template->source->uid])) {
+<a name="line209"></a>                $_template->properties['file_dependency'][$_template->source->uid] = array($_template->source->filepath, $_template->source->timestamp, $_template->source->type);
+<a name="line210"></a>            }
+<a name="line211"></a>            if ($_template->parent instanceof Smarty_Internal_Template) {
+<a name="line212"></a>                $_template->parent->properties['file_dependency'] = array_merge($_template->parent->properties['file_dependency'], $_template->properties['file_dependency']);
+<a name="line213"></a>                foreach ($_template->required_plugins as $code => $tmp1) {
+<a name="line214"></a>                    foreach ($tmp1 as $name => $tmp) {
+<a name="line215"></a>                        foreach ($tmp as $type => $data) {
+<a name="line216"></a>                            $_template->parent->required_plugins[$code][$name][$type] = $data;
+<a name="line217"></a>                        }
+<a name="line218"></a>                    }
+<a name="line219"></a>                }
+<a name="line220"></a>            }
+<a name="line221"></a>            if ($this->smarty->debugging) {
+<a name="line222"></a>                Smarty_Internal_Debug::end_render($_template);
+<a name="line223"></a>            }
+<a name="line224"></a>            // write to cache when nessecary
+<a name="line225"></a>            if (!$_template->source->recompiled && ($_template->caching == Smarty::CACHING_LIFETIME_SAVED || $_template->caching == Smarty::CACHING_LIFETIME_CURRENT)) {
+<a name="line226"></a>                if ($this->smarty->debugging) {
+<a name="line227"></a>                    Smarty_Internal_Debug::start_cache($_template);
+<a name="line228"></a>                }
+<a name="line229"></a>                $_template->properties['has_nocache_code'] = false;
+<a name="line230"></a>                // get text between non-cached items
+<a name="line231"></a>                $cache_split = preg_split("!/\*%%SmartyNocache:{$_template->properties['nocache_hash']}%%\*\/(.+?)/\*/%%SmartyNocache:{$_template->properties['nocache_hash']}%%\*/!s", $_output);
+<a name="line232"></a>                // get non-cached items
+<a name="line233"></a>                preg_match_all("!/\*%%SmartyNocache:{$_template->properties['nocache_hash']}%%\*\/(.+?)/\*/%%SmartyNocache:{$_template->properties['nocache_hash']}%%\*/!s", $_output, $cache_parts);
+<a name="line234"></a>                $output = '';
+<a name="line235"></a>                // loop over items, stitch back together
+<a name="line236"></a>                foreach ($cache_split as $curr_idx => $curr_split) {
+<a name="line237"></a>                    // escape PHP tags in template content
+<a name="line238"></a>                    $output .= preg_replace('/(<%|%>|<\?php|<\?|\?>)/', '<?php echo \'$1\'; ?>', $curr_split);
+<a name="line239"></a>                    if (isset($cache_parts[0][$curr_idx])) {
+<a name="line240"></a>                        $_template->properties['has_nocache_code'] = true;
+<a name="line241"></a>                        // remove nocache tags from cache output
+<a name="line242"></a>                        $output .= preg_replace("!/\*/?%%SmartyNocache:{$_template->properties['nocache_hash']}%%\*/!", '', $cache_parts[0][$curr_idx]);
+<a name="line243"></a>                    }
+<a name="line244"></a>                }
+<a name="line245"></a>                if (!$no_output_filter && (isset($this->smarty->autoload_filters['output']) || isset($this->smarty->registered_filters['output']))) {
+<a name="line246"></a>                    $output = Smarty_Internal_Filter_Handler::runFilter('output', $output, $_template);
+<a name="line247"></a>                }
+<a name="line248"></a>                // rendering (must be done before writing cache file because of {function} nocache handling)
+<a name="line249"></a>                $_smarty_tpl = $_template;
+<a name="line250"></a>                try {
+<a name="line251"></a>                    ob_start();
+<a name="line252"></a>                    eval("?>" . $output);
+<a name="line253"></a>                    $_output = ob_get_clean();
+<a name="line254"></a>                } catch (Exception $e) {
+<a name="line255"></a>                    ob_get_clean();
+<a name="line256"></a>                    throw $e;
+<a name="line257"></a>                }
+<a name="line258"></a>                // write cache file content
+<a name="line259"></a>                $_template->writeCachedContent($output);
+<a name="line260"></a>                if ($this->smarty->debugging) {
+<a name="line261"></a>                    Smarty_Internal_Debug::end_cache($_template);
+<a name="line262"></a>                }
+<a name="line263"></a>            } else {
+<a name="line264"></a>                // var_dump('renderTemplate', $_template->has_nocache_code, $_template->template_resource, $_template->properties['nocache_hash'], $_template->parent->properties['nocache_hash'], $_output);
+<a name="line265"></a>                if (!empty($_template->properties['nocache_hash']) && !empty($_template->parent->properties['nocache_hash'])) {
+<a name="line266"></a>                    // replace nocache_hash
+<a name="line267"></a>                    $_output = preg_replace("/{$_template->properties['nocache_hash']}/", $_template->parent->properties['nocache_hash'], $_output);
+<a name="line268"></a>                    $_template->parent->has_nocache_code = $_template->parent->has_nocache_code || $_template->has_nocache_code;
+<a name="line269"></a>                }
+<a name="line270"></a>            }
+<a name="line271"></a>        } else {
+<a name="line272"></a>            if ($this->smarty->debugging) {
+<a name="line273"></a>                Smarty_Internal_Debug::start_cache($_template);
+<a name="line274"></a>            }
+<a name="line275"></a>            try {
+<a name="line276"></a>                ob_start();
+<a name="line277"></a>                array_unshift($_template->_capture_stack,array());
+<a name="line278"></a>                //
+<a name="line279"></a>                // render cached template
+<a name="line280"></a>                //
+<a name="line281"></a>                $_template->properties['unifunc']($_template);
+<a name="line282"></a>                // any unclosed {capture} tags ?
+<a name="line283"></a>                if (isset($_template->_capture_stack[0][0])) {
+<a name="line284"></a>                    $_template->capture_error();
+<a name="line285"></a>                }
+<a name="line286"></a>                array_shift($_template->_capture_stack);
+<a name="line287"></a>                $_output = ob_get_clean();
+<a name="line288"></a>            } catch (Exception $e) {
+<a name="line289"></a>                ob_get_clean();
+<a name="line290"></a>                throw $e;
+<a name="line291"></a>            }
+<a name="line292"></a>            if ($this->smarty->debugging) {
+<a name="line293"></a>                Smarty_Internal_Debug::end_cache($_template);
+<a name="line294"></a>            }
+<a name="line295"></a>        }
+<a name="line296"></a>        if ((!$this->caching || $_template->source->recompiled) && !$no_output_filter && (isset($this->smarty->autoload_filters['output']) || isset($this->smarty->registered_filters['output']))) {
+<a name="line297"></a>            $_output = Smarty_Internal_Filter_Handler::runFilter('output', $_output, $_template);
+<a name="line298"></a>        }
+<a name="line299"></a>        if (isset($this->error_reporting)) {
+<a name="line300"></a>            error_reporting($_smarty_old_error_level);
+<a name="line301"></a>        }
+<a name="line302"></a>        // display or fetch
+<a name="line303"></a>        if ($display) {
+<a name="line304"></a>            if ($this->caching && $this->cache_modified_check) {
+<a name="line305"></a>                $_isCached = $_template->isCached() && !$_template->has_nocache_code;
+<a name="line306"></a>                $_last_modified_date = @substr($_SERVER['HTTP_IF_MODIFIED_SINCE'], 0, strpos($_SERVER['HTTP_IF_MODIFIED_SINCE'], 'GMT') + 3);
+<a name="line307"></a>                if ($_isCached && $_template->cached->timestamp <= strtotime($_last_modified_date)) {
+<a name="line308"></a>                    switch (PHP_SAPI) {
+<a name="line309"></a>                        case 'cgi':         // php-cgi < 5.3
+<a name="line310"></a>                        case 'cgi-fcgi':    // php-cgi >= 5.3
+<a name="line311"></a>                        case 'fpm-fcgi':    // php-fpm >= 5.3.3
+<a name="line312"></a>                        header('Status: 304 Not Modified');
+<a name="line313"></a>                        break;
+<a name="line314"></a>
+<a name="line315"></a>                        case 'cli':
+<a name="line316"></a>                        if (/* ^phpunit */!empty($_SERVER['SMARTY_PHPUNIT_DISABLE_HEADERS'])/* phpunit$ */) {
+<a name="line317"></a>                            $_SERVER['SMARTY_PHPUNIT_HEADERS'][] = '304 Not Modified';
+<a name="line318"></a>                        }
+<a name="line319"></a>                        break;
+<a name="line320"></a>
+<a name="line321"></a>                        default:
+<a name="line322"></a>                        header('HTTP/1.1 304 Not Modified');
+<a name="line323"></a>                        break;
+<a name="line324"></a>                    }
+<a name="line325"></a>                } else {
+<a name="line326"></a>                    switch (PHP_SAPI) {
+<a name="line327"></a>                        case 'cli':
+<a name="line328"></a>                        if (/* ^phpunit */!empty($_SERVER['SMARTY_PHPUNIT_DISABLE_HEADERS'])/* phpunit$ */) {
+<a name="line329"></a>                            $_SERVER['SMARTY_PHPUNIT_HEADERS'][] = 'Last-Modified: ' . gmdate('D, d M Y H:i:s', $_template->cached->timestamp) . ' GMT';
+<a name="line330"></a>                        }
+<a name="line331"></a>                        break;
+<a name="line332"></a>
+<a name="line333"></a>                        default:
+<a name="line334"></a>                        header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $_template->cached->timestamp) . ' GMT');
+<a name="line335"></a>                        break;
+<a name="line336"></a>                    }
+<a name="line337"></a>                    echo $_output;
+<a name="line338"></a>                }
+<a name="line339"></a>            } else {
+<a name="line340"></a>                echo $_output;
+<a name="line341"></a>            }
+<a name="line342"></a>            // debug output
+<a name="line343"></a>            if ($this->smarty->debugging) {
+<a name="line344"></a>                Smarty_Internal_Debug::display_debug($this);
+<a name="line345"></a>            }
+<a name="line346"></a>            if ($merge_tpl_vars) {
+<a name="line347"></a>                // restore local variables
+<a name="line348"></a>                $_template->tpl_vars = $save_tpl_vars;
+<a name="line349"></a>                $_template->config_vars =  $save_config_vars;
+<a name="line350"></a>            }
+<a name="line351"></a>            return;
+<a name="line352"></a>        } else {
+<a name="line353"></a>            if ($merge_tpl_vars) {
+<a name="line354"></a>                // restore local variables
+<a name="line355"></a>                $_template->tpl_vars = $save_tpl_vars;
+<a name="line356"></a>                $_template->config_vars =  $save_config_vars;
+<a name="line357"></a>            }
+<a name="line358"></a>            // return fetched content
+<a name="line359"></a>            return $_output;
+<a name="line360"></a>        }
+<a name="line361"></a>    }
+<a name="line362"></a>
+<a name="line363"></a>    /**
+<a name="line364"></a>     * displays a Smarty template
+<a name="line365"></a>     *
+<a name="line366"></a>     * @param string $template   the resource handle of the template file or template object
+<a name="line367"></a>     * @param mixed  $cache_id   cache id to be used with this template
+<a name="line368"></a>     * @param mixed  $compile_id compile id to be used with this template
+<a name="line369"></a>     * @param object $parent     next higher level of Smarty variables
+<a name="line370"></a>     */
+<a name="line371"></a>    public function display($template = null, $cache_id = null, $compile_id = null, $parent = null)
+<a name="line372"></a>    {
+<a name="line373"></a>        // display template
+<a name="line374"></a>        $this->fetch($template, $cache_id, $compile_id, $parent, true);
+<a name="line375"></a>    }
+<a name="line376"></a>
+<a name="line377"></a>    /**
+<a name="line378"></a>     * test if cache is valid
+<a name="line379"></a>     *
+<a name="line380"></a>     * @param string|object $template   the resource handle of the template file or template object
+<a name="line381"></a>     * @param mixed         $cache_id   cache id to be used with this template
+<a name="line382"></a>     * @param mixed         $compile_id compile id to be used with this template
+<a name="line383"></a>     * @param object        $parent     next higher level of Smarty variables
+<a name="line384"></a>     * @return boolean cache status
+<a name="line385"></a>     */
+<a name="line386"></a>    public function isCached($template = null, $cache_id = null, $compile_id = null, $parent = null)
+<a name="line387"></a>    {
+<a name="line388"></a>        if ($template === null && $this instanceof $this->template_class) {
+<a name="line389"></a>            return $this->cached->valid;
+<a name="line390"></a>        }
+<a name="line391"></a>        if (!($template instanceof $this->template_class)) {
+<a name="line392"></a>            if ($parent === null) {
+<a name="line393"></a>                $parent = $this;
+<a name="line394"></a>            }
+<a name="line395"></a>            $template = $this->smarty->createTemplate($template, $cache_id, $compile_id, $parent, false);
+<a name="line396"></a>        }
+<a name="line397"></a>        // return cache status of template
+<a name="line398"></a>        return $template->cached->valid;
+<a name="line399"></a>    }
+<a name="line400"></a>
+<a name="line401"></a>    /**
+<a name="line402"></a>     * creates a data object
+<a name="line403"></a>     *
+<a name="line404"></a>     * @param object $parent next higher level of Smarty variables
+<a name="line405"></a>     * @returns Smarty_Data data object
+<a name="line406"></a>     */
+<a name="line407"></a>    public function createData($parent = null)
+<a name="line408"></a>    {
+<a name="line409"></a>        return new Smarty_Data($parent, $this);
+<a name="line410"></a>    }
+<a name="line411"></a>
+<a name="line412"></a>    /**
+<a name="line413"></a>     * Registers plugin to be used in templates
+<a name="line414"></a>     *
+<a name="line415"></a>     * @param string   $type       plugin type
+<a name="line416"></a>     * @param string   $tag        name of template tag
+<a name="line417"></a>     * @param callback $callback   PHP callback to register
+<a name="line418"></a>     * @param boolean  $cacheable  if true (default) this fuction is cachable
+<a name="line419"></a>     * @param array    $cache_attr caching attributes if any
+<a name="line420"></a>     * @return Smarty_Internal_Templatebase current Smarty_Internal_Templatebase (or Smarty or Smarty_Internal_Template) instance for chaining
+<a name="line421"></a>     * @throws SmartyException when the plugin tag is invalid
+<a name="line422"></a>     */
+<a name="line423"></a>    public function registerPlugin($type, $tag, $callback, $cacheable = true, $cache_attr = null)
+<a name="line424"></a>    {
+<a name="line425"></a>        if (isset($this->smarty->registered_plugins[$type][$tag])) {
+<a name="line426"></a>            throw new SmartyException("Plugin tag \"{$tag}\" already registered");
+<a name="line427"></a>        } elseif (!is_callable($callback)) {
+<a name="line428"></a>            throw new SmartyException("Plugin \"{$tag}\" not callable");
+<a name="line429"></a>        } else {
+<a name="line430"></a>            $this->smarty->registered_plugins[$type][$tag] = array($callback, (bool) $cacheable, (array) $cache_attr);
+<a name="line431"></a>        }
+<a name="line432"></a>        
+<a name="line433"></a>        return $this;
+<a name="line434"></a>    }
+<a name="line435"></a>
+<a name="line436"></a>    /**
+<a name="line437"></a>     * Unregister Plugin
+<a name="line438"></a>     *
+<a name="line439"></a>     * @param string $type of plugin
+<a name="line440"></a>     * @param string $tag name of plugin
+<a name="line441"></a>     * @return Smarty_Internal_Templatebase current Smarty_Internal_Templatebase (or Smarty or Smarty_Internal_Template) instance for chaining
+<a name="line442"></a>     */
+<a name="line443"></a>    public function unregisterPlugin($type, $tag)
+<a name="line444"></a>    {
+<a name="line445"></a>        if (isset($this->smarty->registered_plugins[$type][$tag])) {
+<a name="line446"></a>            unset($this->smarty->registered_plugins[$type][$tag]);
+<a name="line447"></a>        }
+<a name="line448"></a>        
+<a name="line449"></a>        return $this;
+<a name="line450"></a>    }
+<a name="line451"></a>
+<a name="line452"></a>    /**
+<a name="line453"></a>     * Registers a resource to fetch a template
+<a name="line454"></a>     *
+<a name="line455"></a>     * @param string $type name of resource type
+<a name="line456"></a>     * @param Smarty_Resource|array $callback or instance of Smarty_Resource, or array of callbacks to handle resource (deprecated)
+<a name="line457"></a>     * @return Smarty_Internal_Templatebase current Smarty_Internal_Templatebase (or Smarty or Smarty_Internal_Template) instance for chaining
+<a name="line458"></a>     */
+<a name="line459"></a>    public function registerResource($type, $callback)
+<a name="line460"></a>    {
+<a name="line461"></a>        $this->smarty->registered_resources[$type] = $callback instanceof Smarty_Resource ? $callback : array($callback, false);
+<a name="line462"></a>        return $this;
+<a name="line463"></a>    }
+<a name="line464"></a>
+<a name="line465"></a>    /**
+<a name="line466"></a>     * Unregisters a resource
+<a name="line467"></a>     *
+<a name="line468"></a>     * @param string $type name of resource type
+<a name="line469"></a>     * @return Smarty_Internal_Templatebase current Smarty_Internal_Templatebase (or Smarty or Smarty_Internal_Template) instance for chaining
+<a name="line470"></a>     */
+<a name="line471"></a>    public function unregisterResource($type)
+<a name="line472"></a>    {
+<a name="line473"></a>        if (isset($this->smarty->registered_resources[$type])) {
+<a name="line474"></a>            unset($this->smarty->registered_resources[$type]);
+<a name="line475"></a>        }
+<a name="line476"></a>        
+<a name="line477"></a>        return $this;
+<a name="line478"></a>    }
+<a name="line479"></a>
+<a name="line480"></a>    /**
+<a name="line481"></a>     * Registers a cache resource to cache a template's output
+<a name="line482"></a>     *
+<a name="line483"></a>     * @param string               $type     name of cache resource type
+<a name="line484"></a>     * @param Smarty_CacheResource $callback instance of Smarty_CacheResource to handle output caching
+<a name="line485"></a>     * @return Smarty_Internal_Templatebase current Smarty_Internal_Templatebase (or Smarty or Smarty_Internal_Template) instance for chaining
+<a name="line486"></a>     */
+<a name="line487"></a>    public function registerCacheResource($type, Smarty_CacheResource $callback)
+<a name="line488"></a>    {
+<a name="line489"></a>        $this->smarty->registered_cache_resources[$type] = $callback;
+<a name="line490"></a>        return $this;
+<a name="line491"></a>    }
+<a name="line492"></a>
+<a name="line493"></a>    /**
+<a name="line494"></a>     * Unregisters a cache resource
+<a name="line495"></a>     *
+<a name="line496"></a>     * @param string $type name of cache resource type
+<a name="line497"></a>     * @return Smarty_Internal_Templatebase current Smarty_Internal_Templatebase (or Smarty or Smarty_Internal_Template) instance for chaining
+<a name="line498"></a>     */
+<a name="line499"></a>    public function unregisterCacheResource($type)
+<a name="line500"></a>    {
+<a name="line501"></a>        if (isset($this->smarty->registered_cache_resources[$type])) {
+<a name="line502"></a>            unset($this->smarty->registered_cache_resources[$type]);
+<a name="line503"></a>        }
+<a name="line504"></a>        
+<a name="line505"></a>        return $this;
+<a name="line506"></a>    }
+<a name="line507"></a>
+<a name="line508"></a>    /**
+<a name="line509"></a>     * Registers object to be used in templates
+<a name="line510"></a>     *
+<a name="line511"></a>     * @param string  $object        name of template object
+<a name="line512"></a>     * @param object  $object_impl   the referenced PHP object to register
+<a name="line513"></a>     * @param array   $allowed       list of allowed methods (empty = all)
+<a name="line514"></a>     * @param boolean $smarty_args   smarty argument format, else traditional
+<a name="line515"></a>     * @param array   $block_methods list of block-methods
+<a name="line516"></a>     * @param array $block_functs list of methods that are block format
+<a name="line517"></a>     * @return Smarty_Internal_Templatebase current Smarty_Internal_Templatebase (or Smarty or Smarty_Internal_Template) instance for chaining
+<a name="line518"></a>     * @throws SmartyException if any of the methods in $allowed or $block_methods are invalid
+<a name="line519"></a>     */
+<a name="line520"></a>    public function registerObject($object_name, $object_impl, $allowed = array(), $smarty_args = true, $block_methods = array())
+<a name="line521"></a>    {
+<a name="line522"></a>        // test if allowed methodes callable
+<a name="line523"></a>        if (!empty($allowed)) {
+<a name="line524"></a>            foreach ((array) $allowed as $method) {
+<a name="line525"></a>                if (!is_callable(array($object_impl, $method))) {
+<a name="line526"></a>                    throw new SmartyException("Undefined method '$method' in registered object");
+<a name="line527"></a>                }
+<a name="line528"></a>            }
+<a name="line529"></a>        }
+<a name="line530"></a>        // test if block methodes callable
+<a name="line531"></a>        if (!empty($block_methods)) {
+<a name="line532"></a>            foreach ((array) $block_methods as $method) {
+<a name="line533"></a>                if (!is_callable(array($object_impl, $method))) {
+<a name="line534"></a>                    throw new SmartyException("Undefined method '$method' in registered object");
+<a name="line535"></a>                }
+<a name="line536"></a>            }
+<a name="line537"></a>        }
+<a name="line538"></a>        // register the object
+<a name="line539"></a>        $this->smarty->registered_objects[$object_name] =
+<a name="line540"></a>        array($object_impl, (array) $allowed, (boolean) $smarty_args, (array) $block_methods);
+<a name="line541"></a>        return $this;
+<a name="line542"></a>    }
+<a name="line543"></a>
+<a name="line544"></a>    /**
+<a name="line545"></a>     * return a reference to a registered object
+<a name="line546"></a>     *
+<a name="line547"></a>     * @param string $name object name
+<a name="line548"></a>     * @return object
+<a name="line549"></a>     * @throws SmartyException if no such object is found
+<a name="line550"></a>     */
+<a name="line551"></a>    public function getRegisteredObject($name)
+<a name="line552"></a>    {
+<a name="line553"></a>        if (!isset($this->smarty->registered_objects[$name])) {
+<a name="line554"></a>            throw new SmartyException("'$name' is not a registered object");
+<a name="line555"></a>        }
+<a name="line556"></a>        if (!is_object($this->smarty->registered_objects[$name][0])) {
+<a name="line557"></a>            throw new SmartyException("registered '$name' is not an object");
+<a name="line558"></a>        }
+<a name="line559"></a>        return $this->smarty->registered_objects[$name][0];
+<a name="line560"></a>    }
+<a name="line561"></a>
+<a name="line562"></a>    /**
+<a name="line563"></a>     * unregister an object
+<a name="line564"></a>     *
+<a name="line565"></a>     * @param string $name object name
+<a name="line566"></a>     * @return Smarty_Internal_Templatebase current Smarty_Internal_Templatebase (or Smarty or Smarty_Internal_Template) instance for chaining
+<a name="line567"></a>     */
+<a name="line568"></a>    public function unregisterObject($name)
+<a name="line569"></a>    {
+<a name="line570"></a>        if (isset($this->smarty->registered_objects[$name])) {
+<a name="line571"></a>            unset($this->smarty->registered_objects[$name]);
+<a name="line572"></a>        }
+<a name="line573"></a>        
+<a name="line574"></a>        return $this;
+<a name="line575"></a>    }
+<a name="line576"></a>
+<a name="line577"></a>    /**
+<a name="line578"></a>     * Registers static classes to be used in templates
+<a name="line579"></a>     *
+<a name="line580"></a>     * @param string $class name of template class
+<a name="line581"></a>     * @param string $class_impl the referenced PHP class to register
+<a name="line582"></a>     * @return Smarty_Internal_Templatebase current Smarty_Internal_Templatebase (or Smarty or Smarty_Internal_Template) instance for chaining
+<a name="line583"></a>     * @throws SmartyException if $class_impl does not refer to an existing class
+<a name="line584"></a>     */
+<a name="line585"></a>    public function registerClass($class_name, $class_impl)
+<a name="line586"></a>    {
+<a name="line587"></a>        // test if exists
+<a name="line588"></a>        if (!class_exists($class_impl)) {
+<a name="line589"></a>            throw new SmartyException("Undefined class '$class_impl' in register template class");
+<a name="line590"></a>        }
+<a name="line591"></a>        // register the class
+<a name="line592"></a>        $this->smarty->registered_classes[$class_name] = $class_impl;
+<a name="line593"></a>        return $this;
+<a name="line594"></a>    }
+<a name="line595"></a>
+<a name="line596"></a>    /**
+<a name="line597"></a>     * Registers a default plugin handler
+<a name="line598"></a>     *
+<a name="line599"></a>     * @param callable $callback class/method name
+<a name="line600"></a>     * @return Smarty_Internal_Templatebase current Smarty_Internal_Templatebase (or Smarty or Smarty_Internal_Template) instance for chaining
+<a name="line601"></a>     * @throws SmartyException if $callback is not callable
+<a name="line602"></a>     */
+<a name="line603"></a>    public function registerDefaultPluginHandler($callback)
+<a name="line604"></a>    {
+<a name="line605"></a>        if (is_callable($callback)) {
+<a name="line606"></a>            $this->smarty->default_plugin_handler_func = $callback;
+<a name="line607"></a>        } else {
+<a name="line608"></a>            throw new SmartyException("Default plugin handler '$callback' not callable");
+<a name="line609"></a>        }
+<a name="line610"></a>        
+<a name="line611"></a>        return $this;
+<a name="line612"></a>    }
+<a name="line613"></a>
+<a name="line614"></a>    /**
+<a name="line615"></a>     * Registers a default template handler
+<a name="line616"></a>     *
+<a name="line617"></a>     * @param callable $callback class/method name
+<a name="line618"></a>     * @return Smarty_Internal_Templatebase current Smarty_Internal_Templatebase (or Smarty or Smarty_Internal_Template) instance for chaining
+<a name="line619"></a>     * @throws SmartyException if $callback is not callable
+<a name="line620"></a>     */
+<a name="line621"></a>    public function registerDefaultTemplateHandler($callback)
+<a name="line622"></a>    {
+<a name="line623"></a>        if (is_callable($callback)) {
+<a name="line624"></a>            $this->smarty->default_template_handler_func = $callback;
+<a name="line625"></a>        } else {
+<a name="line626"></a>            throw new SmartyException("Default template handler '$callback' not callable");
+<a name="line627"></a>        }
+<a name="line628"></a>        
+<a name="line629"></a>        return $this;
+<a name="line630"></a>    }
+<a name="line631"></a>
+<a name="line632"></a>    /**
+<a name="line633"></a>     * Registers a default template handler
+<a name="line634"></a>     *
+<a name="line635"></a>     * @param callable $callback class/method name
+<a name="line636"></a>     * @return Smarty_Internal_Templatebase current Smarty_Internal_Templatebase (or Smarty or Smarty_Internal_Template) instance for chaining
+<a name="line637"></a>     * @throws SmartyException if $callback is not callable
+<a name="line638"></a>     */
+<a name="line639"></a>    public function registerDefaultConfigHandler($callback)
+<a name="line640"></a>    {
+<a name="line641"></a>        if (is_callable($callback)) {
+<a name="line642"></a>            $this->smarty->default_config_handler_func = $callback;
+<a name="line643"></a>        } else {
+<a name="line644"></a>            throw new SmartyException("Default config handler '$callback' not callable");
+<a name="line645"></a>        }
+<a name="line646"></a>        
+<a name="line647"></a>        return $this;
+<a name="line648"></a>    }
+<a name="line649"></a>
+<a name="line650"></a>    /**
+<a name="line651"></a>     * Registers a filter function
+<a name="line652"></a>     *
+<a name="line653"></a>     * @param string $type filter type
+<a name="line654"></a>     * @param callback $callback
+<a name="line655"></a>     * @return Smarty_Internal_Templatebase current Smarty_Internal_Templatebase (or Smarty or Smarty_Internal_Template) instance for chaining
+<a name="line656"></a>     */
+<a name="line657"></a>    public function registerFilter($type, $callback)
+<a name="line658"></a>    {
+<a name="line659"></a>        $this->smarty->registered_filters[$type][$this->_get_filter_name($callback)] = $callback;
+<a name="line660"></a>        return $this;
+<a name="line661"></a>    }
+<a name="line662"></a>
+<a name="line663"></a>    /**
+<a name="line664"></a>     * Unregisters a filter function
+<a name="line665"></a>     *
+<a name="line666"></a>     * @param string $type filter type
+<a name="line667"></a>     * @param callback $callback
+<a name="line668"></a>     * @return Smarty_Internal_Templatebase current Smarty_Internal_Templatebase (or Smarty or Smarty_Internal_Template) instance for chaining
+<a name="line669"></a>     */
+<a name="line670"></a>    public function unregisterFilter($type, $callback)
+<a name="line671"></a>    {
+<a name="line672"></a>        $name = $this->_get_filter_name($callback);
+<a name="line673"></a>        if (isset($this->smarty->registered_filters[$type][$name])) {
+<a name="line674"></a>            unset($this->smarty->registered_filters[$type][$name]);
+<a name="line675"></a>        }
+<a name="line676"></a>        
+<a name="line677"></a>        return $this;
+<a name="line678"></a>    }
+<a name="line679"></a>
+<a name="line680"></a>    /**
+<a name="line681"></a>     * Return internal filter name
+<a name="line682"></a>     *
+<a name="line683"></a>     * @param callback $function_name
+<a name="line684"></a>     * @return string internal filter name
+<a name="line685"></a>     */
+<a name="line686"></a>    public function _get_filter_name($function_name)
+<a name="line687"></a>    {
+<a name="line688"></a>        if (is_array($function_name)) {
+<a name="line689"></a>            $_class_name = (is_object($function_name[0]) ?
+<a name="line690"></a>            get_class($function_name[0]) : $function_name[0]);
+<a name="line691"></a>            return $_class_name . '_' . $function_name[1];
+<a name="line692"></a>        } else {
+<a name="line693"></a>            return $function_name;
+<a name="line694"></a>        }
+<a name="line695"></a>    }
+<a name="line696"></a>
+<a name="line697"></a>    /**
+<a name="line698"></a>     * load a filter of specified type and name
+<a name="line699"></a>     *
+<a name="line700"></a>     * @param string $type filter type
+<a name="line701"></a>     * @param string $name filter name
+<a name="line702"></a>     * @throws SmartyException if filter could not be loaded
+<a name="line703"></a>     */
+<a name="line704"></a>    public function loadFilter($type, $name)
+<a name="line705"></a>    {
+<a name="line706"></a>        $_plugin = "smarty_{$type}filter_{$name}";
+<a name="line707"></a>        $_filter_name = $_plugin;
+<a name="line708"></a>        if ($this->smarty->loadPlugin($_plugin)) {
+<a name="line709"></a>            if (class_exists($_plugin, false)) {
+<a name="line710"></a>                $_plugin = array($_plugin, 'execute');
+<a name="line711"></a>            }
+<a name="line712"></a>            if (is_callable($_plugin)) {
+<a name="line713"></a>                $this->smarty->registered_filters[$type][$_filter_name] = $_plugin;
+<a name="line714"></a>                return true;
+<a name="line715"></a>            }
+<a name="line716"></a>        }
+<a name="line717"></a>        throw new SmartyException("{$type}filter \"{$name}\" not callable");
+<a name="line718"></a>    }
+<a name="line719"></a>
+<a name="line720"></a>    /**
+<a name="line721"></a>     * unload a filter of specified type and name
+<a name="line722"></a>     *
+<a name="line723"></a>     * @param string $type filter type
+<a name="line724"></a>     * @param string $name filter name
+<a name="line725"></a>     * @return Smarty_Internal_Templatebase current Smarty_Internal_Templatebase (or Smarty or Smarty_Internal_Template) instance for chaining
+<a name="line726"></a>     */
+<a name="line727"></a>    public function unloadFilter($type, $name)
+<a name="line728"></a>    {
+<a name="line729"></a>        $_filter_name = "smarty_{$type}filter_{$name}";
+<a name="line730"></a>        if (isset($this->smarty->registered_filters[$type][$_filter_name])) {
+<a name="line731"></a>            unset ($this->smarty->registered_filters[$type][$_filter_name]);
+<a name="line732"></a>        }
+<a name="line733"></a>        
+<a name="line734"></a>        return $this;
+<a name="line735"></a>    }
+<a name="line736"></a>
+<a name="line737"></a>    /**
+<a name="line738"></a>     * preg_replace callback to convert camelcase getter/setter to underscore property names
+<a name="line739"></a>     *
+<a name="line740"></a>     * @param string $match match string
+<a name="line741"></a>     * @return string replacemant
+<a name="line742"></a>     */
+<a name="line743"></a>    private function replaceCamelcase($match) {
+<a name="line744"></a>        return "_" . strtolower($match[1]);
+<a name="line745"></a>    }
+<a name="line746"></a>
+<a name="line747"></a>    /**
+<a name="line748"></a>     * Handle unknown class methods
+<a name="line749"></a>     *
+<a name="line750"></a>     * @param string $name unknown method-name
+<a name="line751"></a>     * @param array  $args argument array
+<a name="line752"></a>     */
+<a name="line753"></a>    public function __call($name, $args)
+<a name="line754"></a>    {
+<a name="line755"></a>        static $_prefixes = array('set' => true, 'get' => true);
+<a name="line756"></a>        static $_resolved_property_name = array();
+<a name="line757"></a>        static $_resolved_property_source = array();
+<a name="line758"></a>
+<a name="line759"></a>        // method of Smarty object?
+<a name="line760"></a>        if (method_exists($this->smarty, $name)) {
+<a name="line761"></a>            return call_user_func_array(array($this->smarty, $name), $args);
+<a name="line762"></a>        }
+<a name="line763"></a>        // see if this is a set/get for a property
+<a name="line764"></a>        $first3 = strtolower(substr($name, 0, 3));
+<a name="line765"></a>        if (isset($_prefixes[$first3]) && isset($name[3]) && $name[3] !== '_') {
+<a name="line766"></a>            if (isset($_resolved_property_name[$name])) {
+<a name="line767"></a>                $property_name = $_resolved_property_name[$name];
+<a name="line768"></a>            } else {
+<a name="line769"></a>                // try to keep case correct for future PHP 6.0 case-sensitive class methods
+<a name="line770"></a>                // lcfirst() not available < PHP 5.3.0, so improvise
+<a name="line771"></a>                $property_name = strtolower(substr($name, 3, 1)) . substr($name, 4);
+<a name="line772"></a>                // convert camel case to underscored name
+<a name="line773"></a>                $property_name = preg_replace_callback('/([A-Z])/', array($this,'replaceCamelcase'), $property_name);
+<a name="line774"></a>                $_resolved_property_name[$name] = $property_name;
+<a name="line775"></a>            }
+<a name="line776"></a>            if (isset($_resolved_property_source[$property_name])) {
+<a name="line777"></a>                $_is_this = $_resolved_property_source[$property_name];
+<a name="line778"></a>            } else {
+<a name="line779"></a>                $_is_this = null;
+<a name="line780"></a>                if (property_exists($this, $property_name)) {
+<a name="line781"></a>                    $_is_this = true;
+<a name="line782"></a>                } else if (property_exists($this->smarty, $property_name)) {
+<a name="line783"></a>                    $_is_this = false;
+<a name="line784"></a>                }
+<a name="line785"></a>                $_resolved_property_source[$property_name] = $_is_this;
+<a name="line786"></a>            }
+<a name="line787"></a>            if ($_is_this) {
+<a name="line788"></a>                if ($first3 == 'get')
+<a name="line789"></a>                return $this->$property_name;
+<a name="line790"></a>                else
+<a name="line791"></a>                return $this->$property_name = $args[0];
+<a name="line792"></a>            } else if ($_is_this === false) {
+<a name="line793"></a>                if ($first3 == 'get')
+<a name="line794"></a>                return $this->smarty->$property_name;
+<a name="line795"></a>                else
+<a name="line796"></a>                return $this->smarty->$property_name = $args[0];
+<a name="line797"></a>            } else {
+<a name="line798"></a>                throw new SmartyException("property '$property_name' does not exist.");
+<a name="line799"></a>                return false;
+<a name="line800"></a>            }
+<a name="line801"></a>        }
+<a name="line802"></a>        if ($name == 'Smarty') {
+<a name="line803"></a>            throw new SmartyException("PHP5 requires you to call __construct() instead of Smarty()");
+<a name="line804"></a>        }
+<a name="line805"></a>        // must be unknown
+<a name="line806"></a>        throw new SmartyException("Call of unknown method '$name'.");
+<a name="line807"></a>    }
+<a name="line808"></a>
+<a name="line809"></a>}
+<a name="line810"></a>
+<a name="line811"></a>?></pre>
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_internal_templatebase.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

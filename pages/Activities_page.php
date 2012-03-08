@@ -1,12 +1,12 @@
 <?php
 
-require_once PAGES . 'Page.php';
+require_once LIB . 'Page.php';
 require_once LIB . 'Activities.php';
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
- *
- *
+ * Activities page displays a sortable list of all activities
+ * @namespace active
  */
 class Activities_page extends Page {
 

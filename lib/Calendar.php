@@ -1,8 +1,9 @@
 <?php
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
  * Calendar stores a representation of the month along with any events occuring
+ * @namespace active
  */
 class Calendar {
 
@@ -165,9 +166,10 @@ class Calendar {
 	}
 }
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
  * Event class stores text and a timestamp for an event
+ * @namespace active
  */
 class Event {
 

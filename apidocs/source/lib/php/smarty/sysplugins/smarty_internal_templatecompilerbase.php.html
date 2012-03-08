@@ -1,0 +1,688 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
+
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css">
+<link rel="start" href="../../../../../overview-summary.html">
+
+<title>lib/php/Smarty/sysplugins/smarty_internal_templatecompilerbase.php (PHPDoctor)</title>
+
+</head>
+<body id="file" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_internal_templatecompilerbase.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<h1>lib/php/Smarty/sysplugins/smarty_internal_templatecompilerbase.php</h1>
+<div class="comment" id="overview_description"><p>Smarty Internal Plugin Smarty Template Compiler Base</p><p>This file contains the basic classes and methodes for compiling Smarty templates with lexer/parser</p></div>
+
+<hr>
+
+<a name="line1"></a><pre><?php
+<a name="line2"></a>/**
+<a name="line3"></a> * Smarty Internal Plugin Smarty Template Compiler Base
+<a name="line4"></a> *
+<a name="line5"></a> * This file contains the basic classes and methodes for compiling Smarty templates with lexer/parser
+<a name="line6"></a> *
+<a name="line7"></a> * @package Smarty
+<a name="line8"></a> * @subpackage Compiler
+<a name="line9"></a> * @author Uwe Tews
+<a name="line10"></a> */
+<a name="line11"></a>
+<a name="line12"></a>/**
+<a name="line13"></a> * Main abstract compiler class
+<a name="line14"></a> *
+<a name="line15"></a> * @package Smarty
+<a name="line16"></a> * @subpackage Compiler
+<a name="line17"></a> */
+<a name="line18"></a>abstract class Smarty_Internal_TemplateCompilerBase {
+<a name="line19"></a>
+<a name="line20"></a>    /**
+<a name="line21"></a>     * hash for nocache sections
+<a name="line22"></a>     *
+<a name="line23"></a>     * @var mixed
+<a name="line24"></a>     */
+<a name="line25"></a>    private $nocache_hash = null;
+<a name="line26"></a>    /**
+<a name="line27"></a>     * suppress generation of nocache code
+<a name="line28"></a>     *
+<a name="line29"></a>     * @var bool
+<a name="line30"></a>     */
+<a name="line31"></a>    public $suppressNocacheProcessing = false;
+<a name="line32"></a>    /**
+<a name="line33"></a>     * suppress generation of merged template code
+<a name="line34"></a>     *
+<a name="line35"></a>     * @var bool
+<a name="line36"></a>     */
+<a name="line37"></a>    public $suppressMergedTemplates = false;
+<a name="line38"></a>    /**
+<a name="line39"></a>     * compile tag objects
+<a name="line40"></a>     *
+<a name="line41"></a>     * @var array
+<a name="line42"></a>     */
+<a name="line43"></a>    public static $_tag_objects = array();
+<a name="line44"></a>    /**
+<a name="line45"></a>     * tag stack
+<a name="line46"></a>     *
+<a name="line47"></a>     * @var array
+<a name="line48"></a>     */
+<a name="line49"></a>    public $_tag_stack = array();
+<a name="line50"></a>    /**
+<a name="line51"></a>     * current template
+<a name="line52"></a>     *
+<a name="line53"></a>     * @var Smarty_Internal_Template
+<a name="line54"></a>     */
+<a name="line55"></a>    public $template = null;
+<a name="line56"></a>    /**
+<a name="line57"></a>     * merged templates
+<a name="line58"></a>     *
+<a name="line59"></a>     * @var array
+<a name="line60"></a>     */
+<a name="line61"></a>    public $merged_templates = array();
+<a name="line62"></a>    /**
+<a name="line63"></a>     * flag when compiling {block}
+<a name="line64"></a>     *
+<a name="line65"></a>     * @var bool
+<a name="line66"></a>     */
+<a name="line67"></a>    public $inheritance = false;
+<a name="line68"></a>    /**
+<a name="line69"></a>     * plugins loaded by default plugin handler
+<a name="line70"></a>     *
+<a name="line71"></a>     * @var array
+<a name="line72"></a>     */
+<a name="line73"></a>    public $default_handler_plugins = array();
+<a name="line74"></a>    /**
+<a name="line75"></a>     * saved preprocessed modifier list
+<a name="line76"></a>     *
+<a name="line77"></a>     * @var mixed
+<a name="line78"></a>     */
+<a name="line79"></a>    public $default_modifier_list = null;
+<a name="line80"></a>    /**
+<a name="line81"></a>     * force compilation of complete template as nocache
+<a name="line82"></a>     * @var boolean
+<a name="line83"></a>     */
+<a name="line84"></a>    public $forceNocache = false;
+<a name="line85"></a>    /**
+<a name="line86"></a>     * suppress Smarty header code in compiled template
+<a name="line87"></a>     * @var bool
+<a name="line88"></a>     */
+<a name="line89"></a>    public $suppressHeader = false;
+<a name="line90"></a>    /**
+<a name="line91"></a>     * suppress template property header code in compiled template
+<a name="line92"></a>     * @var bool
+<a name="line93"></a>     */
+<a name="line94"></a>    public $suppressTemplatePropertyHeader = false;
+<a name="line95"></a>    /**
+<a name="line96"></a>     * flag if compiled template file shall we written
+<a name="line97"></a>     * @var bool
+<a name="line98"></a>     */
+<a name="line99"></a>    public $write_compiled_code = true;
+<a name="line100"></a>    /**
+<a name="line101"></a>     * flag if currently a template function is compiled
+<a name="line102"></a>     * @var bool
+<a name="line103"></a>     */
+<a name="line104"></a>    public $compiles_template_function = false;
+<a name="line105"></a>    /**
+<a name="line106"></a>     * called subfuntions from template function
+<a name="line107"></a>     * @var array
+<a name="line108"></a>     */
+<a name="line109"></a>    public $called_functions = array();
+<a name="line110"></a>    /**
+<a name="line111"></a>     * flags for used modifier plugins
+<a name="line112"></a>     * @var array
+<a name="line113"></a>     */
+<a name="line114"></a>    public $modifier_plugins = array();
+<a name="line115"></a>
+<a name="line116"></a>    /**
+<a name="line117"></a>     * Initialize compiler
+<a name="line118"></a>     */
+<a name="line119"></a>    public function __construct()
+<a name="line120"></a>    {
+<a name="line121"></a>        $this->nocache_hash = str_replace('.', '-', uniqid(rand(), true));
+<a name="line122"></a>    }
+<a name="line123"></a>
+<a name="line124"></a>    /**
+<a name="line125"></a>     * Method to compile a Smarty template
+<a name="line126"></a>     *
+<a name="line127"></a>     * @param  Smarty_Internal_Template $template template object to compile
+<a name="line128"></a>     * @return bool true if compiling succeeded, false if it failed
+<a name="line129"></a>     */
+<a name="line130"></a>    public function compileTemplate(Smarty_Internal_Template $template)
+<a name="line131"></a>    {
+<a name="line132"></a>        if (empty($template->properties['nocache_hash'])) {
+<a name="line133"></a>            $template->properties['nocache_hash'] = $this->nocache_hash;
+<a name="line134"></a>        } else {
+<a name="line135"></a>            $this->nocache_hash = $template->properties['nocache_hash'];
+<a name="line136"></a>        }
+<a name="line137"></a>        // flag for nochache sections
+<a name="line138"></a>        $this->nocache = false;
+<a name="line139"></a>        $this->tag_nocache = false;
+<a name="line140"></a>        // save template object in compiler class
+<a name="line141"></a>        $this->template = $template;
+<a name="line142"></a>        // reset has noche code flag
+<a name="line143"></a>        $this->template->has_nocache_code = false;
+<a name="line144"></a>        $this->smarty->_current_file = $saved_filepath = $this->template->source->filepath;
+<a name="line145"></a>        // template header code
+<a name="line146"></a>        $template_header = '';
+<a name="line147"></a>        if (!$this->suppressHeader) {
+<a name="line148"></a>            $template_header .= "<?php /* Smarty version " . Smarty::SMARTY_VERSION . ", created on " . strftime("%Y-%m-%d %H:%M:%S") . "\n";
+<a name="line149"></a>            $template_header .= "         compiled from \"" . $this->template->source->filepath . "\" */ ?>\n";
+<a name="line150"></a>        }
+<a name="line151"></a>
+<a name="line152"></a>        do {
+<a name="line153"></a>            // flag for aborting current and start recompile
+<a name="line154"></a>            $this->abort_and_recompile = false;
+<a name="line155"></a>            // get template source
+<a name="line156"></a>            $_content = $template->source->content;
+<a name="line157"></a>            // run prefilter if required
+<a name="line158"></a>            if (isset($this->smarty->autoload_filters['pre']) || isset($this->smarty->registered_filters['pre'])) {
+<a name="line159"></a>                $template->source->content = $_content = Smarty_Internal_Filter_Handler::runFilter('pre', $_content, $template);
+<a name="line160"></a>            }
+<a name="line161"></a>            // on empty template just return header
+<a name="line162"></a>            if ($_content == '') {
+<a name="line163"></a>                if ($this->suppressTemplatePropertyHeader) {
+<a name="line164"></a>                    $code = '';
+<a name="line165"></a>                } else {
+<a name="line166"></a>                    $code = $template_header . $template->createTemplateCodeFrame();
+<a name="line167"></a>                }
+<a name="line168"></a>                return $code;
+<a name="line169"></a>            }
+<a name="line170"></a>            // call compiler
+<a name="line171"></a>            $_compiled_code = $this->doCompile($_content);
+<a name="line172"></a>        } while ($this->abort_and_recompile);
+<a name="line173"></a>        $this->template->source->filepath = $saved_filepath;
+<a name="line174"></a>        // free memory
+<a name="line175"></a>        unset($this->parser->root_buffer, $this->parser->current_buffer, $this->parser, $this->lex, $this->template);
+<a name="line176"></a>        self::$_tag_objects = array();
+<a name="line177"></a>        // return compiled code to template object
+<a name="line178"></a>        $merged_code = '';
+<a name="line179"></a>        if (!$this->suppressMergedTemplates) {
+<a name="line180"></a>            foreach ($this->merged_templates as $code) {
+<a name="line181"></a>                $merged_code .= $code;
+<a name="line182"></a>            }
+<a name="line183"></a>        }
+<a name="line184"></a>        if ($this->suppressTemplatePropertyHeader) {
+<a name="line185"></a>            $code = $_compiled_code . $merged_code;
+<a name="line186"></a>        } else {
+<a name="line187"></a>            $code = $template_header . $template->createTemplateCodeFrame($_compiled_code) . $merged_code;
+<a name="line188"></a>        }
+<a name="line189"></a>        // run postfilter if required
+<a name="line190"></a>        if (isset($this->smarty->autoload_filters['post']) || isset($this->smarty->registered_filters['post'])) {
+<a name="line191"></a>            $code = Smarty_Internal_Filter_Handler::runFilter('post', $code, $template);
+<a name="line192"></a>        }
+<a name="line193"></a>        return $code;
+<a name="line194"></a>    }
+<a name="line195"></a>
+<a name="line196"></a>    /**
+<a name="line197"></a>     * Compile Tag
+<a name="line198"></a>     *
+<a name="line199"></a>     * This is a call back from the lexer/parser
+<a name="line200"></a>     * It executes the required compile plugin for the Smarty tag
+<a name="line201"></a>     *
+<a name="line202"></a>     * @param string $tag       tag name
+<a name="line203"></a>     * @param array  $args      array with tag attributes
+<a name="line204"></a>     * @param array  $parameter array with compilation parameter
+<a name="line205"></a>     * @return string compiled code
+<a name="line206"></a>     */
+<a name="line207"></a>    public function compileTag($tag, $args, $parameter = array())
+<a name="line208"></a>    {
+<a name="line209"></a>        // $args contains the attributes parsed and compiled by the lexer/parser
+<a name="line210"></a>        // assume that tag does compile into code, but creates no HTML output
+<a name="line211"></a>        $this->has_code = true;
+<a name="line212"></a>        $this->has_output = false;
+<a name="line213"></a>        // log tag/attributes
+<a name="line214"></a>        if (isset($this->smarty->get_used_tags) && $this->smarty->get_used_tags) {
+<a name="line215"></a>            $this->template->used_tags[] = array($tag, $args);
+<a name="line216"></a>        }
+<a name="line217"></a>        // check nocache option flag
+<a name="line218"></a>        if (in_array("'nocache'",$args) || in_array(array('nocache'=>'true'),$args)
+<a name="line219"></a>        || in_array(array('nocache'=>'"true"'),$args) || in_array(array('nocache'=>"'true'"),$args)) {
+<a name="line220"></a>            $this->tag_nocache = true;
+<a name="line221"></a>        }
+<a name="line222"></a>        // compile the smarty tag (required compile classes to compile the tag are autoloaded)
+<a name="line223"></a>        if (($_output = $this->callTagCompiler($tag, $args, $parameter)) === false) {
+<a name="line224"></a>            if (isset($this->smarty->template_functions[$tag])) {
+<a name="line225"></a>                // template defined by {template} tag
+<a name="line226"></a>                $args['_attr']['name'] = "'" . $tag . "'";
+<a name="line227"></a>                $_output = $this->callTagCompiler('call', $args, $parameter);
+<a name="line228"></a>            }
+<a name="line229"></a>        }
+<a name="line230"></a>        if ($_output !== false) {
+<a name="line231"></a>            if ($_output !== true) {
+<a name="line232"></a>                // did we get compiled code
+<a name="line233"></a>                if ($this->has_code) {
+<a name="line234"></a>                    // Does it create output?
+<a name="line235"></a>                    if ($this->has_output) {
+<a name="line236"></a>                        $_output .= "\n";
+<a name="line237"></a>                    }
+<a name="line238"></a>                    // return compiled code
+<a name="line239"></a>                    return $_output;
+<a name="line240"></a>                }
+<a name="line241"></a>            }
+<a name="line242"></a>            // tag did not produce compiled code
+<a name="line243"></a>            return '';
+<a name="line244"></a>        } else {
+<a name="line245"></a>            // map_named attributes
+<a name="line246"></a>            if (isset($args['_attr'])) {
+<a name="line247"></a>                foreach ($args['_attr'] as $key => $attribute) {
+<a name="line248"></a>                    if (is_array($attribute)) {
+<a name="line249"></a>                        $args = array_merge($args, $attribute);
+<a name="line250"></a>                    }
+<a name="line251"></a>                }
+<a name="line252"></a>            }
+<a name="line253"></a>            // not an internal compiler tag
+<a name="line254"></a>            if (strlen($tag) < 6 || substr($tag, -5) != 'close') {
+<a name="line255"></a>                // check if tag is a registered object
+<a name="line256"></a>                if (isset($this->smarty->registered_objects[$tag]) && isset($parameter['object_methode'])) {
+<a name="line257"></a>                    $methode = $parameter['object_methode'];
+<a name="line258"></a>                    if (!in_array($methode, $this->smarty->registered_objects[$tag][3]) &&
+<a name="line259"></a>                    (empty($this->smarty->registered_objects[$tag][1]) || in_array($methode, $this->smarty->registered_objects[$tag][1]))) {
+<a name="line260"></a>                        return $this->callTagCompiler('private_object_function', $args, $parameter, $tag, $methode);
+<a name="line261"></a>                    } elseif (in_array($methode, $this->smarty->registered_objects[$tag][3])) {
+<a name="line262"></a>                        return $this->callTagCompiler('private_object_block_function', $args, $parameter, $tag, $methode);
+<a name="line263"></a>                    } else {
+<a name="line264"></a>                        return $this->trigger_template_error ('unallowed methode "' . $methode . '" in registered object "' . $tag . '"', $this->lex->taglineno);
+<a name="line265"></a>                    }
+<a name="line266"></a>                }
+<a name="line267"></a>                // check if tag is registered
+<a name="line268"></a>                foreach (array(Smarty::PLUGIN_COMPILER, Smarty::PLUGIN_FUNCTION, Smarty::PLUGIN_BLOCK) as $plugin_type) {
+<a name="line269"></a>                    if (isset($this->smarty->registered_plugins[$plugin_type][$tag])) {
+<a name="line270"></a>                        // if compiler function plugin call it now
+<a name="line271"></a>                        if ($plugin_type == Smarty::PLUGIN_COMPILER) {
+<a name="line272"></a>                            $new_args = array();
+<a name="line273"></a>                            foreach ($args as $key => $mixed) {
+<a name="line274"></a>                            	if (is_array($mixed)) {
+<a name="line275"></a>                                	$new_args = array_merge($new_args, $mixed);
+<a name="line276"></a>                                } else {
+<a name="line277"></a>                                	$new_args[$key] = $mixed;
+<a name="line278"></a>                                }
+<a name="line279"></a>                            }
+<a name="line280"></a>                            if (!$this->smarty->registered_plugins[$plugin_type][$tag][1]) {
+<a name="line281"></a>                                $this->tag_nocache = true;
+<a name="line282"></a>                            }
+<a name="line283"></a>                            $function = $this->smarty->registered_plugins[$plugin_type][$tag][0];
+<a name="line284"></a>                            if (!is_array($function)) {
+<a name="line285"></a>                                return $function($new_args, $this);
+<a name="line286"></a>                            } else if (is_object($function[0])) {
+<a name="line287"></a>                                return $this->smarty->registered_plugins[$plugin_type][$tag][0][0]->$function[1]($new_args, $this);
+<a name="line288"></a>                            } else {
+<a name="line289"></a>                                return call_user_func_array($function, array($new_args, $this));
+<a name="line290"></a>                            }
+<a name="line291"></a>                        }
+<a name="line292"></a>                        // compile registered function or block function
+<a name="line293"></a>                        if ($plugin_type == Smarty::PLUGIN_FUNCTION || $plugin_type == Smarty::PLUGIN_BLOCK) {
+<a name="line294"></a>                            return $this->callTagCompiler('private_registered_' . $plugin_type, $args, $parameter, $tag);
+<a name="line295"></a>                        }
+<a name="line296"></a>
+<a name="line297"></a>                    }
+<a name="line298"></a>                }
+<a name="line299"></a>                // check plugins from plugins folder
+<a name="line300"></a>                foreach ($this->smarty->plugin_search_order as $plugin_type) {
+<a name="line301"></a>                    if ($plugin_type == Smarty::PLUGIN_BLOCK && $this->smarty->loadPlugin('smarty_compiler_' . $tag) && (!isset($this->smarty->security_policy) || $this->smarty->security_policy->isTrustedTag($tag, $this))) {
+<a name="line302"></a>                        $plugin = 'smarty_compiler_' . $tag;
+<a name="line303"></a>                        if (is_callable($plugin)) {
+<a name="line304"></a>                            // convert arguments format for old compiler plugins
+<a name="line305"></a>                            $new_args = array();
+<a name="line306"></a>                            foreach ($args as $key => $mixed) {
+<a name="line307"></a>                            	if (is_array($mixed)) {
+<a name="line308"></a>                                	$new_args = array_merge($new_args, $mixed);
+<a name="line309"></a>                                } else {
+<a name="line310"></a>                                	$new_args[$key] = $mixed;
+<a name="line311"></a>                                }
+<a name="line312"></a>                            }
+<a name="line313"></a>                            return $plugin($new_args, $this->smarty);
+<a name="line314"></a>                        }
+<a name="line315"></a>                        if (class_exists($plugin, false)) {
+<a name="line316"></a>                            $plugin_object = new $plugin;
+<a name="line317"></a>                            if (method_exists($plugin_object, 'compile')) {
+<a name="line318"></a>                                return $plugin_object->compile($args, $this);
+<a name="line319"></a>                            }
+<a name="line320"></a>                        }
+<a name="line321"></a>                        throw new SmartyException("Plugin \"{$tag}\" not callable");
+<a name="line322"></a>                    } else {
+<a name="line323"></a>                        if ($function = $this->getPlugin($tag, $plugin_type)) {
+<a name="line324"></a>                            if(!isset($this->smarty->security_policy) || $this->smarty->security_policy->isTrustedTag($tag, $this)) {
+<a name="line325"></a>                                return $this->callTagCompiler('private_' . $plugin_type . '_plugin', $args, $parameter, $tag, $function);
+<a name="line326"></a>                            }
+<a name="line327"></a>                        }
+<a name="line328"></a>                    }
+<a name="line329"></a>                }
+<a name="line330"></a>                if (is_callable($this->smarty->default_plugin_handler_func)) {
+<a name="line331"></a>                    $found = false;
+<a name="line332"></a>                    // look for already resolved tags
+<a name="line333"></a>                    foreach ($this->smarty->plugin_search_order as $plugin_type) {
+<a name="line334"></a>                        if (isset($this->default_handler_plugins[$plugin_type][$tag])) {
+<a name="line335"></a>                            $found = true;
+<a name="line336"></a>                            break;
+<a name="line337"></a>                        }
+<a name="line338"></a>                    }
+<a name="line339"></a>                    if (!$found) {
+<a name="line340"></a>                        // call default handler
+<a name="line341"></a>                        foreach ($this->smarty->plugin_search_order as $plugin_type) {
+<a name="line342"></a>                            if ($this->getPluginFromDefaultHandler($tag, $plugin_type)) {
+<a name="line343"></a>                                $found = true;
+<a name="line344"></a>                                break;
+<a name="line345"></a>                            }
+<a name="line346"></a>                        }
+<a name="line347"></a>                    }
+<a name="line348"></a>                    if ($found) {
+<a name="line349"></a>                        // if compiler function plugin call it now
+<a name="line350"></a>                        if ($plugin_type == Smarty::PLUGIN_COMPILER) {
+<a name="line351"></a>                            $new_args = array();
+<a name="line352"></a>                            foreach ($args as $mixed) {
+<a name="line353"></a>                                $new_args = array_merge($new_args, $mixed);
+<a name="line354"></a>                            }
+<a name="line355"></a>                            $function = $this->default_handler_plugins[$plugin_type][$tag][0];
+<a name="line356"></a>                            if (!is_array($function)) {
+<a name="line357"></a>                                return $function($new_args, $this);
+<a name="line358"></a>                            } else if (is_object($function[0])) {
+<a name="line359"></a>                                return $this->default_handler_plugins[$plugin_type][$tag][0][0]->$function[1]($new_args, $this);
+<a name="line360"></a>                            } else {
+<a name="line361"></a>                                return call_user_func_array($function, array($new_args, $this));
+<a name="line362"></a>                            }
+<a name="line363"></a>                        } else {
+<a name="line364"></a>                            return $this->callTagCompiler('private_registered_' . $plugin_type, $args, $parameter, $tag);
+<a name="line365"></a>                        }
+<a name="line366"></a>                    }
+<a name="line367"></a>                }
+<a name="line368"></a>            } else {
+<a name="line369"></a>                // compile closing tag of block function
+<a name="line370"></a>                $base_tag = substr($tag, 0, -5);
+<a name="line371"></a>                // check if closing tag is a registered object
+<a name="line372"></a>                if (isset($this->smarty->registered_objects[$base_tag]) && isset($parameter['object_methode'])) {
+<a name="line373"></a>                    $methode = $parameter['object_methode'];
+<a name="line374"></a>                    if (in_array($methode, $this->smarty->registered_objects[$base_tag][3])) {
+<a name="line375"></a>                        return $this->callTagCompiler('private_object_block_function', $args, $parameter, $tag, $methode);
+<a name="line376"></a>                    } else {
+<a name="line377"></a>                        return $this->trigger_template_error ('unallowed closing tag methode "' . $methode . '" in registered object "' . $base_tag . '"', $this->lex->taglineno);
+<a name="line378"></a>                    }
+<a name="line379"></a>                }
+<a name="line380"></a>                // registered block tag ?
+<a name="line381"></a>                if (isset($this->smarty->registered_plugins[Smarty::PLUGIN_BLOCK][$base_tag]) || isset($this->default_handler_plugins[Smarty::PLUGIN_BLOCK][$base_tag])) {
+<a name="line382"></a>                    return $this->callTagCompiler('private_registered_block', $args, $parameter, $tag);
+<a name="line383"></a>                }
+<a name="line384"></a>                // block plugin?
+<a name="line385"></a>                if ($function = $this->getPlugin($base_tag, Smarty::PLUGIN_BLOCK)) {
+<a name="line386"></a>                    return $this->callTagCompiler('private_block_plugin', $args, $parameter, $tag, $function);
+<a name="line387"></a>                }
+<a name="line388"></a>                if ($this->smarty->loadPlugin('smarty_compiler_' . $tag)) {
+<a name="line389"></a>                    $plugin = 'smarty_compiler_' . $tag;
+<a name="line390"></a>                    if (is_callable($plugin)) {
+<a name="line391"></a>                        return $plugin($args, $this->smarty);
+<a name="line392"></a>                    }
+<a name="line393"></a>                    if (class_exists($plugin, false)) {
+<a name="line394"></a>                        $plugin_object = new $plugin;
+<a name="line395"></a>                        if (method_exists($plugin_object, 'compile')) {
+<a name="line396"></a>                            return $plugin_object->compile($args, $this);
+<a name="line397"></a>                        }
+<a name="line398"></a>                    }
+<a name="line399"></a>                    throw new SmartyException("Plugin \"{$tag}\" not callable");
+<a name="line400"></a>                }
+<a name="line401"></a>            }
+<a name="line402"></a>            $this->trigger_template_error ("unknown tag \"" . $tag . "\"", $this->lex->taglineno);
+<a name="line403"></a>        }
+<a name="line404"></a>    }
+<a name="line405"></a>
+<a name="line406"></a>    /**
+<a name="line407"></a>     * lazy loads internal compile plugin for tag and calls the compile methode
+<a name="line408"></a>     *
+<a name="line409"></a>     * compile objects cached for reuse.
+<a name="line410"></a>     * class name format:  Smarty_Internal_Compile_TagName
+<a name="line411"></a>     * plugin filename format: Smarty_Internal_Tagname.php
+<a name="line412"></a>     *
+<a name="line413"></a>     * @param string $tag   tag name
+<a name="line414"></a>     * @param array $args   list of tag attributes
+<a name="line415"></a>     * @param mixed $param1 optional parameter
+<a name="line416"></a>     * @param mixed $param2 optional parameter
+<a name="line417"></a>     * @param mixed $param3 optional parameter
+<a name="line418"></a>     * @return string compiled code
+<a name="line419"></a>     */
+<a name="line420"></a>    public function callTagCompiler($tag, $args, $param1 = null, $param2 = null, $param3 = null)
+<a name="line421"></a>    {
+<a name="line422"></a>        // re-use object if already exists
+<a name="line423"></a>        if (isset(self::$_tag_objects[$tag])) {
+<a name="line424"></a>            // compile this tag
+<a name="line425"></a>            return self::$_tag_objects[$tag]->compile($args, $this, $param1, $param2, $param3);
+<a name="line426"></a>        }
+<a name="line427"></a>        // lazy load internal compiler plugin
+<a name="line428"></a>        $class_name = 'Smarty_Internal_Compile_' . $tag;
+<a name="line429"></a>        if ($this->smarty->loadPlugin($class_name)) {
+<a name="line430"></a>            // check if tag allowed by security
+<a name="line431"></a>            if (!isset($this->smarty->security_policy) || $this->smarty->security_policy->isTrustedTag($tag, $this)) {
+<a name="line432"></a>            // use plugin if found
+<a name="line433"></a>            self::$_tag_objects[$tag] = new $class_name;
+<a name="line434"></a>            // compile this tag
+<a name="line435"></a>            return self::$_tag_objects[$tag]->compile($args, $this, $param1, $param2, $param3);
+<a name="line436"></a>            }
+<a name="line437"></a>        }
+<a name="line438"></a>        // no internal compile plugin for this tag
+<a name="line439"></a>        return false;
+<a name="line440"></a>    }
+<a name="line441"></a>
+<a name="line442"></a>    /**
+<a name="line443"></a>     * Check for plugins and return function name
+<a name="line444"></a>     *
+<a name="line445"></a>     * @param string $pugin_name  name of plugin or function
+<a name="line446"></a>     * @param string $plugin_type type of plugin
+<a name="line447"></a>     * @return string call name of function
+<a name="line448"></a>     */
+<a name="line449"></a>    public function getPlugin($plugin_name, $plugin_type)
+<a name="line450"></a>    {
+<a name="line451"></a>        $function = null;
+<a name="line452"></a>        if ($this->template->caching && ($this->nocache || $this->tag_nocache)) {
+<a name="line453"></a>            if (isset($this->template->required_plugins['nocache'][$plugin_name][$plugin_type])) {
+<a name="line454"></a>                $function = $this->template->required_plugins['nocache'][$plugin_name][$plugin_type]['function'];
+<a name="line455"></a>            } else if (isset($this->template->required_plugins['compiled'][$plugin_name][$plugin_type])) {
+<a name="line456"></a>                $this->template->required_plugins['nocache'][$plugin_name][$plugin_type] = $this->template->required_plugins['compiled'][$plugin_name][$plugin_type];
+<a name="line457"></a>                $function = $this->template->required_plugins['nocache'][$plugin_name][$plugin_type]['function'];
+<a name="line458"></a>            }
+<a name="line459"></a>        } else {
+<a name="line460"></a>            if (isset($this->template->required_plugins['compiled'][$plugin_name][$plugin_type])) {
+<a name="line461"></a>                $function = $this->template->required_plugins['compiled'][$plugin_name][$plugin_type]['function'];
+<a name="line462"></a>            } else if (isset($this->template->required_plugins['nocache'][$plugin_name][$plugin_type])) {
+<a name="line463"></a>                $this->template->required_plugins['compiled'][$plugin_name][$plugin_type] = $this->template->required_plugins['nocache'][$plugin_name][$plugin_type];
+<a name="line464"></a>                $function = $this->template->required_plugins['compiled'][$plugin_name][$plugin_type]['function'];
+<a name="line465"></a>            }
+<a name="line466"></a>        }
+<a name="line467"></a>        if (isset($function)) {
+<a name="line468"></a>            if ($plugin_type == 'modifier') {
+<a name="line469"></a>                $this->modifier_plugins[$plugin_name] = true;
+<a name="line470"></a>            }
+<a name="line471"></a>            return $function;
+<a name="line472"></a>        }
+<a name="line473"></a>        // loop through plugin dirs and find the plugin
+<a name="line474"></a>        $function = 'smarty_' . $plugin_type . '_' . $plugin_name;
+<a name="line475"></a>        $file = $this->smarty->loadPlugin($function, false);
+<a name="line476"></a>
+<a name="line477"></a>        if (is_string($file)) {
+<a name="line478"></a>            if ($this->template->caching && ($this->nocache || $this->tag_nocache)) {
+<a name="line479"></a>                $this->template->required_plugins['nocache'][$plugin_name][$plugin_type]['file'] = $file;
+<a name="line480"></a>                $this->template->required_plugins['nocache'][$plugin_name][$plugin_type]['function'] = $function;
+<a name="line481"></a>            } else {
+<a name="line482"></a>                $this->template->required_plugins['compiled'][$plugin_name][$plugin_type]['file'] = $file;
+<a name="line483"></a>                $this->template->required_plugins['compiled'][$plugin_name][$plugin_type]['function'] = $function;
+<a name="line484"></a>            }
+<a name="line485"></a>            if ($plugin_type == 'modifier') {
+<a name="line486"></a>                $this->modifier_plugins[$plugin_name] = true;
+<a name="line487"></a>            }
+<a name="line488"></a>            return $function;
+<a name="line489"></a>        }
+<a name="line490"></a>        if (is_callable($function)) {
+<a name="line491"></a>            // plugin function is defined in the script
+<a name="line492"></a>            return $function;
+<a name="line493"></a>        }
+<a name="line494"></a>        return false;
+<a name="line495"></a>    }
+<a name="line496"></a>
+<a name="line497"></a>    /**
+<a name="line498"></a>     * Check for plugins by default plugin handler
+<a name="line499"></a>     *
+<a name="line500"></a>     * @param string $tag         name of tag
+<a name="line501"></a>     * @param string $plugin_type type of plugin
+<a name="line502"></a>     * @return boolean true if found
+<a name="line503"></a>     */
+<a name="line504"></a>    public function getPluginFromDefaultHandler($tag, $plugin_type)
+<a name="line505"></a>    {
+<a name="line506"></a>        $callback = null;
+<a name="line507"></a>        $script = null;
+<a name="line508"></a>        $result = call_user_func_array(
+<a name="line509"></a>            $this->smarty->default_plugin_handler_func,
+<a name="line510"></a>            array($tag, $plugin_type, $this->template, &$callback, &$script)
+<a name="line511"></a>        );
+<a name="line512"></a>        if ($result) {
+<a name="line513"></a>            if ($script !== null) {
+<a name="line514"></a>                if (is_file($script)) {
+<a name="line515"></a>                    if ($this->template->caching && ($this->nocache || $this->tag_nocache)) {
+<a name="line516"></a>                        $this->template->required_plugins['nocache'][$tag][$plugin_type]['file'] = $script;
+<a name="line517"></a>                        $this->template->required_plugins['nocache'][$tag][$plugin_type]['function'] = $callback;
+<a name="line518"></a>                    } else {
+<a name="line519"></a>                        $this->template->required_plugins['compiled'][$tag][$plugin_type]['file'] = $script;
+<a name="line520"></a>                        $this->template->required_plugins['compiled'][$tag][$plugin_type]['function'] = $callback;
+<a name="line521"></a>                    }
+<a name="line522"></a>                    include_once $script;
+<a name="line523"></a>                }  else {
+<a name="line524"></a>                    $this->trigger_template_error("Default plugin handler: Returned script file \"{$script}\" for \"{$tag}\" not found");
+<a name="line525"></a>                }
+<a name="line526"></a>            }
+<a name="line527"></a>            if (!is_string($callback) && !(is_array($callback) && is_string($callback[0]) && is_string($callback[1]))) {
+<a name="line528"></a>                $this->trigger_template_error("Default plugin handler: Returned callback for \"{$tag}\" must be a static function name or array of class and function name");
+<a name="line529"></a>            }
+<a name="line530"></a>            if (is_callable($callback)) {
+<a name="line531"></a>                $this->default_handler_plugins[$plugin_type][$tag] = array($callback, true, array());
+<a name="line532"></a>                return true;
+<a name="line533"></a>            } else {
+<a name="line534"></a>                $this->trigger_template_error("Default plugin handler: Returned callback for \"{$tag}\" not callable");
+<a name="line535"></a>            }
+<a name="line536"></a>        }
+<a name="line537"></a>        return false;
+<a name="line538"></a>    }
+<a name="line539"></a>
+<a name="line540"></a>    /**
+<a name="line541"></a>     * Inject inline code for nocache template sections
+<a name="line542"></a>     *
+<a name="line543"></a>     * This method gets the content of each template element from the parser.
+<a name="line544"></a>     * If the content is compiled code and it should be not cached the code is injected
+<a name="line545"></a>     * into the rendered output.
+<a name="line546"></a>     *
+<a name="line547"></a>     * @param string  $content content of template element
+<a name="line548"></a>     * @param boolean $is_code true if content is compiled code
+<a name="line549"></a>     * @return string content
+<a name="line550"></a>     */
+<a name="line551"></a>    public function processNocacheCode($content, $is_code)
+<a name="line552"></a>    {
+<a name="line553"></a>        // If the template is not evaluated and we have a nocache section and or a nocache tag
+<a name="line554"></a>        if ($is_code && !empty($content)) {
+<a name="line555"></a>            // generate replacement code
+<a name="line556"></a>            if ((!($this->template->source->recompiled) || $this->forceNocache) && $this->template->caching && !$this->suppressNocacheProcessing &&
+<a name="line557"></a>            ($this->nocache || $this->tag_nocache || $this->forceNocache == 2)) {
+<a name="line558"></a>                $this->template->has_nocache_code = true;
+<a name="line559"></a>                $_output = str_replace("'", "\'", $content);
+<a name="line560"></a>                $_output = str_replace('\\\\', '\\\\\\\\', $_output);
+<a name="line561"></a>                $_output = str_replace("^#^", "'", $_output);
+<a name="line562"></a>                $_output = "<?php echo '/*%%SmartyNocache:{$this->nocache_hash}%%*/" . $_output . "/*/%%SmartyNocache:{$this->nocache_hash}%%*/';?>\n";
+<a name="line563"></a>                // make sure we include modifer plugins for nocache code
+<a name="line564"></a>                foreach ($this->modifier_plugins as $plugin_name => $dummy) {
+<a name="line565"></a>                    if (isset($this->template->required_plugins['compiled'][$plugin_name]['modifier'])) {
+<a name="line566"></a>                        $this->template->required_plugins['nocache'][$plugin_name]['modifier'] = $this->template->required_plugins['compiled'][$plugin_name]['modifier'];
+<a name="line567"></a>                    }
+<a name="line568"></a>                }
+<a name="line569"></a>            } else {
+<a name="line570"></a>                $_output = $content;
+<a name="line571"></a>            }
+<a name="line572"></a>        } else {
+<a name="line573"></a>            $_output = $content;
+<a name="line574"></a>        }
+<a name="line575"></a>        $this->modifier_plugins = array();
+<a name="line576"></a>        $this->suppressNocacheProcessing = false;
+<a name="line577"></a>        $this->tag_nocache = false;
+<a name="line578"></a>        return $_output;
+<a name="line579"></a>    }
+<a name="line580"></a>
+<a name="line581"></a>    /**
+<a name="line582"></a>     * display compiler error messages without dying
+<a name="line583"></a>     *
+<a name="line584"></a>     * If parameter $args is empty it is a parser detected syntax error.
+<a name="line585"></a>     * In this case the parser is called to obtain information about expected tokens.
+<a name="line586"></a>     *
+<a name="line587"></a>     * If parameter $args contains a string this is used as error message
+<a name="line588"></a>     *
+<a name="line589"></a>     * @param string $args individual error message or null
+<a name="line590"></a>     * @param string $line line-number
+<a name="line591"></a>     * @throws SmartyCompilerException when an unexpected token is found
+<a name="line592"></a>     */
+<a name="line593"></a>    public function trigger_template_error($args = null, $line = null)
+<a name="line594"></a>    {
+<a name="line595"></a>        // get template source line which has error
+<a name="line596"></a>        if (!isset($line)) {
+<a name="line597"></a>            $line = $this->lex->line;
+<a name="line598"></a>        }
+<a name="line599"></a>        $match = preg_split("/\n/", $this->lex->data);
+<a name="line600"></a>        $error_text = 'Syntax Error in template "' . $this->template->source->filepath . '"  on line ' . $line . ' "' . htmlspecialchars(trim(preg_replace('![\t\r\n]+!',' ',$match[$line-1]))) . '" ';
+<a name="line601"></a>        if (isset($args)) {
+<a name="line602"></a>            // individual error message
+<a name="line603"></a>            $error_text .= $args;
+<a name="line604"></a>        } else {
+<a name="line605"></a>            // expected token from parser
+<a name="line606"></a>            $error_text .= ' - Unexpected "' . $this->lex->value.'"';
+<a name="line607"></a>            if (count($this->parser->yy_get_expected_tokens($this->parser->yymajor)) <= 4 ) {
+<a name="line608"></a>                foreach ($this->parser->yy_get_expected_tokens($this->parser->yymajor) as $token) {
+<a name="line609"></a>                    $exp_token = $this->parser->yyTokenName[$token];
+<a name="line610"></a>                    if (isset($this->lex->smarty_token_names[$exp_token])) {
+<a name="line611"></a>                        // token type from lexer
+<a name="line612"></a>                        $expect[] = '"' . $this->lex->smarty_token_names[$exp_token] . '"';
+<a name="line613"></a>                    } else {
+<a name="line614"></a>                        // otherwise internal token name
+<a name="line615"></a>                        $expect[] = $this->parser->yyTokenName[$token];
+<a name="line616"></a>                    }
+<a name="line617"></a>                }
+<a name="line618"></a>                $error_text .= ', expected one of: ' . implode(' , ', $expect);
+<a name="line619"></a>            }
+<a name="line620"></a>        }
+<a name="line621"></a>        throw new SmartyCompilerException($error_text);
+<a name="line622"></a>    }
+<a name="line623"></a>
+<a name="line624"></a>}
+<a name="line625"></a>
+<a name="line626"></a>?></pre>
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_internal_templatecompilerbase.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

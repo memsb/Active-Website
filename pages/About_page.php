@@ -1,10 +1,11 @@
 <?php
 
-require_once PAGES . 'Page.php';
+require_once LIB . 'Page.php';
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
  * The about page displays simple content form the about template
+ * @namespace active
  */
 class About_page extends Page{
 

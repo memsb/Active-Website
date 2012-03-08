@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
+
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css">
+<link rel="start" href="../../../../../overview-summary.html">
+
+<title>lib/php/Smarty/sysplugins/smarty_resource_custom.php (PHPDoctor)</title>
+
+</head>
+<body id="file" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_resource_custom.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<h1>lib/php/Smarty/sysplugins/smarty_resource_custom.php</h1>
+<div class="comment" id="overview_description"><p>Smarty Resource Plugin</p></div>
+
+<hr>
+
+<a name="line1"></a><pre><?php
+<a name="line2"></a>/**
+<a name="line3"></a> * Smarty Resource Plugin
+<a name="line4"></a> *
+<a name="line5"></a> * @package Smarty
+<a name="line6"></a> * @subpackage TemplateResources
+<a name="line7"></a> * @author Rodney Rehm
+<a name="line8"></a> */
+<a name="line9"></a>
+<a name="line10"></a>/**
+<a name="line11"></a> * Smarty Resource Plugin
+<a name="line12"></a> *
+<a name="line13"></a> * Wrapper Implementation for custom resource plugins
+<a name="line14"></a> *
+<a name="line15"></a> * @package Smarty
+<a name="line16"></a> * @subpackage TemplateResources
+<a name="line17"></a> */
+<a name="line18"></a>abstract class Smarty_Resource_Custom extends Smarty_Resource {
+<a name="line19"></a>
+<a name="line20"></a>    /**
+<a name="line21"></a>     * fetch template and its modification time from data source
+<a name="line22"></a>     *
+<a name="line23"></a>     * @param string  $name    template name
+<a name="line24"></a>     * @param string  &$source template source
+<a name="line25"></a>     * @param integer &$mtime  template modification timestamp (epoch)
+<a name="line26"></a>     */
+<a name="line27"></a>    protected abstract function fetch($name, &$source, &$mtime);
+<a name="line28"></a>
+<a name="line29"></a>    /**
+<a name="line30"></a>     * Fetch template's modification timestamp from data source
+<a name="line31"></a>     *
+<a name="line32"></a>     * {@internal implementing this method is optional.
+<a name="line33"></a>     *  Only implement it if modification times can be accessed faster than loading the complete template source.}}
+<a name="line34"></a>     *
+<a name="line35"></a>     * @param string $name template name
+<a name="line36"></a>     * @return integer|boolean timestamp (epoch) the template was modified, or false if not found
+<a name="line37"></a>     */
+<a name="line38"></a>    protected function fetchTimestamp($name)
+<a name="line39"></a>    {
+<a name="line40"></a>        return null;
+<a name="line41"></a>    }
+<a name="line42"></a>
+<a name="line43"></a>    /**
+<a name="line44"></a>     * populate Source Object with meta data from Resource
+<a name="line45"></a>     *
+<a name="line46"></a>     * @param Smarty_Template_Source   $source    source object
+<a name="line47"></a>     * @param Smarty_Internal_Template $_template template object
+<a name="line48"></a>     */
+<a name="line49"></a>    public function populate(Smarty_Template_Source $source, Smarty_Internal_Template $_template=null)
+<a name="line50"></a>    {
+<a name="line51"></a>        $source->filepath = strtolower($source->type . ':' . $source->name);
+<a name="line52"></a>        $source->uid = sha1($source->type . ':' . $source->name);
+<a name="line53"></a>
+<a name="line54"></a>        $mtime = $this->fetchTimestamp($source->name);
+<a name="line55"></a>        if ($mtime !== null) {
+<a name="line56"></a>            $source->timestamp = $mtime;
+<a name="line57"></a>        } else {
+<a name="line58"></a>            $this->fetch($source->name, $content, $timestamp);
+<a name="line59"></a>            $source->timestamp = isset($timestamp) ? $timestamp : false;
+<a name="line60"></a>            if( isset($content) )
+<a name="line61"></a>                $source->content = $content;
+<a name="line62"></a>        }
+<a name="line63"></a>        $source->exists = !!$source->timestamp;
+<a name="line64"></a>    }
+<a name="line65"></a>
+<a name="line66"></a>    /**
+<a name="line67"></a>     * Load template's source into current template object
+<a name="line68"></a>     *
+<a name="line69"></a>     * @param Smarty_Template_Source $source source object
+<a name="line70"></a>     * @return string template source
+<a name="line71"></a>     * @throws SmartyException if source cannot be loaded
+<a name="line72"></a>     */
+<a name="line73"></a>    public function getContent(Smarty_Template_Source $source)
+<a name="line74"></a>    {
+<a name="line75"></a>        $this->fetch($source->name, $content, $timestamp);
+<a name="line76"></a>        if (isset($content)) {
+<a name="line77"></a>            return $content;
+<a name="line78"></a>        }
+<a name="line79"></a>
+<a name="line80"></a>        throw new SmartyException("Unable to read template {$source->type} '{$source->name}'");
+<a name="line81"></a>    }
+<a name="line82"></a>
+<a name="line83"></a>    /**
+<a name="line84"></a>     * Determine basename for compiled filename
+<a name="line85"></a>     *
+<a name="line86"></a>     * @param Smarty_Template_Source $source source object
+<a name="line87"></a>     * @return string resource's basename
+<a name="line88"></a>     */
+<a name="line89"></a>    protected function getBasename(Smarty_Template_Source $source)
+<a name="line90"></a>    {
+<a name="line91"></a>        return basename($source->name);
+<a name="line92"></a>    }
+<a name="line93"></a>
+<a name="line94"></a>}
+<a name="line95"></a>
+<a name="line96"></a>?></pre>
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_resource_custom.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

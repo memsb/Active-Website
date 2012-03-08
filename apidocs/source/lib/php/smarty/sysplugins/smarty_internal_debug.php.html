@@ -1,0 +1,268 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
+
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css">
+<link rel="start" href="../../../../../overview-summary.html">
+
+<title>lib/php/Smarty/sysplugins/smarty_internal_debug.php (PHPDoctor)</title>
+
+</head>
+<body id="file" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_internal_debug.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<h1>lib/php/Smarty/sysplugins/smarty_internal_debug.php</h1>
+<div class="comment" id="overview_description"><p>Smarty Internal Plugin Debug</p><p>Class to collect data for the Smarty Debugging Consol</p></div>
+
+<hr>
+
+<a name="line1"></a><pre><?php
+<a name="line2"></a>/**
+<a name="line3"></a> * Smarty Internal Plugin Debug
+<a name="line4"></a> *
+<a name="line5"></a> * Class to collect data for the Smarty Debugging Consol
+<a name="line6"></a> *
+<a name="line7"></a> * @package Smarty
+<a name="line8"></a> * @subpackage Debug
+<a name="line9"></a> * @author Uwe Tews
+<a name="line10"></a> */
+<a name="line11"></a>
+<a name="line12"></a>/**
+<a name="line13"></a> * Smarty Internal Plugin Debug Class
+<a name="line14"></a> *
+<a name="line15"></a> * @package Smarty
+<a name="line16"></a> * @subpackage Debug
+<a name="line17"></a> */
+<a name="line18"></a>class Smarty_Internal_Debug extends Smarty_Internal_Data {
+<a name="line19"></a>
+<a name="line20"></a>    /**
+<a name="line21"></a>     * template data
+<a name="line22"></a>     *
+<a name="line23"></a>     * @var array
+<a name="line24"></a>     */
+<a name="line25"></a>    public static $template_data = array();
+<a name="line26"></a>
+<a name="line27"></a>    /**
+<a name="line28"></a>     * Start logging of compile time
+<a name="line29"></a>     *
+<a name="line30"></a>     * @param object $template
+<a name="line31"></a>     */
+<a name="line32"></a>    public static function start_compile($template)
+<a name="line33"></a>    {
+<a name="line34"></a>        $key = self::get_key($template);
+<a name="line35"></a>        self::$template_data[$key]['start_time'] = microtime(true);
+<a name="line36"></a>    }
+<a name="line37"></a>
+<a name="line38"></a>    /**
+<a name="line39"></a>     * End logging of compile time
+<a name="line40"></a>     *
+<a name="line41"></a>     * @param object $template
+<a name="line42"></a>     */
+<a name="line43"></a>    public static function end_compile($template)
+<a name="line44"></a>    {
+<a name="line45"></a>        $key = self::get_key($template);
+<a name="line46"></a>        self::$template_data[$key]['compile_time'] += microtime(true) - self::$template_data[$key]['start_time'];
+<a name="line47"></a>    }
+<a name="line48"></a>
+<a name="line49"></a>    /**
+<a name="line50"></a>     * Start logging of render time
+<a name="line51"></a>     *
+<a name="line52"></a>     * @param object $template
+<a name="line53"></a>     */
+<a name="line54"></a>    public static function start_render($template)
+<a name="line55"></a>    {
+<a name="line56"></a>        $key = self::get_key($template);
+<a name="line57"></a>        self::$template_data[$key]['start_time'] = microtime(true);
+<a name="line58"></a>    }
+<a name="line59"></a>
+<a name="line60"></a>    /**
+<a name="line61"></a>     * End logging of compile time
+<a name="line62"></a>     *
+<a name="line63"></a>     * @param object $template
+<a name="line64"></a>     */
+<a name="line65"></a>    public static function end_render($template)
+<a name="line66"></a>    {
+<a name="line67"></a>        $key = self::get_key($template);
+<a name="line68"></a>        self::$template_data[$key]['render_time'] += microtime(true) - self::$template_data[$key]['start_time'];
+<a name="line69"></a>    }
+<a name="line70"></a>
+<a name="line71"></a>    /**
+<a name="line72"></a>     * Start logging of cache time
+<a name="line73"></a>     *
+<a name="line74"></a>     * @param object $template cached template
+<a name="line75"></a>     */
+<a name="line76"></a>    public static function start_cache($template)
+<a name="line77"></a>    {
+<a name="line78"></a>        $key = self::get_key($template);
+<a name="line79"></a>        self::$template_data[$key]['start_time'] = microtime(true);
+<a name="line80"></a>    }
+<a name="line81"></a>
+<a name="line82"></a>    /**
+<a name="line83"></a>     * End logging of cache time
+<a name="line84"></a>     *
+<a name="line85"></a>     * @param object $template cached template
+<a name="line86"></a>     */
+<a name="line87"></a>    public static function end_cache($template)
+<a name="line88"></a>    {
+<a name="line89"></a>        $key = self::get_key($template);
+<a name="line90"></a>        self::$template_data[$key]['cache_time'] += microtime(true) - self::$template_data[$key]['start_time'];
+<a name="line91"></a>    }
+<a name="line92"></a>
+<a name="line93"></a>    /**
+<a name="line94"></a>     * Opens a window for the Smarty Debugging Consol and display the data
+<a name="line95"></a>     *
+<a name="line96"></a>     * @param Smarty_Internal_Template|Smarty $obj object to debug
+<a name="line97"></a>     */
+<a name="line98"></a>    public static function display_debug($obj)
+<a name="line99"></a>    {
+<a name="line100"></a>        // prepare information of assigned variables
+<a name="line101"></a>        $ptr = self::get_debug_vars($obj);
+<a name="line102"></a>        if ($obj instanceof Smarty) {
+<a name="line103"></a>            $smarty = clone $obj;
+<a name="line104"></a>        } else {
+<a name="line105"></a>            $smarty = clone $obj->smarty;
+<a name="line106"></a>        }
+<a name="line107"></a>        $_assigned_vars = $ptr->tpl_vars;
+<a name="line108"></a>        ksort($_assigned_vars);
+<a name="line109"></a>        $_config_vars = $ptr->config_vars;
+<a name="line110"></a>        ksort($_config_vars);
+<a name="line111"></a>        $smarty->registered_filters = array();
+<a name="line112"></a>        $smarty->autoload_filters = array();
+<a name="line113"></a>        $smarty->default_modifiers = array();
+<a name="line114"></a>        $smarty->force_compile = false;
+<a name="line115"></a>        $smarty->left_delimiter = '{';
+<a name="line116"></a>        $smarty->right_delimiter = '}';
+<a name="line117"></a>        $smarty->debugging = false;
+<a name="line118"></a>        $smarty->force_compile = false;
+<a name="line119"></a>        $_template = new Smarty_Internal_Template($smarty->debug_tpl, $smarty);
+<a name="line120"></a>        $_template->caching = false;
+<a name="line121"></a>        $_template->disableSecurity();
+<a name="line122"></a>        $_template->cache_id = null;
+<a name="line123"></a>        $_template->compile_id = null;
+<a name="line124"></a>        if ($obj instanceof Smarty_Internal_Template) {
+<a name="line125"></a>            $_template->assign('template_name', $obj->source->type . ':' . $obj->source->name);
+<a name="line126"></a>        }
+<a name="line127"></a>        if ($obj instanceof Smarty) {
+<a name="line128"></a>            $_template->assign('template_data', self::$template_data);
+<a name="line129"></a>        } else {
+<a name="line130"></a>            $_template->assign('template_data', null);
+<a name="line131"></a>        }
+<a name="line132"></a>        $_template->assign('assigned_vars', $_assigned_vars);
+<a name="line133"></a>        $_template->assign('config_vars', $_config_vars);
+<a name="line134"></a>        $_template->assign('execution_time', microtime(true) - $smarty->start_time);
+<a name="line135"></a>        echo $_template->fetch();
+<a name="line136"></a>    }
+<a name="line137"></a>
+<a name="line138"></a>    /**
+<a name="line139"></a>     * Recursively gets variables from all template/data scopes
+<a name="line140"></a>     *
+<a name="line141"></a>     * @param Smarty_Internal_Template|Smarty_Data $obj object to debug
+<a name="line142"></a>     * @return StdClass
+<a name="line143"></a>     */
+<a name="line144"></a>    public static function get_debug_vars($obj)
+<a name="line145"></a>    {
+<a name="line146"></a>        $config_vars = $obj->config_vars;
+<a name="line147"></a>        $tpl_vars = array();
+<a name="line148"></a>        foreach ($obj->tpl_vars as $key => $var) {
+<a name="line149"></a>            $tpl_vars[$key] = clone $var;
+<a name="line150"></a>            if ($obj instanceof Smarty_Internal_Template) {
+<a name="line151"></a>                $tpl_vars[$key]->scope = $obj->source->type . ':' . $obj->source->name;
+<a name="line152"></a>            } elseif ($obj instanceof Smarty_Data) {
+<a name="line153"></a>                $tpl_vars[$key]->scope = 'Data object';
+<a name="line154"></a>            } else {
+<a name="line155"></a>                $tpl_vars[$key]->scope = 'Smarty root';
+<a name="line156"></a>            }
+<a name="line157"></a>        }
+<a name="line158"></a>
+<a name="line159"></a>        if (isset($obj->parent)) {
+<a name="line160"></a>            $parent = self::get_debug_vars($obj->parent);
+<a name="line161"></a>            $tpl_vars = array_merge($parent->tpl_vars, $tpl_vars);
+<a name="line162"></a>            $config_vars = array_merge($parent->config_vars, $config_vars);
+<a name="line163"></a>        } else {
+<a name="line164"></a>            foreach (Smarty::$global_tpl_vars as $name => $var) {
+<a name="line165"></a>                if (!array_key_exists($name, $tpl_vars)) {
+<a name="line166"></a>                    $clone = clone $var;
+<a name="line167"></a>                    $clone->scope = 'Global';
+<a name="line168"></a>                    $tpl_vars[$name] = $clone;
+<a name="line169"></a>                }
+<a name="line170"></a>            }
+<a name="line171"></a>        }
+<a name="line172"></a>        return (object) array('tpl_vars' => $tpl_vars, 'config_vars' => $config_vars);
+<a name="line173"></a>    }
+<a name="line174"></a>
+<a name="line175"></a>    /**
+<a name="line176"></a>     * Return key into $template_data for template
+<a name="line177"></a>     *
+<a name="line178"></a>     * @param object $template  template object
+<a name="line179"></a>     * @return string   key into $template_data
+<a name="line180"></a>     */
+<a name="line181"></a>    private static function get_key($template)
+<a name="line182"></a>    {
+<a name="line183"></a>        static $_is_stringy = array('string' => true, 'eval' => true);
+<a name="line184"></a>        // calculate Uid if not already done
+<a name="line185"></a>        if ($template->source->uid == '') {
+<a name="line186"></a>            $template->source->filepath;
+<a name="line187"></a>        }
+<a name="line188"></a>        $key = $template->source->uid;
+<a name="line189"></a>        if (isset(self::$template_data[$key])) {
+<a name="line190"></a>            return $key;
+<a name="line191"></a>        } else {
+<a name="line192"></a>            if (isset($_is_stringy[$template->source->type])) {
+<a name="line193"></a>                self::$template_data[$key]['name'] = '\''.substr($template->source->name,0,25).'...\'';
+<a name="line194"></a>            } else {
+<a name="line195"></a>                self::$template_data[$key]['name'] = $template->source->filepath;
+<a name="line196"></a>            }
+<a name="line197"></a>            self::$template_data[$key]['compile_time'] = 0;
+<a name="line198"></a>            self::$template_data[$key]['render_time'] = 0;
+<a name="line199"></a>            self::$template_data[$key]['cache_time'] = 0;
+<a name="line200"></a>            return $key;
+<a name="line201"></a>        }
+<a name="line202"></a>    }
+<a name="line203"></a>
+<a name="line204"></a>}
+<a name="line205"></a>
+<a name="line206"></a>?></pre>
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_internal_debug.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

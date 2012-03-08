@@ -2,9 +2,10 @@
 
 require_once LIB . 'Workout.php';
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
  * Workouts stores an internal list of Workout
+ * @namespace active
  */
 class Workouts{
 

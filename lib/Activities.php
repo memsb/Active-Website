@@ -1,17 +1,27 @@
 <?php
 require_once LIB . 'Activity.php';
 
-/*
+/**
+ * @author Martin Buckley - MBuckley@gmail.com
  * Custom sorting functions
+ * @namespace active
  */
 function name_asc($a,$b) {
 	return strcmp($a->name, $b->name);
 }
-
+/**
+ * @author Martin Buckley - MBuckley@gmail.com
+ * Custom sorting functions
+ * @namespace active
+ */
 function name_desc($a,$b) {
 	return strcmp($b->name, $a->name);
 }
-
+/**
+ * @author Martin Buckley - MBuckley@gmail.com
+ * Custom sorting functions
+ * @namespace active
+ */
 function compare($a, $b){
 	if($b == $a)
 		return 0;
@@ -20,18 +30,27 @@ function compare($a, $b){
 	else
 		return -1;
 }
-
+/**
+ * @author Martin Buckley - MBuckley@gmail.com
+ * Custom sorting functions
+ * @namespace active
+ */
 function kcal_asc($a,$b) {
 	return compare($a->kcal, $b->kcal);	
 }
-
+/**
+ * @author Martin Buckley - MBuckley@gmail.com
+ * Custom sorting functions
+ * @namespace active
+ */
 function kcal_desc($a,$b) {
 	return compare($b->kcal, $a->kcal);
 }
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
  * Manages a list of Activity
+ * @namespace active
  */
 class Activities{
 

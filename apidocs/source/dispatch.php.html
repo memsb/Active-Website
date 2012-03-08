@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Wed, 07 Mar 2012 14:34:43 +0000">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
 
 <link rel="stylesheet" type="text/css" href="../stylesheet.css">
 <link rel="start" href="../overview-summary.html">
@@ -40,45 +40,44 @@
 <a name="line2"></a>namespace active;
 <a name="line3"></a>
 <a name="line4"></a>require_once 'config.php';
-<a name="line5"></a>require_once 'lib/smarty.php';
+<a name="line5"></a>require_once LIB . 'smarty.php';
 <a name="line6"></a>
-<a name="line7"></a>/**
-<a name="line8"></a> * Class autoloader automatically attempts to find and include undeclared classes
-<a name="line9"></a> *
-<a name="line10"></a> */
-<a name="line11"></a>function autoload($class_name) {
-<a name="line12"></a>	include PAGES . $class_name . '.php';
-<a name="line13"></a>}
+<a name="line7"></a>//Class autoloader automatically attempts to find and include undeclared classes
+<a name="line8"></a>function autoload($class_name) {
+<a name="line9"></a>	include PAGES . $class_name . '.php';
+<a name="line10"></a>}
+<a name="line11"></a>
+<a name="line12"></a>spl_autoload_register(__NAMESPACE__ . '\autoload');
+<a name="line13"></a>
 <a name="line14"></a>
-<a name="line15"></a>spl_autoload_register(__NAMESPACE__ . '\autoload');
-<a name="line16"></a>
-<a name="line17"></a>/**
-<a name="line18"></a> * Parses the URI to find the requested page name
-<a name="line19"></a> * REquires that the dispatcher is placed in the root directory
-<a name="line20"></a> */
-<a name="line21"></a>$root = dirname($_SERVER['SCRIPT_NAME']) . '/';
-<a name="line22"></a>$uri = $_SERVER['REDIRECT_URL'];
-<a name="line23"></a>$page_requested = strtolower(str_replace($root, '', $uri));
-<a name="line24"></a>
-<a name="line25"></a>// 404 if page not found.
-<a name="line26"></a>if( ! isset($pages[$page_requested]) ){	
-<a name="line27"></a>	header('Location: ' . NOT_FOUND);
-<a name="line28"></a>	exit();
-<a name="line29"></a>}
-<a name="line30"></a>
-<a name="line31"></a>$controller = new $pages[$page_requested];
-<a name="line32"></a>$controller->setSmarty($smarty);
-<a name="line33"></a>
-<a name="line34"></a>if( count($_GET) != 0 )
-<a name="line35"></a>	$controller->get($_GET);
-<a name="line36"></a>
-<a name="line37"></a>if( count($_POST) != 0 )
-<a name="line38"></a>	$controller->post($_POST);
-<a name="line39"></a>
-<a name="line40"></a>$controller->visit();
-<a name="line41"></a>
-<a name="line42"></a>?>
-<a name="line43"></a></pre>
+<a name="line15"></a>// Parses the URI to find the requested page name
+<a name="line16"></a>// Requires that the dispatcher is placed in the root directory
+<a name="line17"></a>$root = dirname($_SERVER['SCRIPT_NAME']);
+<a name="line18"></a>$uri = pathinfo($_SERVER['REDIRECT_URL']);
+<a name="line19"></a>$page_requested = '';
+<a name="line20"></a>
+<a name="line21"></a>if( strcmp($root, $uri['dirname']) == 0 )
+<a name="line22"></a>	$page_requested = strtolower( $uri['filename'] );
+<a name="line23"></a>
+<a name="line24"></a>// 404 if page not found.
+<a name="line25"></a>if( ! isset($pages[$page_requested]) ){	
+<a name="line26"></a>	header('Location: ' . NOT_FOUND);
+<a name="line27"></a>	exit();
+<a name="line28"></a>}
+<a name="line29"></a>
+<a name="line30"></a>$controller = new $pages[$page_requested];
+<a name="line31"></a>$controller->setSmarty($smarty);
+<a name="line32"></a>
+<a name="line33"></a>if( count($_GET) != 0 )
+<a name="line34"></a>	$controller->get($_GET);
+<a name="line35"></a>
+<a name="line36"></a>if( count($_POST) != 0 )
+<a name="line37"></a>	$controller->post($_POST);
+<a name="line38"></a>
+<a name="line39"></a>$controller->visit();
+<a name="line40"></a>
+<a name="line41"></a>?>1'
+<a name="line42"></a></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

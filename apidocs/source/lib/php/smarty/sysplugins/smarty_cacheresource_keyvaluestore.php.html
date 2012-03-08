@@ -1,0 +1,525 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
+
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css">
+<link rel="start" href="../../../../../overview-summary.html">
+
+<title>lib/php/Smarty/sysplugins/smarty_cacheresource_keyvaluestore.php (PHPDoctor)</title>
+
+</head>
+<body id="file" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_cacheresource_keyvaluestore.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<h1>lib/php/Smarty/sysplugins/smarty_cacheresource_keyvaluestore.php</h1>
+<div class="comment" id="overview_description"><p>Smarty Internal Plugin</p></div>
+
+<hr>
+
+<a name="line1"></a><pre><?php
+<a name="line2"></a>/**
+<a name="line3"></a> * Smarty Internal Plugin
+<a name="line4"></a> *
+<a name="line5"></a> * @package Smarty
+<a name="line6"></a> * @subpackage Cacher
+<a name="line7"></a> */
+<a name="line8"></a>
+<a name="line9"></a>/**
+<a name="line10"></a> * Smarty Cache Handler Base for Key/Value Storage Implementations
+<a name="line11"></a> *
+<a name="line12"></a> * This class implements the functionality required to use simple key/value stores
+<a name="line13"></a> * for hierarchical cache groups. key/value stores like memcache or APC do not support
+<a name="line14"></a> * wildcards in keys, therefore a cache group cannot be cleared like "a|*" - which
+<a name="line15"></a> * is no problem to filesystem and RDBMS implementations.
+<a name="line16"></a> *
+<a name="line17"></a> * This implementation is based on the concept of invalidation. While one specific cache
+<a name="line18"></a> * can be identified and cleared, any range of caches cannot be identified. For this reason
+<a name="line19"></a> * each level of the cache group hierarchy can have its own value in the store. These values
+<a name="line20"></a> * are nothing but microtimes, telling us when a particular cache group was cleared for the
+<a name="line21"></a> * last time. These keys are evaluated for every cache read to determine if the cache has
+<a name="line22"></a> * been invalidated since it was created and should hence be treated as inexistent.
+<a name="line23"></a> *
+<a name="line24"></a> * Although deep hierarchies are possible, they are not recommended. Try to keep your
+<a name="line25"></a> * cache groups as shallow as possible. Anything up 3-5 parents should be ok. So
+<a name="line26"></a> * »a|b|c« is a good depth where »a|b|c|d|e|f|g|h|i|j|k« isn't. Try to join correlating
+<a name="line27"></a> * cache groups: if your cache groups look somewhat like »a|b|$page|$items|$whatever«
+<a name="line28"></a> * consider using »a|b|c|$page-$items-$whatever« instead.
+<a name="line29"></a> *
+<a name="line30"></a> * @package Smarty
+<a name="line31"></a> * @subpackage Cacher
+<a name="line32"></a> * @author Rodney Rehm
+<a name="line33"></a> */
+<a name="line34"></a>abstract class Smarty_CacheResource_KeyValueStore extends Smarty_CacheResource {
+<a name="line35"></a>
+<a name="line36"></a>    /**
+<a name="line37"></a>     * cache for contents
+<a name="line38"></a>     * @var array
+<a name="line39"></a>     */
+<a name="line40"></a>    protected $contents = array();
+<a name="line41"></a>    /**
+<a name="line42"></a>     * cache for timestamps
+<a name="line43"></a>     * @var array
+<a name="line44"></a>     */
+<a name="line45"></a>    protected $timestamps = array();
+<a name="line46"></a>
+<a name="line47"></a>    /**
+<a name="line48"></a>     * populate Cached Object with meta data from Resource
+<a name="line49"></a>     *
+<a name="line50"></a>     * @param Smarty_Template_Cached   $cached    cached object
+<a name="line51"></a>     * @param Smarty_Internal_Template $_template template object
+<a name="line52"></a>     * @return void
+<a name="line53"></a>     */
+<a name="line54"></a>    public function populate(Smarty_Template_Cached $cached, Smarty_Internal_Template $_template)
+<a name="line55"></a>    {
+<a name="line56"></a>        $cached->filepath = $_template->source->uid
+<a name="line57"></a>                . '#' . $this->sanitize($cached->source->name)
+<a name="line58"></a>                . '#' . $this->sanitize($cached->cache_id)
+<a name="line59"></a>                . '#' . $this->sanitize($cached->compile_id);
+<a name="line60"></a>
+<a name="line61"></a>        $this->populateTimestamp($cached);
+<a name="line62"></a>    }
+<a name="line63"></a>
+<a name="line64"></a>    /**
+<a name="line65"></a>     * populate Cached Object with timestamp and exists from Resource
+<a name="line66"></a>     *
+<a name="line67"></a>     * @param Smarty_Template_Cached $cached cached object
+<a name="line68"></a>     * @return void
+<a name="line69"></a>     */
+<a name="line70"></a>    public function populateTimestamp(Smarty_Template_Cached $cached)
+<a name="line71"></a>    {
+<a name="line72"></a>        if (!$this->fetch($cached->filepath, $cached->source->name, $cached->cache_id, $cached->compile_id, $content, $timestamp, $cached->source->uid)) {
+<a name="line73"></a>            return;
+<a name="line74"></a>        }
+<a name="line75"></a>        $cached->content = $content;
+<a name="line76"></a>        $cached->timestamp = (int) $timestamp;
+<a name="line77"></a>        $cached->exists = $cached->timestamp;
+<a name="line78"></a>    }
+<a name="line79"></a>
+<a name="line80"></a>    /**
+<a name="line81"></a>     * Read the cached template and process the header
+<a name="line82"></a>     *
+<a name="line83"></a>     * @param Smarty_Internal_Template $_template template object
+<a name="line84"></a>     * @param Smarty_Template_Cached $cached cached object
+<a name="line85"></a>     * @return booelan true or false if the cached content does not exist
+<a name="line86"></a>     */
+<a name="line87"></a>    public function process(Smarty_Internal_Template $_template, Smarty_Template_Cached $cached=null)
+<a name="line88"></a>    {
+<a name="line89"></a>        if (!$cached) {
+<a name="line90"></a>            $cached = $_template->cached;
+<a name="line91"></a>        }
+<a name="line92"></a>        $content = $cached->content ? $cached->content : null;
+<a name="line93"></a>        $timestamp = $cached->timestamp ? $cached->timestamp : null;
+<a name="line94"></a>        if ($content === null || !$timestamp) {
+<a name="line95"></a>            if (!$this->fetch($_template->cached->filepath, $_template->source->name, $_template->cache_id, $_template->compile_id, $content, $timestamp, $_template->source->uid)) {
+<a name="line96"></a>                return false;
+<a name="line97"></a>            }
+<a name="line98"></a>        }
+<a name="line99"></a>        if (isset($content)) {
+<a name="line100"></a>            $_smarty_tpl = $_template;
+<a name="line101"></a>            eval("?>" . $content);
+<a name="line102"></a>            return true;
+<a name="line103"></a>        }
+<a name="line104"></a>        return false;
+<a name="line105"></a>    }
+<a name="line106"></a>
+<a name="line107"></a>    /**
+<a name="line108"></a>     * Write the rendered template output to cache
+<a name="line109"></a>     *
+<a name="line110"></a>     * @param Smarty_Internal_Template $_template template object
+<a name="line111"></a>     * @param string $content content to cache
+<a name="line112"></a>     * @return boolean success
+<a name="line113"></a>     */
+<a name="line114"></a>    public function writeCachedContent(Smarty_Internal_Template $_template, $content)
+<a name="line115"></a>    {
+<a name="line116"></a>        $this->addMetaTimestamp($content);
+<a name="line117"></a>        return $this->write(array($_template->cached->filepath => $content), $_template->properties['cache_lifetime']);
+<a name="line118"></a>    }
+<a name="line119"></a>
+<a name="line120"></a>    /**
+<a name="line121"></a>     * Empty cache
+<a name="line122"></a>     *
+<a name="line123"></a>     * {@internal the $exp_time argument is ignored altogether }}
+<a name="line124"></a>     *
+<a name="line125"></a>     * @param Smarty  $smarty   Smarty object
+<a name="line126"></a>     * @param integer $exp_time expiration time [being ignored]
+<a name="line127"></a>     * @return integer number of cache files deleted [always -1]
+<a name="line128"></a>     * @uses purge() to clear the whole store
+<a name="line129"></a>     * @uses invalidate() to mark everything outdated if purge() is inapplicable
+<a name="line130"></a>     */
+<a name="line131"></a>    public function clearAll(Smarty $smarty, $exp_time=null)
+<a name="line132"></a>    {
+<a name="line133"></a>        if (!$this->purge()) {
+<a name="line134"></a>            $this->invalidate(null);
+<a name="line135"></a>        }
+<a name="line136"></a>        return -1;
+<a name="line137"></a>    }
+<a name="line138"></a>
+<a name="line139"></a>    /**
+<a name="line140"></a>     * Empty cache for a specific template
+<a name="line141"></a>     *
+<a name="line142"></a>     * {@internal the $exp_time argument is ignored altogether}}
+<a name="line143"></a>     *
+<a name="line144"></a>     * @param Smarty  $smarty        Smarty object
+<a name="line145"></a>     * @param string  $resource_name template name
+<a name="line146"></a>     * @param string  $cache_id      cache id
+<a name="line147"></a>     * @param string  $compile_id    compile id
+<a name="line148"></a>     * @param integer $exp_time      expiration time [being ignored]
+<a name="line149"></a>     * @return integer number of cache files deleted [always -1]
+<a name="line150"></a>     * @uses buildCachedFilepath() to generate the CacheID
+<a name="line151"></a>     * @uses invalidate() to mark CacheIDs parent chain as outdated
+<a name="line152"></a>     * @uses delete() to remove CacheID from cache
+<a name="line153"></a>     */
+<a name="line154"></a>    public function clear(Smarty $smarty, $resource_name, $cache_id, $compile_id, $exp_time)
+<a name="line155"></a>    {
+<a name="line156"></a>        $uid = $this->getTemplateUid($smarty, $resource_name, $cache_id, $compile_id);
+<a name="line157"></a>        $cid = $uid . '#' . $this->sanitize($resource_name) . '#' . $this->sanitize($cache_id) . '#' . $this->sanitize($compile_id);
+<a name="line158"></a>        $this->delete(array($cid));
+<a name="line159"></a>        $this->invalidate($cid, $resource_name, $cache_id, $compile_id, $uid);
+<a name="line160"></a>        return -1;
+<a name="line161"></a>    }
+<a name="line162"></a>    /**
+<a name="line163"></a>     * Get template's unique ID
+<a name="line164"></a>     *
+<a name="line165"></a>     * @param Smarty $smarty        Smarty object
+<a name="line166"></a>     * @param string $resource_name template name
+<a name="line167"></a>     * @param string $cache_id      cache id
+<a name="line168"></a>     * @param string $compile_id    compile id
+<a name="line169"></a>     * @return string filepath of cache file
+<a name="line170"></a>     */
+<a name="line171"></a>    protected function getTemplateUid(Smarty $smarty, $resource_name, $cache_id, $compile_id)
+<a name="line172"></a>    {
+<a name="line173"></a>        $uid = '';
+<a name="line174"></a>        if (isset($resource_name)) {
+<a name="line175"></a>            $tpl = new $smarty->template_class($resource_name, $smarty);
+<a name="line176"></a>            if ($tpl->source->exists) {
+<a name="line177"></a>                $uid = $tpl->source->uid;
+<a name="line178"></a>            }
+<a name="line179"></a>            
+<a name="line180"></a>            // remove from template cache
+<a name="line181"></a>            if ($smarty->allow_ambiguous_resources) {
+<a name="line182"></a>                $_templateId = $tpl->source->unique_resource . $tpl->cache_id . $tpl->compile_id;
+<a name="line183"></a>            } else {
+<a name="line184"></a>                $_templateId = $smarty->joined_template_dir . '#' . $resource_name . $tpl->cache_id . $tpl->compile_id;
+<a name="line185"></a>            }
+<a name="line186"></a>            if (isset($_templateId[150])) {
+<a name="line187"></a>                $_templateId = sha1($_templateId);
+<a name="line188"></a>            }
+<a name="line189"></a>            unset($smarty->template_objects[$_templateId]);
+<a name="line190"></a>        }
+<a name="line191"></a>        return $uid;
+<a name="line192"></a>    }
+<a name="line193"></a>
+<a name="line194"></a>    /**
+<a name="line195"></a>     * Sanitize CacheID components
+<a name="line196"></a>     *
+<a name="line197"></a>     * @param string $string CacheID component to sanitize
+<a name="line198"></a>     * @return string sanitized CacheID component
+<a name="line199"></a>     */
+<a name="line200"></a>    protected function sanitize($string)
+<a name="line201"></a>    {
+<a name="line202"></a>        // some poeple smoke bad weed
+<a name="line203"></a>        $string = trim($string, '|');
+<a name="line204"></a>        if (!$string) {
+<a name="line205"></a>            return null;
+<a name="line206"></a>        }
+<a name="line207"></a>        return preg_replace('#[^\w\|]+#S', '_', $string);
+<a name="line208"></a>    }
+<a name="line209"></a>
+<a name="line210"></a>    /**
+<a name="line211"></a>     * Fetch and prepare a cache object.
+<a name="line212"></a>     *
+<a name="line213"></a>     * @param string  $cid           CacheID to fetch
+<a name="line214"></a>     * @param string  $resource_name template name
+<a name="line215"></a>     * @param string  $cache_id      cache id
+<a name="line216"></a>     * @param string  $compile_id    compile id
+<a name="line217"></a>     * @param string  $content       cached content
+<a name="line218"></a>     * @param integer &$timestamp    cached timestamp (epoch)
+<a name="line219"></a>     * @param string  $resource_uid  resource's uid
+<a name="line220"></a>     * @return boolean success
+<a name="line221"></a>     */
+<a name="line222"></a>    protected function fetch($cid, $resource_name = null, $cache_id = null, $compile_id = null, &$content = null, &$timestamp = null, $resource_uid = null)
+<a name="line223"></a>    {
+<a name="line224"></a>        $t = $this->read(array($cid));
+<a name="line225"></a>        $content = !empty($t[$cid]) ? $t[$cid] : null;
+<a name="line226"></a>        $timestamp = null;
+<a name="line227"></a>
+<a name="line228"></a>        if ($content && ($timestamp = $this->getMetaTimestamp($content))) {
+<a name="line229"></a>            $invalidated = $this->getLatestInvalidationTimestamp($cid, $resource_name, $cache_id, $compile_id, $resource_uid);
+<a name="line230"></a>            if ($invalidated > $timestamp) {
+<a name="line231"></a>                $timestamp = null;
+<a name="line232"></a>                $content = null;
+<a name="line233"></a>            }
+<a name="line234"></a>        }
+<a name="line235"></a>
+<a name="line236"></a>        return !!$content;
+<a name="line237"></a>    }
+<a name="line238"></a>
+<a name="line239"></a>    /**
+<a name="line240"></a>     * Add current microtime to the beginning of $cache_content
+<a name="line241"></a>     *
+<a name="line242"></a>     * {@internal the header uses 8 Bytes, the first 4 Bytes are the seconds, the second 4 Bytes are the microseconds}}
+<a name="line243"></a>     *
+<a name="line244"></a>     * @param string &$content the content to be cached
+<a name="line245"></a>     */
+<a name="line246"></a>    protected function addMetaTimestamp(&$content)
+<a name="line247"></a>    {
+<a name="line248"></a>        $mt = explode(" ", microtime());
+<a name="line249"></a>        $ts = pack("NN", $mt[1], (int) ($mt[0] * 100000000));
+<a name="line250"></a>        $content = $ts . $content;
+<a name="line251"></a>    }
+<a name="line252"></a>
+<a name="line253"></a>    /**
+<a name="line254"></a>     * Extract the timestamp the $content was cached
+<a name="line255"></a>     *
+<a name="line256"></a>     * @param string &$content the cached content
+<a name="line257"></a>     * @return float the microtime the content was cached
+<a name="line258"></a>     */
+<a name="line259"></a>    protected function getMetaTimestamp(&$content)
+<a name="line260"></a>    {
+<a name="line261"></a>        $s = unpack("N", substr($content, 0, 4));
+<a name="line262"></a>        $m = unpack("N", substr($content, 4, 4));
+<a name="line263"></a>        $content = substr($content, 8);
+<a name="line264"></a>        return $s[1] + ($m[1] / 100000000);
+<a name="line265"></a>    }
+<a name="line266"></a>
+<a name="line267"></a>    /**
+<a name="line268"></a>     * Invalidate CacheID
+<a name="line269"></a>     *
+<a name="line270"></a>     * @param string $cid           CacheID
+<a name="line271"></a>     * @param string $resource_name template name
+<a name="line272"></a>     * @param string $cache_id      cache id
+<a name="line273"></a>     * @param string $compile_id    compile id
+<a name="line274"></a>     * @param string $resource_uid  source's uid
+<a name="line275"></a>     * @return void
+<a name="line276"></a>     */
+<a name="line277"></a>    protected function invalidate($cid = null, $resource_name = null, $cache_id = null, $compile_id = null, $resource_uid = null)
+<a name="line278"></a>    {
+<a name="line279"></a>        $now = microtime(true);
+<a name="line280"></a>        $key = null;
+<a name="line281"></a>        // invalidate everything
+<a name="line282"></a>        if (!$resource_name && !$cache_id && !$compile_id) {
+<a name="line283"></a>            $key = 'IVK#ALL';
+<a name="line284"></a>        }
+<a name="line285"></a>        // invalidate all caches by template
+<a name="line286"></a>        else if ($resource_name && !$cache_id && !$compile_id) {
+<a name="line287"></a>            $key = 'IVK#TEMPLATE#' . $resource_uid . '#' . $this->sanitize($resource_name);
+<a name="line288"></a>        }
+<a name="line289"></a>        // invalidate all caches by cache group
+<a name="line290"></a>        else if (!$resource_name && $cache_id && !$compile_id) {
+<a name="line291"></a>            $key = 'IVK#CACHE#' . $this->sanitize($cache_id);
+<a name="line292"></a>        }
+<a name="line293"></a>        // invalidate all caches by compile id
+<a name="line294"></a>        else if (!$resource_name && !$cache_id && $compile_id) {
+<a name="line295"></a>            $key = 'IVK#COMPILE#' . $this->sanitize($compile_id);
+<a name="line296"></a>        }
+<a name="line297"></a>        // invalidate by combination
+<a name="line298"></a>        else {
+<a name="line299"></a>            $key = 'IVK#CID#' . $cid;
+<a name="line300"></a>        }
+<a name="line301"></a>        $this->write(array($key => $now));
+<a name="line302"></a>    }
+<a name="line303"></a>
+<a name="line304"></a>    /**
+<a name="line305"></a>     * Determine the latest timestamp known to the invalidation chain
+<a name="line306"></a>     *
+<a name="line307"></a>     * @param string $cid           CacheID to determine latest invalidation timestamp of
+<a name="line308"></a>     * @param string $resource_name template name
+<a name="line309"></a>     * @param string $cache_id      cache id
+<a name="line310"></a>     * @param string $compile_id    compile id
+<a name="line311"></a>     * @param string $resource_uid  source's filepath
+<a name="line312"></a>     * @return float the microtime the CacheID was invalidated
+<a name="line313"></a>     */
+<a name="line314"></a>    protected function getLatestInvalidationTimestamp($cid, $resource_name = null, $cache_id = null, $compile_id = null, $resource_uid = null)
+<a name="line315"></a>    {
+<a name="line316"></a>        // abort if there is no CacheID
+<a name="line317"></a>        if (false && !$cid) {
+<a name="line318"></a>            return 0;
+<a name="line319"></a>        }
+<a name="line320"></a>        // abort if there are no InvalidationKeys to check
+<a name="line321"></a>        if (!($_cid = $this->listInvalidationKeys($cid, $resource_name, $cache_id, $compile_id, $resource_uid))) {
+<a name="line322"></a>            return 0;
+<a name="line323"></a>        }
+<a name="line324"></a>        
+<a name="line325"></a>        // there are no InValidationKeys
+<a name="line326"></a>        if (!($values = $this->read($_cid))) {
+<a name="line327"></a>            return 0;
+<a name="line328"></a>        }
+<a name="line329"></a>        // make sure we're dealing with floats
+<a name="line330"></a>        $values = array_map('floatval', $values);
+<a name="line331"></a>        return max($values);
+<a name="line332"></a>    }
+<a name="line333"></a>
+<a name="line334"></a>    /**
+<a name="line335"></a>     * Translate a CacheID into the list of applicable InvalidationKeys.
+<a name="line336"></a>     *
+<a name="line337"></a>     * Splits "some|chain|into|an|array" into array( '#clearAll#', 'some', 'some|chain', 'some|chain|into', ... )
+<a name="line338"></a>     *
+<a name="line339"></a>     * @param string $cid           CacheID to translate
+<a name="line340"></a>     * @param string $resource_name template name
+<a name="line341"></a>     * @param string $cache_id      cache id
+<a name="line342"></a>     * @param string $compile_id    compile id
+<a name="line343"></a>     * @param string $resource_uid  source's filepath
+<a name="line344"></a>     * @return array list of InvalidationKeys
+<a name="line345"></a>     * @uses $invalidationKeyPrefix to prepend to each InvalidationKey
+<a name="line346"></a>     */
+<a name="line347"></a>    protected function listInvalidationKeys($cid, $resource_name = null, $cache_id = null, $compile_id = null, $resource_uid = null)
+<a name="line348"></a>    {
+<a name="line349"></a>        $t = array('IVK#ALL');
+<a name="line350"></a>        $_name = $_compile = '#';
+<a name="line351"></a>        if ($resource_name) {
+<a name="line352"></a>            $_name .= $resource_uid . '#' . $this->sanitize($resource_name);
+<a name="line353"></a>            $t[] = 'IVK#TEMPLATE' . $_name;
+<a name="line354"></a>        }
+<a name="line355"></a>        if ($compile_id) {
+<a name="line356"></a>            $_compile .= $this->sanitize($compile_id);
+<a name="line357"></a>            $t[] = 'IVK#COMPILE' . $_compile;
+<a name="line358"></a>        }
+<a name="line359"></a>        $_name .= '#';
+<a name="line360"></a>        // some poeple smoke bad weed
+<a name="line361"></a>        $cid = trim($cache_id, '|');
+<a name="line362"></a>        if (!$cid) {
+<a name="line363"></a>            return $t;
+<a name="line364"></a>        }
+<a name="line365"></a>        $i = 0;
+<a name="line366"></a>        while (true) {
+<a name="line367"></a>            // determine next delimiter position
+<a name="line368"></a>            $i = strpos($cid, '|', $i);
+<a name="line369"></a>            // add complete CacheID if there are no more delimiters
+<a name="line370"></a>            if ($i === false) {
+<a name="line371"></a>                $t[] = 'IVK#CACHE#' . $cid;
+<a name="line372"></a>                $t[] = 'IVK#CID' . $_name . $cid . $_compile;
+<a name="line373"></a>                $t[] = 'IVK#CID' . $_name . $_compile;
+<a name="line374"></a>                break;
+<a name="line375"></a>            }
+<a name="line376"></a>            $part = substr($cid, 0, $i);
+<a name="line377"></a>            // add slice to list
+<a name="line378"></a>            $t[] = 'IVK#CACHE#' . $part;
+<a name="line379"></a>            $t[] = 'IVK#CID' . $_name . $part . $_compile;
+<a name="line380"></a>            // skip past delimiter position
+<a name="line381"></a>            $i++;
+<a name="line382"></a>        }
+<a name="line383"></a>        return $t;
+<a name="line384"></a>    }
+<a name="line385"></a>
+<a name="line386"></a>    /**
+<a name="line387"></a>     * Check is cache is locked for this template
+<a name="line388"></a>     *
+<a name="line389"></a>     * @param Smarty $smarty Smarty object
+<a name="line390"></a>     * @param Smarty_Template_Cached $cached cached object
+<a name="line391"></a>     * @return booelan true or false if cache is locked
+<a name="line392"></a>     */
+<a name="line393"></a>    public function hasLock(Smarty $smarty, Smarty_Template_Cached $cached)
+<a name="line394"></a>    {
+<a name="line395"></a>        $key = 'LOCK#' . $cached->filepath;
+<a name="line396"></a>        $data = $this->read(array($key));
+<a name="line397"></a>        return $data && time() - $data[$key] < $smarty->locking_timeout;
+<a name="line398"></a>    }
+<a name="line399"></a>
+<a name="line400"></a>    /**
+<a name="line401"></a>     * Lock cache for this template
+<a name="line402"></a>     *
+<a name="line403"></a>     * @param Smarty $smarty Smarty object
+<a name="line404"></a>     * @param Smarty_Template_Cached $cached cached object
+<a name="line405"></a>     */
+<a name="line406"></a>    public function acquireLock(Smarty $smarty, Smarty_Template_Cached $cached)
+<a name="line407"></a>    {
+<a name="line408"></a>        $cached->is_locked = true;
+<a name="line409"></a>        $key = 'LOCK#' . $cached->filepath;
+<a name="line410"></a>        $this->write(array($key => time()), $smarty->locking_timeout);
+<a name="line411"></a>    }
+<a name="line412"></a>
+<a name="line413"></a>    /**
+<a name="line414"></a>     * Unlock cache for this template
+<a name="line415"></a>     *
+<a name="line416"></a>     * @param Smarty $smarty Smarty object
+<a name="line417"></a>     * @param Smarty_Template_Cached $cached cached object
+<a name="line418"></a>     */
+<a name="line419"></a>    public function releaseLock(Smarty $smarty, Smarty_Template_Cached $cached)
+<a name="line420"></a>    {
+<a name="line421"></a>        $cached->is_locked = false;
+<a name="line422"></a>        $key = 'LOCK#' . $cached->filepath;
+<a name="line423"></a>        $this->delete(array($key));
+<a name="line424"></a>    }
+<a name="line425"></a>
+<a name="line426"></a>    /**
+<a name="line427"></a>     * Read values for a set of keys from cache
+<a name="line428"></a>     *
+<a name="line429"></a>     * @param array $keys list of keys to fetch
+<a name="line430"></a>     * @return array list of values with the given keys used as indexes
+<a name="line431"></a>     */
+<a name="line432"></a>    protected abstract function read(array $keys);
+<a name="line433"></a>
+<a name="line434"></a>    /**
+<a name="line435"></a>     * Save values for a set of keys to cache
+<a name="line436"></a>     *
+<a name="line437"></a>     * @param array $keys   list of values to save
+<a name="line438"></a>     * @param int   $expire expiration time
+<a name="line439"></a>     * @return boolean true on success, false on failure
+<a name="line440"></a>     */
+<a name="line441"></a>    protected abstract function write(array $keys, $expire=null);
+<a name="line442"></a>
+<a name="line443"></a>    /**
+<a name="line444"></a>     * Remove values from cache
+<a name="line445"></a>     *
+<a name="line446"></a>     * @param array $keys list of keys to delete
+<a name="line447"></a>     * @return boolean true on success, false on failure
+<a name="line448"></a>     */
+<a name="line449"></a>    protected abstract function delete(array $keys);
+<a name="line450"></a>
+<a name="line451"></a>    /**
+<a name="line452"></a>     * Remove *all* values from cache
+<a name="line453"></a>     *
+<a name="line454"></a>     * @return boolean true on success, false on failure
+<a name="line455"></a>     */
+<a name="line456"></a>    protected function purge()
+<a name="line457"></a>    {
+<a name="line458"></a>        return false;
+<a name="line459"></a>    }
+<a name="line460"></a>
+<a name="line461"></a>}
+<a name="line462"></a>
+<a name="line463"></a>?></pre>
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_cacheresource_keyvaluestore.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

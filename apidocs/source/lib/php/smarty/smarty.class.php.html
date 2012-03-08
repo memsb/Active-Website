@@ -1,0 +1,1577 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
+
+<link rel="stylesheet" type="text/css" href="../../../../stylesheet.css">
+<link rel="start" href="../../../../overview-summary.html">
+
+<title>lib/php/Smarty/Smarty.class.php (PHPDoctor)</title>
+
+</head>
+<body id="file" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../index.html" target="_top">Frames</a>
+<a href="../../../../source/lib/php/smarty/smarty.class.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<h1>lib/php/Smarty/Smarty.class.php</h1>
+<div class="comment" id="overview_description"><p>Project:     Smarty: the PHP compiling template engine
+File:        Smarty.class.php
+SVN:         $Id: Smarty.class.php 4518 2011-12-18 18:48:07Z rodneyrehm $</p><p>This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.</p><p>This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.</p><p>You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</p><p>For questions, help, comments, discussion, etc., please join the
+Smarty mailing list. Send a blank e-mail to
+smarty-discussion-subscribe@googlegroups.com</p></div>
+
+<hr>
+
+<a name="line1"></a><pre><?php
+<a name="line2"></a>/**
+<a name="line3"></a> * Project:     Smarty: the PHP compiling template engine
+<a name="line4"></a> * File:        Smarty.class.php
+<a name="line5"></a> * SVN:         $Id: Smarty.class.php 4518 2011-12-18 18:48:07Z rodneyrehm $
+<a name="line6"></a> *
+<a name="line7"></a> * This library is free software; you can redistribute it and/or
+<a name="line8"></a> * modify it under the terms of the GNU Lesser General Public
+<a name="line9"></a> * License as published by the Free Software Foundation; either
+<a name="line10"></a> * version 2.1 of the License, or (at your option) any later version.
+<a name="line11"></a> *
+<a name="line12"></a> * This library is distributed in the hope that it will be useful,
+<a name="line13"></a> * but WITHOUT ANY WARRANTY; without even the implied warranty of
+<a name="line14"></a> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+<a name="line15"></a> * Lesser General Public License for more details.
+<a name="line16"></a> *
+<a name="line17"></a> * You should have received a copy of the GNU Lesser General Public
+<a name="line18"></a> * License along with this library; if not, write to the Free Software
+<a name="line19"></a> * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+<a name="line20"></a> *
+<a name="line21"></a> * For questions, help, comments, discussion, etc., please join the
+<a name="line22"></a> * Smarty mailing list. Send a blank e-mail to
+<a name="line23"></a> * smarty-discussion-subscribe@googlegroups.com
+<a name="line24"></a> *
+<a name="line25"></a> * @link http://www.smarty.net/
+<a name="line26"></a> * @copyright 2008 New Digital Group, Inc.
+<a name="line27"></a> * @author Monte Ohrt <monte at ohrt dot com>
+<a name="line28"></a> * @author Uwe Tews
+<a name="line29"></a> * @author Rodney Rehm
+<a name="line30"></a> * @package Smarty
+<a name="line31"></a> * @version 3.1.7
+<a name="line32"></a> */
+<a name="line33"></a>
+<a name="line34"></a>/**
+<a name="line35"></a> * define shorthand directory separator constant
+<a name="line36"></a> */
+<a name="line37"></a>if (!defined('DS')) {
+<a name="line38"></a>    define('DS', DIRECTORY_SEPARATOR);
+<a name="line39"></a>}
+<a name="line40"></a>
+<a name="line41"></a>/**
+<a name="line42"></a> * set SMARTY_DIR to absolute path to Smarty library files.
+<a name="line43"></a> * Sets SMARTY_DIR only if user application has not already defined it.
+<a name="line44"></a> */
+<a name="line45"></a>if (!defined('SMARTY_DIR')) {
+<a name="line46"></a>    define('SMARTY_DIR', dirname(__FILE__) . DS);
+<a name="line47"></a>}
+<a name="line48"></a>
+<a name="line49"></a>/**
+<a name="line50"></a> * set SMARTY_SYSPLUGINS_DIR to absolute path to Smarty internal plugins.
+<a name="line51"></a> * Sets SMARTY_SYSPLUGINS_DIR only if user application has not already defined it.
+<a name="line52"></a> */
+<a name="line53"></a>if (!defined('SMARTY_SYSPLUGINS_DIR')) {
+<a name="line54"></a>    define('SMARTY_SYSPLUGINS_DIR', SMARTY_DIR . 'sysplugins' . DS);
+<a name="line55"></a>}
+<a name="line56"></a>if (!defined('SMARTY_PLUGINS_DIR')) {
+<a name="line57"></a>    define('SMARTY_PLUGINS_DIR', SMARTY_DIR . 'plugins' . DS);
+<a name="line58"></a>}
+<a name="line59"></a>if (!defined('SMARTY_MBSTRING')) {
+<a name="line60"></a>    define('SMARTY_MBSTRING', function_exists('mb_strlen'));
+<a name="line61"></a>}
+<a name="line62"></a>if (!defined('SMARTY_RESOURCE_CHAR_SET')) {
+<a name="line63"></a>    // UTF-8 can only be done properly when mbstring is available!
+<a name="line64"></a>    /**
+<a name="line65"></a>     * @deprecated in favor of Smarty::$_CHARSET
+<a name="line66"></a>     */
+<a name="line67"></a>    define('SMARTY_RESOURCE_CHAR_SET', SMARTY_MBSTRING ? 'UTF-8' : 'ISO-8859-1');
+<a name="line68"></a>}
+<a name="line69"></a>if (!defined('SMARTY_RESOURCE_DATE_FORMAT')) {
+<a name="line70"></a>    /**
+<a name="line71"></a>     * @deprecated in favor of Smarty::$_DATE_FORMAT
+<a name="line72"></a>     */
+<a name="line73"></a>    define('SMARTY_RESOURCE_DATE_FORMAT', '%b %e, %Y');
+<a name="line74"></a>}
+<a name="line75"></a>
+<a name="line76"></a>/**
+<a name="line77"></a> * register the class autoloader
+<a name="line78"></a> */
+<a name="line79"></a>if (!defined('SMARTY_SPL_AUTOLOAD')) {
+<a name="line80"></a>    define('SMARTY_SPL_AUTOLOAD', 0);
+<a name="line81"></a>}
+<a name="line82"></a>
+<a name="line83"></a>if (SMARTY_SPL_AUTOLOAD && set_include_path(get_include_path() . PATH_SEPARATOR . SMARTY_SYSPLUGINS_DIR) !== false) {
+<a name="line84"></a>    $registeredAutoLoadFunctions = spl_autoload_functions();
+<a name="line85"></a>    if (!isset($registeredAutoLoadFunctions['spl_autoload'])) {
+<a name="line86"></a>        spl_autoload_register();
+<a name="line87"></a>    }
+<a name="line88"></a>} else {
+<a name="line89"></a>    spl_autoload_register('smartyAutoload');
+<a name="line90"></a>}
+<a name="line91"></a>
+<a name="line92"></a>/**
+<a name="line93"></a> * Load always needed external class files
+<a name="line94"></a> */
+<a name="line95"></a>include_once SMARTY_SYSPLUGINS_DIR.'smarty_internal_data.php';
+<a name="line96"></a>include_once SMARTY_SYSPLUGINS_DIR.'smarty_internal_templatebase.php';
+<a name="line97"></a>include_once SMARTY_SYSPLUGINS_DIR.'smarty_internal_template.php';
+<a name="line98"></a>include_once SMARTY_SYSPLUGINS_DIR.'smarty_resource.php';
+<a name="line99"></a>include_once SMARTY_SYSPLUGINS_DIR.'smarty_internal_resource_file.php';
+<a name="line100"></a>include_once SMARTY_SYSPLUGINS_DIR.'smarty_cacheresource.php';
+<a name="line101"></a>include_once SMARTY_SYSPLUGINS_DIR.'smarty_internal_cacheresource_file.php';
+<a name="line102"></a>
+<a name="line103"></a>/**
+<a name="line104"></a> * This is the main Smarty class
+<a name="line105"></a> * @package Smarty
+<a name="line106"></a> */
+<a name="line107"></a>class Smarty extends Smarty_Internal_TemplateBase {
+<a name="line108"></a>
+<a name="line109"></a>    /**#@+
+<a name="line110"></a>     * constant definitions
+<a name="line111"></a>     */
+<a name="line112"></a>
+<a name="line113"></a>    /**
+<a name="line114"></a>     * smarty version
+<a name="line115"></a>     */
+<a name="line116"></a>    const SMARTY_VERSION = 'Smarty-3.1.7';
+<a name="line117"></a>
+<a name="line118"></a>    /**
+<a name="line119"></a>     * define variable scopes
+<a name="line120"></a>     */
+<a name="line121"></a>    const SCOPE_LOCAL = 0;
+<a name="line122"></a>    const SCOPE_PARENT = 1;
+<a name="line123"></a>    const SCOPE_ROOT = 2;
+<a name="line124"></a>    const SCOPE_GLOBAL = 3;
+<a name="line125"></a>    /**
+<a name="line126"></a>     * define caching modes
+<a name="line127"></a>     */
+<a name="line128"></a>    const CACHING_OFF = 0;
+<a name="line129"></a>    const CACHING_LIFETIME_CURRENT = 1;
+<a name="line130"></a>    const CACHING_LIFETIME_SAVED = 2;
+<a name="line131"></a>    /**
+<a name="line132"></a>     * define compile check modes
+<a name="line133"></a>     */
+<a name="line134"></a>    const COMPILECHECK_OFF = 0;
+<a name="line135"></a>    const COMPILECHECK_ON = 1;
+<a name="line136"></a>    const COMPILECHECK_CACHEMISS = 2;
+<a name="line137"></a>    /**
+<a name="line138"></a>     * modes for handling of "<?php ... ?>" tags in templates.
+<a name="line139"></a>     */
+<a name="line140"></a>    const PHP_PASSTHRU = 0; //-> print tags as plain text
+<a name="line141"></a>    const PHP_QUOTE = 1; //-> escape tags as entities
+<a name="line142"></a>    const PHP_REMOVE = 2; //-> escape tags as entities
+<a name="line143"></a>    const PHP_ALLOW = 3; //-> escape tags as entities
+<a name="line144"></a>    /**
+<a name="line145"></a>     * filter types
+<a name="line146"></a>     */
+<a name="line147"></a>    const FILTER_POST = 'post';
+<a name="line148"></a>    const FILTER_PRE = 'pre';
+<a name="line149"></a>    const FILTER_OUTPUT = 'output';
+<a name="line150"></a>    const FILTER_VARIABLE = 'variable';
+<a name="line151"></a>    /**
+<a name="line152"></a>     * plugin types
+<a name="line153"></a>     */
+<a name="line154"></a>    const PLUGIN_FUNCTION = 'function';
+<a name="line155"></a>    const PLUGIN_BLOCK = 'block';
+<a name="line156"></a>    const PLUGIN_COMPILER = 'compiler';
+<a name="line157"></a>    const PLUGIN_MODIFIER = 'modifier';
+<a name="line158"></a>    const PLUGIN_MODIFIERCOMPILER = 'modifiercompiler';
+<a name="line159"></a>
+<a name="line160"></a>    /**#@-*/
+<a name="line161"></a>
+<a name="line162"></a>    /**
+<a name="line163"></a>     * assigned global tpl vars
+<a name="line164"></a>     */
+<a name="line165"></a>    public static $global_tpl_vars = array();
+<a name="line166"></a>
+<a name="line167"></a>    /**
+<a name="line168"></a>     * error handler returned by set_error_hanlder() in Smarty::muteExpectedErrors()
+<a name="line169"></a>     */
+<a name="line170"></a>    public static $_previous_error_handler = null;
+<a name="line171"></a>    /**
+<a name="line172"></a>     * contains directories outside of SMARTY_DIR that are to be muted by muteExpectedErrors()
+<a name="line173"></a>     */
+<a name="line174"></a>    public static $_muted_directories = array();
+<a name="line175"></a>    /**
+<a name="line176"></a>     * Flag denoting if Multibyte String functions are available
+<a name="line177"></a>     */
+<a name="line178"></a>    public static $_MBSTRING = SMARTY_MBSTRING;
+<a name="line179"></a>    /**
+<a name="line180"></a>     * The character set to adhere to (e.g. "UTF-8")
+<a name="line181"></a>     */
+<a name="line182"></a>    public static $_CHARSET = SMARTY_RESOURCE_CHAR_SET;
+<a name="line183"></a>    /**
+<a name="line184"></a>     * The date format to be used internally
+<a name="line185"></a>     * (accepts date() and strftime())
+<a name="line186"></a>     */
+<a name="line187"></a>    public static $_DATE_FORMAT = SMARTY_RESOURCE_DATE_FORMAT;
+<a name="line188"></a>    /**
+<a name="line189"></a>     * Flag denoting if PCRE should run in UTF-8 mode
+<a name="line190"></a>     */
+<a name="line191"></a>    public static $_UTF8_MODIFIER = 'u';
+<a name="line192"></a>    
+<a name="line193"></a>    
+<a name="line194"></a>    /**#@+
+<a name="line195"></a>     * variables
+<a name="line196"></a>     */
+<a name="line197"></a>
+<a name="line198"></a>    /**
+<a name="line199"></a>     * auto literal on delimiters with whitspace
+<a name="line200"></a>     * @var boolean
+<a name="line201"></a>     */
+<a name="line202"></a>    public $auto_literal = true;
+<a name="line203"></a>    /**
+<a name="line204"></a>     * display error on not assigned variables
+<a name="line205"></a>     * @var boolean
+<a name="line206"></a>     */
+<a name="line207"></a>    public $error_unassigned = false;
+<a name="line208"></a>    /**
+<a name="line209"></a>     * look up relative filepaths in include_path
+<a name="line210"></a>     * @var boolean
+<a name="line211"></a>     */
+<a name="line212"></a>    public $use_include_path = false;
+<a name="line213"></a>    /**
+<a name="line214"></a>     * template directory
+<a name="line215"></a>     * @var array
+<a name="line216"></a>     */
+<a name="line217"></a>    private $template_dir = array();
+<a name="line218"></a>    /**
+<a name="line219"></a>     * joined template directory string used in cache keys
+<a name="line220"></a>     * @var string
+<a name="line221"></a>     */
+<a name="line222"></a>    public $joined_template_dir = null;
+<a name="line223"></a>    /**
+<a name="line224"></a>     * joined config directory string used in cache keys
+<a name="line225"></a>     * @var string
+<a name="line226"></a>     */
+<a name="line227"></a>    public $joined_config_dir = null;
+<a name="line228"></a>    /**
+<a name="line229"></a>     * default template handler
+<a name="line230"></a>     * @var callable
+<a name="line231"></a>     */
+<a name="line232"></a>    public $default_template_handler_func = null;
+<a name="line233"></a>    /**
+<a name="line234"></a>     * default config handler
+<a name="line235"></a>     * @var callable
+<a name="line236"></a>     */
+<a name="line237"></a>    public $default_config_handler_func = null;
+<a name="line238"></a>    /**
+<a name="line239"></a>     * default plugin handler
+<a name="line240"></a>     * @var callable
+<a name="line241"></a>     */
+<a name="line242"></a>    public $default_plugin_handler_func = null;
+<a name="line243"></a>    /**
+<a name="line244"></a>     * compile directory
+<a name="line245"></a>     * @var string
+<a name="line246"></a>     */
+<a name="line247"></a>    private $compile_dir = null;
+<a name="line248"></a>    /**
+<a name="line249"></a>     * plugins directory
+<a name="line250"></a>     * @var array
+<a name="line251"></a>     */
+<a name="line252"></a>    private $plugins_dir = array();
+<a name="line253"></a>    /**
+<a name="line254"></a>     * cache directory
+<a name="line255"></a>     * @var string
+<a name="line256"></a>     */
+<a name="line257"></a>    private $cache_dir = null;
+<a name="line258"></a>    /**
+<a name="line259"></a>     * config directory
+<a name="line260"></a>     * @var array
+<a name="line261"></a>     */
+<a name="line262"></a>    private $config_dir = array();
+<a name="line263"></a>    /**
+<a name="line264"></a>     * force template compiling?
+<a name="line265"></a>     * @var boolean
+<a name="line266"></a>     */
+<a name="line267"></a>    public $force_compile = false;
+<a name="line268"></a>    /**
+<a name="line269"></a>     * check template for modifications?
+<a name="line270"></a>     * @var boolean
+<a name="line271"></a>     */
+<a name="line272"></a>    public $compile_check = true;
+<a name="line273"></a>    /**
+<a name="line274"></a>     * use sub dirs for compiled/cached files?
+<a name="line275"></a>     * @var boolean
+<a name="line276"></a>     */
+<a name="line277"></a>    public $use_sub_dirs = false;
+<a name="line278"></a>    /**
+<a name="line279"></a>     * allow ambiguous resources (that are made unique by the resource handler)
+<a name="line280"></a>     * @var boolean
+<a name="line281"></a>     */
+<a name="line282"></a>    public $allow_ambiguous_resources = false;
+<a name="line283"></a>    /**
+<a name="line284"></a>     * caching enabled
+<a name="line285"></a>     * @var boolean
+<a name="line286"></a>     */
+<a name="line287"></a>    public $caching = false;
+<a name="line288"></a>    /**
+<a name="line289"></a>     * merge compiled includes
+<a name="line290"></a>     * @var boolean
+<a name="line291"></a>     */
+<a name="line292"></a>    public $merge_compiled_includes = false;
+<a name="line293"></a>    /**
+<a name="line294"></a>     * cache lifetime in seconds
+<a name="line295"></a>     * @var integer
+<a name="line296"></a>     */
+<a name="line297"></a>    public $cache_lifetime = 3600;
+<a name="line298"></a>    /**
+<a name="line299"></a>     * force cache file creation
+<a name="line300"></a>     * @var boolean
+<a name="line301"></a>     */
+<a name="line302"></a>    public $force_cache = false;
+<a name="line303"></a>    /**
+<a name="line304"></a>     * Set this if you want different sets of cache files for the same
+<a name="line305"></a>     * templates.
+<a name="line306"></a>     *
+<a name="line307"></a>     * @var string
+<a name="line308"></a>     */
+<a name="line309"></a>    public $cache_id = null;
+<a name="line310"></a>    /**
+<a name="line311"></a>     * Set this if you want different sets of compiled files for the same
+<a name="line312"></a>     * templates.
+<a name="line313"></a>     *
+<a name="line314"></a>     * @var string
+<a name="line315"></a>     */
+<a name="line316"></a>    public $compile_id = null;
+<a name="line317"></a>    /**
+<a name="line318"></a>     * template left-delimiter
+<a name="line319"></a>     * @var string
+<a name="line320"></a>     */
+<a name="line321"></a>    public $left_delimiter = "{";
+<a name="line322"></a>    /**
+<a name="line323"></a>     * template right-delimiter
+<a name="line324"></a>     * @var string
+<a name="line325"></a>     */
+<a name="line326"></a>    public $right_delimiter = "}";
+<a name="line327"></a>    /**#@+
+<a name="line328"></a>     * security
+<a name="line329"></a>     */
+<a name="line330"></a>    /**
+<a name="line331"></a>     * class name
+<a name="line332"></a>     *
+<a name="line333"></a>     * This should be instance of Smarty_Security.
+<a name="line334"></a>     *
+<a name="line335"></a>     * @var string
+<a name="line336"></a>     * @see Smarty_Security
+<a name="line337"></a>     */
+<a name="line338"></a>    public $security_class = 'Smarty_Security';
+<a name="line339"></a>    /**
+<a name="line340"></a>     * implementation of security class
+<a name="line341"></a>     *
+<a name="line342"></a>     * @var Smarty_Security
+<a name="line343"></a>     */
+<a name="line344"></a>    public $security_policy = null;
+<a name="line345"></a>    /**
+<a name="line346"></a>     * controls handling of PHP-blocks
+<a name="line347"></a>     *
+<a name="line348"></a>     * @var integer
+<a name="line349"></a>     */
+<a name="line350"></a>    public $php_handling = self::PHP_PASSTHRU;
+<a name="line351"></a>    /**
+<a name="line352"></a>     * controls if the php template file resource is allowed
+<a name="line353"></a>     *
+<a name="line354"></a>     * @var bool
+<a name="line355"></a>     */
+<a name="line356"></a>    public $allow_php_templates = false;
+<a name="line357"></a>    /**
+<a name="line358"></a>     * Should compiled-templates be prevented from being called directly?
+<a name="line359"></a>     *
+<a name="line360"></a>     * {@internal
+<a name="line361"></a>     * Currently used by Smarty_Internal_Template only.
+<a name="line362"></a>     * }}
+<a name="line363"></a>     *
+<a name="line364"></a>     * @var boolean
+<a name="line365"></a>     */
+<a name="line366"></a>    public $direct_access_security = true;
+<a name="line367"></a>    /**#@-*/
+<a name="line368"></a>    /**
+<a name="line369"></a>     * debug mode
+<a name="line370"></a>     *
+<a name="line371"></a>     * Setting this to true enables the debug-console.
+<a name="line372"></a>     *
+<a name="line373"></a>     * @var boolean
+<a name="line374"></a>     */
+<a name="line375"></a>    public $debugging = false;
+<a name="line376"></a>    /**
+<a name="line377"></a>     * This determines if debugging is enable-able from the browser.
+<a name="line378"></a>     * <ul>
+<a name="line379"></a>     *  <li>NONE => no debugging control allowed</li>
+<a name="line380"></a>     *  <li>URL => enable debugging when SMARTY_DEBUG is found in the URL.</li>
+<a name="line381"></a>     * </ul>
+<a name="line382"></a>     * @var string
+<a name="line383"></a>     */
+<a name="line384"></a>    public $debugging_ctrl = 'NONE';
+<a name="line385"></a>    /**
+<a name="line386"></a>     * Name of debugging URL-param.
+<a name="line387"></a>     *
+<a name="line388"></a>     * Only used when $debugging_ctrl is set to 'URL'.
+<a name="line389"></a>     * The name of the URL-parameter that activates debugging.
+<a name="line390"></a>     *
+<a name="line391"></a>     * @var type
+<a name="line392"></a>     */
+<a name="line393"></a>    public $smarty_debug_id = 'SMARTY_DEBUG';
+<a name="line394"></a>    /**
+<a name="line395"></a>     * Path of debug template.
+<a name="line396"></a>     * @var string
+<a name="line397"></a>     */
+<a name="line398"></a>    public $debug_tpl = null;
+<a name="line399"></a>    /**
+<a name="line400"></a>     * When set, smarty uses this value as error_reporting-level.
+<a name="line401"></a>     * @var int
+<a name="line402"></a>     */
+<a name="line403"></a>    public $error_reporting = null;
+<a name="line404"></a>    /**
+<a name="line405"></a>     * Internal flag for getTags()
+<a name="line406"></a>     * @var boolean
+<a name="line407"></a>     */
+<a name="line408"></a>    public $get_used_tags = false;
+<a name="line409"></a>
+<a name="line410"></a>    /**#@+
+<a name="line411"></a>     * config var settings
+<a name="line412"></a>     */
+<a name="line413"></a>
+<a name="line414"></a>    /**
+<a name="line415"></a>     * Controls whether variables with the same name overwrite each other.
+<a name="line416"></a>     * @var boolean
+<a name="line417"></a>     */
+<a name="line418"></a>    public $config_overwrite = true;
+<a name="line419"></a>    /**
+<a name="line420"></a>     * Controls whether config values of on/true/yes and off/false/no get converted to boolean.
+<a name="line421"></a>     * @var boolean
+<a name="line422"></a>     */
+<a name="line423"></a>    public $config_booleanize = true;
+<a name="line424"></a>    /**
+<a name="line425"></a>     * Controls whether hidden config sections/vars are read from the file.
+<a name="line426"></a>     * @var boolean
+<a name="line427"></a>     */
+<a name="line428"></a>    public $config_read_hidden = false;
+<a name="line429"></a>
+<a name="line430"></a>    /**#@-*/
+<a name="line431"></a>
+<a name="line432"></a>    /**#@+
+<a name="line433"></a>     * resource locking
+<a name="line434"></a>     */
+<a name="line435"></a>
+<a name="line436"></a>    /**
+<a name="line437"></a>     * locking concurrent compiles
+<a name="line438"></a>     * @var boolean
+<a name="line439"></a>     */
+<a name="line440"></a>    public $compile_locking = true;
+<a name="line441"></a>    /**
+<a name="line442"></a>     * Controls whether cache resources should emply locking mechanism
+<a name="line443"></a>     * @var boolean
+<a name="line444"></a>     */
+<a name="line445"></a>    public $cache_locking = false;
+<a name="line446"></a>    /**
+<a name="line447"></a>     * seconds to wait for acquiring a lock before ignoring the write lock
+<a name="line448"></a>     * @var float
+<a name="line449"></a>     */
+<a name="line450"></a>    public $locking_timeout = 10;
+<a name="line451"></a>
+<a name="line452"></a>    /**#@-*/
+<a name="line453"></a>
+<a name="line454"></a>    /**
+<a name="line455"></a>     * global template functions
+<a name="line456"></a>     * @var array
+<a name="line457"></a>     */
+<a name="line458"></a>    public $template_functions = array();
+<a name="line459"></a>    /**
+<a name="line460"></a>     * resource type used if none given
+<a name="line461"></a>     *
+<a name="line462"></a>     * Must be an valid key of $registered_resources.
+<a name="line463"></a>     * @var string
+<a name="line464"></a>     */
+<a name="line465"></a>    public $default_resource_type = 'file';
+<a name="line466"></a>    /**
+<a name="line467"></a>     * caching type
+<a name="line468"></a>     *
+<a name="line469"></a>     * Must be an element of $cache_resource_types.
+<a name="line470"></a>     *
+<a name="line471"></a>     * @var string
+<a name="line472"></a>     */
+<a name="line473"></a>    public $caching_type = 'file';
+<a name="line474"></a>    /**
+<a name="line475"></a>     * internal config properties
+<a name="line476"></a>     * @var array
+<a name="line477"></a>     */
+<a name="line478"></a>    public $properties = array();
+<a name="line479"></a>    /**
+<a name="line480"></a>     * config type
+<a name="line481"></a>     * @var string
+<a name="line482"></a>     */
+<a name="line483"></a>    public $default_config_type = 'file';
+<a name="line484"></a>    /**
+<a name="line485"></a>     * cached template objects
+<a name="line486"></a>     * @var array
+<a name="line487"></a>     */
+<a name="line488"></a>    public $template_objects = array();
+<a name="line489"></a>    /**
+<a name="line490"></a>     * check If-Modified-Since headers
+<a name="line491"></a>     * @var boolean
+<a name="line492"></a>     */
+<a name="line493"></a>    public $cache_modified_check = false;
+<a name="line494"></a>    /**
+<a name="line495"></a>     * registered plugins
+<a name="line496"></a>     * @var array
+<a name="line497"></a>     */
+<a name="line498"></a>    public $registered_plugins = array();
+<a name="line499"></a>    /**
+<a name="line500"></a>     * plugin search order
+<a name="line501"></a>     * @var array
+<a name="line502"></a>     */
+<a name="line503"></a>    public $plugin_search_order = array('function', 'block', 'compiler', 'class');
+<a name="line504"></a>    /**
+<a name="line505"></a>     * registered objects
+<a name="line506"></a>     * @var array
+<a name="line507"></a>     */
+<a name="line508"></a>    public $registered_objects = array();
+<a name="line509"></a>    /**
+<a name="line510"></a>     * registered classes
+<a name="line511"></a>     * @var array
+<a name="line512"></a>     */
+<a name="line513"></a>    public $registered_classes = array();
+<a name="line514"></a>    /**
+<a name="line515"></a>     * registered filters
+<a name="line516"></a>     * @var array
+<a name="line517"></a>     */
+<a name="line518"></a>    public $registered_filters = array();
+<a name="line519"></a>    /**
+<a name="line520"></a>     * registered resources
+<a name="line521"></a>     * @var array
+<a name="line522"></a>     */
+<a name="line523"></a>    public $registered_resources = array();
+<a name="line524"></a>    /**
+<a name="line525"></a>     * resource handler cache
+<a name="line526"></a>     * @var array
+<a name="line527"></a>     */
+<a name="line528"></a>    public $_resource_handlers = array();
+<a name="line529"></a>    /**
+<a name="line530"></a>     * registered cache resources
+<a name="line531"></a>     * @var array
+<a name="line532"></a>     */
+<a name="line533"></a>    public $registered_cache_resources = array();
+<a name="line534"></a>    /**
+<a name="line535"></a>     * cache resource handler cache
+<a name="line536"></a>     * @var array
+<a name="line537"></a>     */
+<a name="line538"></a>    public $_cacheresource_handlers = array();
+<a name="line539"></a>    /**
+<a name="line540"></a>     * autoload filter
+<a name="line541"></a>     * @var array
+<a name="line542"></a>     */
+<a name="line543"></a>    public $autoload_filters = array();
+<a name="line544"></a>    /**
+<a name="line545"></a>     * default modifier
+<a name="line546"></a>     * @var array
+<a name="line547"></a>     */
+<a name="line548"></a>    public $default_modifiers = array();
+<a name="line549"></a>    /**
+<a name="line550"></a>     * autoescape variable output
+<a name="line551"></a>     * @var boolean
+<a name="line552"></a>     */
+<a name="line553"></a>    public $escape_html = false;
+<a name="line554"></a>    /**
+<a name="line555"></a>     * global internal smarty vars
+<a name="line556"></a>     * @var array
+<a name="line557"></a>     */
+<a name="line558"></a>    public static $_smarty_vars = array();
+<a name="line559"></a>    /**
+<a name="line560"></a>     * start time for execution time calculation
+<a name="line561"></a>     * @var int
+<a name="line562"></a>     */
+<a name="line563"></a>    public $start_time = 0;
+<a name="line564"></a>    /**
+<a name="line565"></a>     * default file permissions
+<a name="line566"></a>     * @var int
+<a name="line567"></a>     */
+<a name="line568"></a>    public $_file_perms = 0644;
+<a name="line569"></a>    /**
+<a name="line570"></a>     * default dir permissions
+<a name="line571"></a>     * @var int
+<a name="line572"></a>     */
+<a name="line573"></a>    public $_dir_perms = 0771;
+<a name="line574"></a>    /**
+<a name="line575"></a>     * block tag hierarchy
+<a name="line576"></a>     * @var array
+<a name="line577"></a>     */
+<a name="line578"></a>    public $_tag_stack = array();
+<a name="line579"></a>    /**
+<a name="line580"></a>     * self pointer to Smarty object
+<a name="line581"></a>     * @var Smarty
+<a name="line582"></a>     */
+<a name="line583"></a>    public $smarty;
+<a name="line584"></a>    /**
+<a name="line585"></a>     * required by the compiler for BC
+<a name="line586"></a>     * @var string
+<a name="line587"></a>     */
+<a name="line588"></a>    public $_current_file = null;
+<a name="line589"></a>    /**
+<a name="line590"></a>     * internal flag to enable parser debugging
+<a name="line591"></a>     * @var bool
+<a name="line592"></a>     */
+<a name="line593"></a>    public $_parserdebug = false;
+<a name="line594"></a>    /**
+<a name="line595"></a>     * Saved parameter of merged templates during compilation
+<a name="line596"></a>     *
+<a name="line597"></a>     * @var array
+<a name="line598"></a>     */
+<a name="line599"></a>    public $merged_templates_func = array();
+<a name="line600"></a>    /**#@-*/
+<a name="line601"></a>
+<a name="line602"></a>    /**
+<a name="line603"></a>     * Initialize new Smarty object
+<a name="line604"></a>     *
+<a name="line605"></a>     */
+<a name="line606"></a>    public function __construct()
+<a name="line607"></a>    {
+<a name="line608"></a>        // selfpointer needed by some other class methods
+<a name="line609"></a>        $this->smarty = $this;
+<a name="line610"></a>        if (is_callable('mb_internal_encoding')) {
+<a name="line611"></a>            mb_internal_encoding(Smarty::$_CHARSET);
+<a name="line612"></a>        }
+<a name="line613"></a>        $this->start_time = microtime(true);
+<a name="line614"></a>        // set default dirs
+<a name="line615"></a>        $this->setTemplateDir('.' . DS . 'templates' . DS)
+<a name="line616"></a>            ->setCompileDir('.' . DS . 'templates_c' . DS)
+<a name="line617"></a>            ->setPluginsDir(SMARTY_PLUGINS_DIR)
+<a name="line618"></a>            ->setCacheDir('.' . DS . 'cache' . DS)
+<a name="line619"></a>            ->setConfigDir('.' . DS . 'configs' . DS);
+<a name="line620"></a>
+<a name="line621"></a>        $this->debug_tpl = 'file:' . dirname(__FILE__) . '/debug.tpl';
+<a name="line622"></a>        if (isset($_SERVER['SCRIPT_NAME'])) {
+<a name="line623"></a>            $this->assignGlobal('SCRIPT_NAME', $_SERVER['SCRIPT_NAME']);
+<a name="line624"></a>        }
+<a name="line625"></a>    }
+<a name="line626"></a>
+<a name="line627"></a>
+<a name="line628"></a>    /**
+<a name="line629"></a>     * Class destructor
+<a name="line630"></a>     */
+<a name="line631"></a>    public function __destruct()
+<a name="line632"></a>    {
+<a name="line633"></a>        // intentionally left blank
+<a name="line634"></a>    }
+<a name="line635"></a>
+<a name="line636"></a>    /**
+<a name="line637"></a>     * <<magic>> set selfpointer on cloned object
+<a name="line638"></a>     */
+<a name="line639"></a>    public function __clone()
+<a name="line640"></a>    {
+<a name="line641"></a>        $this->smarty = $this;
+<a name="line642"></a>    }
+<a name="line643"></a>
+<a name="line644"></a>
+<a name="line645"></a>    /**
+<a name="line646"></a>     * <<magic>> Generic getter.
+<a name="line647"></a>     *
+<a name="line648"></a>     * Calls the appropriate getter function.
+<a name="line649"></a>     * Issues an E_USER_NOTICE if no valid getter is found.
+<a name="line650"></a>     *
+<a name="line651"></a>     * @param string $name property name
+<a name="line652"></a>     * @return mixed
+<a name="line653"></a>     */
+<a name="line654"></a>    public function __get($name)
+<a name="line655"></a>    {
+<a name="line656"></a>        $allowed = array(
+<a name="line657"></a>        'template_dir' => 'getTemplateDir',
+<a name="line658"></a>        'config_dir' => 'getConfigDir',
+<a name="line659"></a>        'plugins_dir' => 'getPluginsDir',
+<a name="line660"></a>        'compile_dir' => 'getCompileDir',
+<a name="line661"></a>        'cache_dir' => 'getCacheDir',
+<a name="line662"></a>        );
+<a name="line663"></a>
+<a name="line664"></a>        if (isset($allowed[$name])) {
+<a name="line665"></a>            return $this->{$allowed[$name]}();
+<a name="line666"></a>        } else {
+<a name="line667"></a>            trigger_error('Undefined property: '. get_class($this) .'::$'. $name, E_USER_NOTICE);
+<a name="line668"></a>        }
+<a name="line669"></a>    }
+<a name="line670"></a>
+<a name="line671"></a>    /**
+<a name="line672"></a>     * <<magic>> Generic setter.
+<a name="line673"></a>     *
+<a name="line674"></a>     * Calls the appropriate setter function.
+<a name="line675"></a>     * Issues an E_USER_NOTICE if no valid setter is found.
+<a name="line676"></a>     *
+<a name="line677"></a>     * @param string $name  property name
+<a name="line678"></a>     * @param mixed  $value parameter passed to setter
+<a name="line679"></a>     */
+<a name="line680"></a>    public function __set($name, $value)
+<a name="line681"></a>    {
+<a name="line682"></a>        $allowed = array(
+<a name="line683"></a>        'template_dir' => 'setTemplateDir',
+<a name="line684"></a>        'config_dir' => 'setConfigDir',
+<a name="line685"></a>        'plugins_dir' => 'setPluginsDir',
+<a name="line686"></a>        'compile_dir' => 'setCompileDir',
+<a name="line687"></a>        'cache_dir' => 'setCacheDir',
+<a name="line688"></a>        );
+<a name="line689"></a>
+<a name="line690"></a>        if (isset($allowed[$name])) {
+<a name="line691"></a>            $this->{$allowed[$name]}($value);
+<a name="line692"></a>        } else {
+<a name="line693"></a>            trigger_error('Undefined property: ' . get_class($this) . '::$' . $name, E_USER_NOTICE);
+<a name="line694"></a>        }
+<a name="line695"></a>    }
+<a name="line696"></a>
+<a name="line697"></a>    /**
+<a name="line698"></a>     * Check if a template resource exists
+<a name="line699"></a>     *
+<a name="line700"></a>     * @param string $resource_name template name
+<a name="line701"></a>     * @return boolean status
+<a name="line702"></a>     */
+<a name="line703"></a>    public function templateExists($resource_name)
+<a name="line704"></a>    {
+<a name="line705"></a>        // create template object
+<a name="line706"></a>        $save = $this->template_objects;
+<a name="line707"></a>        $tpl = new $this->template_class($resource_name, $this);
+<a name="line708"></a>        // check if it does exists
+<a name="line709"></a>        $result = $tpl->source->exists;
+<a name="line710"></a>        $this->template_objects = $save;
+<a name="line711"></a>        return $result;
+<a name="line712"></a>    }
+<a name="line713"></a>
+<a name="line714"></a>    /**
+<a name="line715"></a>     * Returns a single or all global  variables
+<a name="line716"></a>     *
+<a name="line717"></a>     * @param object $smarty
+<a name="line718"></a>     * @param string $varname variable name or null
+<a name="line719"></a>     * @return string variable value or or array of variables
+<a name="line720"></a>     */
+<a name="line721"></a>    public function getGlobal($varname = null)
+<a name="line722"></a>    {
+<a name="line723"></a>        if (isset($varname)) {
+<a name="line724"></a>            if (isset(self::$global_tpl_vars[$varname])) {
+<a name="line725"></a>                return self::$global_tpl_vars[$varname]->value;
+<a name="line726"></a>            } else {
+<a name="line727"></a>                return '';
+<a name="line728"></a>            }
+<a name="line729"></a>        } else {
+<a name="line730"></a>            $_result = array();
+<a name="line731"></a>            foreach (self::$global_tpl_vars AS $key => $var) {
+<a name="line732"></a>                $_result[$key] = $var->value;
+<a name="line733"></a>            }
+<a name="line734"></a>            return $_result;
+<a name="line735"></a>        }
+<a name="line736"></a>    }
+<a name="line737"></a>
+<a name="line738"></a>    /**
+<a name="line739"></a>     * Empty cache folder
+<a name="line740"></a>     *
+<a name="line741"></a>     * @param integer $exp_time expiration time
+<a name="line742"></a>     * @param string  $type     resource type
+<a name="line743"></a>     * @return integer number of cache files deleted
+<a name="line744"></a>     */
+<a name="line745"></a>    function clearAllCache($exp_time = null, $type = null)
+<a name="line746"></a>    {
+<a name="line747"></a>        // load cache resource and call clearAll
+<a name="line748"></a>        $_cache_resource = Smarty_CacheResource::load($this, $type);
+<a name="line749"></a>        Smarty_CacheResource::invalidLoadedCache($this);
+<a name="line750"></a>        return $_cache_resource->clearAll($this, $exp_time);
+<a name="line751"></a>    }
+<a name="line752"></a>
+<a name="line753"></a>    /**
+<a name="line754"></a>     * Empty cache for a specific template
+<a name="line755"></a>     *
+<a name="line756"></a>     * @param string  $template_name template name
+<a name="line757"></a>     * @param string  $cache_id      cache id
+<a name="line758"></a>     * @param string  $compile_id    compile id
+<a name="line759"></a>     * @param integer $exp_time      expiration time
+<a name="line760"></a>     * @param string  $type          resource type
+<a name="line761"></a>     * @return integer number of cache files deleted
+<a name="line762"></a>     */
+<a name="line763"></a>    public function clearCache($template_name, $cache_id = null, $compile_id = null, $exp_time = null, $type = null)
+<a name="line764"></a>    {
+<a name="line765"></a>        // load cache resource and call clear
+<a name="line766"></a>        $_cache_resource = Smarty_CacheResource::load($this, $type);
+<a name="line767"></a>        Smarty_CacheResource::invalidLoadedCache($this);
+<a name="line768"></a>        return $_cache_resource->clear($this, $template_name, $cache_id, $compile_id, $exp_time);
+<a name="line769"></a>    }
+<a name="line770"></a>
+<a name="line771"></a>    /**
+<a name="line772"></a>     * Loads security class and enables security
+<a name="line773"></a>     *
+<a name="line774"></a>     * @param string|Smarty_Security $security_class if a string is used, it must be class-name
+<a name="line775"></a>     * @return Smarty current Smarty instance for chaining
+<a name="line776"></a>     * @throws SmartyException when an invalid class name is provided
+<a name="line777"></a>     */
+<a name="line778"></a>    public function enableSecurity($security_class = null)
+<a name="line779"></a>    {
+<a name="line780"></a>        if ($security_class instanceof Smarty_Security) {
+<a name="line781"></a>            $this->security_policy = $security_class;
+<a name="line782"></a>            return $this;
+<a name="line783"></a>        } elseif (is_object($security_class)) {
+<a name="line784"></a>            throw new SmartyException("Class '" . get_class($security_class) . "' must extend Smarty_Security.");
+<a name="line785"></a>        }
+<a name="line786"></a>        if ($security_class == null) {
+<a name="line787"></a>            $security_class = $this->security_class;
+<a name="line788"></a>        }
+<a name="line789"></a>        if (!class_exists($security_class)) {
+<a name="line790"></a>            throw new SmartyException("Security class '$security_class' is not defined");
+<a name="line791"></a>        } elseif ($security_class !== 'Smarty_Security' && !is_subclass_of($security_class, 'Smarty_Security')) {
+<a name="line792"></a>            throw new SmartyException("Class '$security_class' must extend Smarty_Security.");
+<a name="line793"></a>        } else {
+<a name="line794"></a>            $this->security_policy = new $security_class($this);
+<a name="line795"></a>        }
+<a name="line796"></a>
+<a name="line797"></a>        return $this;
+<a name="line798"></a>    }
+<a name="line799"></a>
+<a name="line800"></a>    /**
+<a name="line801"></a>     * Disable security
+<a name="line802"></a>     * @return Smarty current Smarty instance for chaining
+<a name="line803"></a>     */
+<a name="line804"></a>    public function disableSecurity()
+<a name="line805"></a>    {
+<a name="line806"></a>        $this->security_policy = null;
+<a name="line807"></a>
+<a name="line808"></a>        return $this;
+<a name="line809"></a>    }
+<a name="line810"></a>
+<a name="line811"></a>    /**
+<a name="line812"></a>     * Set template directory
+<a name="line813"></a>     *
+<a name="line814"></a>     * @param string|array $template_dir directory(s) of template sources
+<a name="line815"></a>     * @return Smarty current Smarty instance for chaining
+<a name="line816"></a>     */
+<a name="line817"></a>    public function setTemplateDir($template_dir)
+<a name="line818"></a>    {
+<a name="line819"></a>        $this->template_dir = array();
+<a name="line820"></a>        foreach ((array) $template_dir as $k => $v) {
+<a name="line821"></a>            $this->template_dir[$k] = rtrim($v, '/\\') . DS;
+<a name="line822"></a>        }
+<a name="line823"></a>
+<a name="line824"></a>        $this->joined_template_dir = join(DIRECTORY_SEPARATOR, $this->template_dir);
+<a name="line825"></a>        return $this;
+<a name="line826"></a>    }
+<a name="line827"></a>
+<a name="line828"></a>    /**
+<a name="line829"></a>     * Add template directory(s)
+<a name="line830"></a>     *
+<a name="line831"></a>     * @param string|array $template_dir directory(s) of template sources
+<a name="line832"></a>     * @param string       $key          of the array element to assign the template dir to
+<a name="line833"></a>     * @return Smarty current Smarty instance for chaining
+<a name="line834"></a>     * @throws SmartyException when the given template directory is not valid
+<a name="line835"></a>     */
+<a name="line836"></a>    public function addTemplateDir($template_dir, $key=null)
+<a name="line837"></a>    {
+<a name="line838"></a>        // make sure we're dealing with an array
+<a name="line839"></a>        $this->template_dir = (array) $this->template_dir;
+<a name="line840"></a>
+<a name="line841"></a>        if (is_array($template_dir)) {
+<a name="line842"></a>            foreach ($template_dir as $k => $v) {
+<a name="line843"></a>                if (is_int($k)) {
+<a name="line844"></a>                    // indexes are not merged but appended
+<a name="line845"></a>                    $this->template_dir[] = rtrim($v, '/\\') . DS;
+<a name="line846"></a>                } else {
+<a name="line847"></a>                    // string indexes are overridden
+<a name="line848"></a>                    $this->template_dir[$k] = rtrim($v, '/\\') . DS;
+<a name="line849"></a>                }
+<a name="line850"></a>            }
+<a name="line851"></a>        } elseif ($key !== null) {
+<a name="line852"></a>            // override directory at specified index
+<a name="line853"></a>            $this->template_dir[$key] = rtrim($template_dir, '/\\') . DS;
+<a name="line854"></a>        } else {
+<a name="line855"></a>            // append new directory
+<a name="line856"></a>            $this->template_dir[] = rtrim($template_dir, '/\\') . DS;
+<a name="line857"></a>        }
+<a name="line858"></a>        $this->joined_template_dir = join(DIRECTORY_SEPARATOR, $this->template_dir);
+<a name="line859"></a>        return $this;
+<a name="line860"></a>    }
+<a name="line861"></a>
+<a name="line862"></a>    /**
+<a name="line863"></a>     * Get template directories
+<a name="line864"></a>     *
+<a name="line865"></a>     * @param mixed index of directory to get, null to get all
+<a name="line866"></a>     * @return array|string list of template directories, or directory of $index
+<a name="line867"></a>     */
+<a name="line868"></a>    public function getTemplateDir($index=null)
+<a name="line869"></a>    {
+<a name="line870"></a>        if ($index !== null) {
+<a name="line871"></a>            return isset($this->template_dir[$index]) ? $this->template_dir[$index] : null;
+<a name="line872"></a>        }
+<a name="line873"></a>
+<a name="line874"></a>        return (array)$this->template_dir;
+<a name="line875"></a>    }
+<a name="line876"></a>
+<a name="line877"></a>    /**
+<a name="line878"></a>     * Set config directory
+<a name="line879"></a>     *
+<a name="line880"></a>     * @param string|array $template_dir directory(s) of configuration sources
+<a name="line881"></a>     * @return Smarty current Smarty instance for chaining
+<a name="line882"></a>     */
+<a name="line883"></a>    public function setConfigDir($config_dir)
+<a name="line884"></a>    {
+<a name="line885"></a>        $this->config_dir = array();
+<a name="line886"></a>        foreach ((array) $config_dir as $k => $v) {
+<a name="line887"></a>            $this->config_dir[$k] = rtrim($v, '/\\') . DS;
+<a name="line888"></a>        }
+<a name="line889"></a>
+<a name="line890"></a>        $this->joined_config_dir = join(DIRECTORY_SEPARATOR, $this->config_dir);
+<a name="line891"></a>        return $this;
+<a name="line892"></a>    }
+<a name="line893"></a>
+<a name="line894"></a>    /**
+<a name="line895"></a>     * Add config directory(s)
+<a name="line896"></a>     *
+<a name="line897"></a>     * @param string|array $config_dir directory(s) of config sources
+<a name="line898"></a>     * @param string key of the array element to assign the config dir to
+<a name="line899"></a>     * @return Smarty current Smarty instance for chaining
+<a name="line900"></a>     */
+<a name="line901"></a>    public function addConfigDir($config_dir, $key=null)
+<a name="line902"></a>    {
+<a name="line903"></a>        // make sure we're dealing with an array
+<a name="line904"></a>        $this->config_dir = (array) $this->config_dir;
+<a name="line905"></a>
+<a name="line906"></a>        if (is_array($config_dir)) {
+<a name="line907"></a>            foreach ($config_dir as $k => $v) {
+<a name="line908"></a>                if (is_int($k)) {
+<a name="line909"></a>                    // indexes are not merged but appended
+<a name="line910"></a>                    $this->config_dir[] = rtrim($v, '/\\') . DS;
+<a name="line911"></a>                } else {
+<a name="line912"></a>                    // string indexes are overridden
+<a name="line913"></a>                    $this->config_dir[$k] = rtrim($v, '/\\') . DS;
+<a name="line914"></a>                }
+<a name="line915"></a>            }
+<a name="line916"></a>        } elseif( $key !== null ) {
+<a name="line917"></a>            // override directory at specified index
+<a name="line918"></a>            $this->config_dir[$key] = rtrim($config_dir, '/\\') . DS;
+<a name="line919"></a>        } else {
+<a name="line920"></a>            // append new directory
+<a name="line921"></a>            $this->config_dir[] = rtrim($config_dir, '/\\') . DS;
+<a name="line922"></a>        }
+<a name="line923"></a>
+<a name="line924"></a>        $this->joined_config_dir = join(DIRECTORY_SEPARATOR, $this->config_dir);
+<a name="line925"></a>        return $this;
+<a name="line926"></a>    }
+<a name="line927"></a>
+<a name="line928"></a>    /**
+<a name="line929"></a>     * Get config directory
+<a name="line930"></a>     *
+<a name="line931"></a>     * @param mixed index of directory to get, null to get all
+<a name="line932"></a>     * @return array|string configuration directory
+<a name="line933"></a>     */
+<a name="line934"></a>    public function getConfigDir($index=null)
+<a name="line935"></a>    {
+<a name="line936"></a>        if ($index !== null) {
+<a name="line937"></a>            return isset($this->config_dir[$index]) ? $this->config_dir[$index] : null;
+<a name="line938"></a>        }
+<a name="line939"></a>
+<a name="line940"></a>        return (array)$this->config_dir;
+<a name="line941"></a>    }
+<a name="line942"></a>
+<a name="line943"></a>    /**
+<a name="line944"></a>     * Set plugins directory
+<a name="line945"></a>     *
+<a name="line946"></a>     * @param string|array $plugins_dir directory(s) of plugins
+<a name="line947"></a>     * @return Smarty current Smarty instance for chaining
+<a name="line948"></a>     */
+<a name="line949"></a>    public function setPluginsDir($plugins_dir)
+<a name="line950"></a>    {
+<a name="line951"></a>        $this->plugins_dir = array();
+<a name="line952"></a>        foreach ((array)$plugins_dir as $k => $v) {
+<a name="line953"></a>            $this->plugins_dir[$k] = rtrim($v, '/\\') . DS;
+<a name="line954"></a>        }
+<a name="line955"></a>
+<a name="line956"></a>        return $this;
+<a name="line957"></a>    }
+<a name="line958"></a>
+<a name="line959"></a>    /**
+<a name="line960"></a>     * Adds directory of plugin files
+<a name="line961"></a>     *
+<a name="line962"></a>     * @param object $smarty
+<a name="line963"></a>     * @param string $ |array $ plugins folder
+<a name="line964"></a>     * @return Smarty current Smarty instance for chaining
+<a name="line965"></a>     */
+<a name="line966"></a>    public function addPluginsDir($plugins_dir)
+<a name="line967"></a>    {
+<a name="line968"></a>        // make sure we're dealing with an array
+<a name="line969"></a>        $this->plugins_dir = (array) $this->plugins_dir;
+<a name="line970"></a>
+<a name="line971"></a>        if (is_array($plugins_dir)) {
+<a name="line972"></a>            foreach ($plugins_dir as $k => $v) {
+<a name="line973"></a>                if (is_int($k)) {
+<a name="line974"></a>                    // indexes are not merged but appended
+<a name="line975"></a>                    $this->plugins_dir[] = rtrim($v, '/\\') . DS;
+<a name="line976"></a>                } else {
+<a name="line977"></a>                    // string indexes are overridden
+<a name="line978"></a>                    $this->plugins_dir[$k] = rtrim($v, '/\\') . DS;
+<a name="line979"></a>                }
+<a name="line980"></a>            }
+<a name="line981"></a>        } else {
+<a name="line982"></a>            // append new directory
+<a name="line983"></a>            $this->plugins_dir[] = rtrim($plugins_dir, '/\\') . DS;
+<a name="line984"></a>        }
+<a name="line985"></a>
+<a name="line986"></a>        $this->plugins_dir = array_unique($this->plugins_dir);
+<a name="line987"></a>        return $this;
+<a name="line988"></a>    }
+<a name="line989"></a>
+<a name="line990"></a>    /**
+<a name="line991"></a>     * Get plugin directories
+<a name="line992"></a>     *
+<a name="line993"></a>     * @return array list of plugin directories
+<a name="line994"></a>     */
+<a name="line995"></a>    public function getPluginsDir()
+<a name="line996"></a>    {
+<a name="line997"></a>        return (array)$this->plugins_dir;
+<a name="line998"></a>    }
+<a name="line999"></a>
+<a name="line1000"></a>    /**
+<a name="line1001"></a>     * Set compile directory
+<a name="line1002"></a>     *
+<a name="line1003"></a>     * @param string $compile_dir directory to store compiled templates in
+<a name="line1004"></a>     * @return Smarty current Smarty instance for chaining
+<a name="line1005"></a>     */
+<a name="line1006"></a>    public function setCompileDir($compile_dir)
+<a name="line1007"></a>    {
+<a name="line1008"></a>        $this->compile_dir = rtrim($compile_dir, '/\\') . DS;
+<a name="line1009"></a>        if (!isset(Smarty::$_muted_directories[$this->compile_dir])) {
+<a name="line1010"></a>            Smarty::$_muted_directories[$this->compile_dir] = null;
+<a name="line1011"></a>        }
+<a name="line1012"></a>        return $this;
+<a name="line1013"></a>    }
+<a name="line1014"></a>
+<a name="line1015"></a>    /**
+<a name="line1016"></a>     * Get compiled directory
+<a name="line1017"></a>     *
+<a name="line1018"></a>     * @return string path to compiled templates
+<a name="line1019"></a>     */
+<a name="line1020"></a>    public function getCompileDir()
+<a name="line1021"></a>    {
+<a name="line1022"></a>        return $this->compile_dir;
+<a name="line1023"></a>    }
+<a name="line1024"></a>
+<a name="line1025"></a>    /**
+<a name="line1026"></a>     * Set cache directory
+<a name="line1027"></a>     *
+<a name="line1028"></a>     * @param string $cache_dir directory to store cached templates in
+<a name="line1029"></a>     * @return Smarty current Smarty instance for chaining
+<a name="line1030"></a>     */
+<a name="line1031"></a>    public function setCacheDir($cache_dir)
+<a name="line1032"></a>    {
+<a name="line1033"></a>        $this->cache_dir = rtrim($cache_dir, '/\\') . DS;
+<a name="line1034"></a>        if (!isset(Smarty::$_muted_directories[$this->cache_dir])) {
+<a name="line1035"></a>            Smarty::$_muted_directories[$this->cache_dir] = null;
+<a name="line1036"></a>        }
+<a name="line1037"></a>        return $this;
+<a name="line1038"></a>    }
+<a name="line1039"></a>
+<a name="line1040"></a>    /**
+<a name="line1041"></a>     * Get cache directory
+<a name="line1042"></a>     *
+<a name="line1043"></a>     * @return string path of cache directory
+<a name="line1044"></a>     */
+<a name="line1045"></a>    public function getCacheDir()
+<a name="line1046"></a>    {
+<a name="line1047"></a>        return $this->cache_dir;
+<a name="line1048"></a>    }
+<a name="line1049"></a>
+<a name="line1050"></a>    /**
+<a name="line1051"></a>     * Set default modifiers
+<a name="line1052"></a>     *
+<a name="line1053"></a>     * @param array|string $modifiers modifier or list of modifiers to set
+<a name="line1054"></a>     * @return Smarty current Smarty instance for chaining
+<a name="line1055"></a>     */
+<a name="line1056"></a>    public function setDefaultModifiers($modifiers)
+<a name="line1057"></a>    {
+<a name="line1058"></a>        $this->default_modifiers = (array) $modifiers;
+<a name="line1059"></a>        return $this;
+<a name="line1060"></a>    }
+<a name="line1061"></a>
+<a name="line1062"></a>    /**
+<a name="line1063"></a>     * Add default modifiers
+<a name="line1064"></a>     *
+<a name="line1065"></a>     * @param array|string $modifiers modifier or list of modifiers to add
+<a name="line1066"></a>     * @return Smarty current Smarty instance for chaining
+<a name="line1067"></a>     */
+<a name="line1068"></a>    public function addDefaultModifiers($modifiers)
+<a name="line1069"></a>    {
+<a name="line1070"></a>        if (is_array($modifiers)) {
+<a name="line1071"></a>            $this->default_modifiers = array_merge($this->default_modifiers, $modifiers);
+<a name="line1072"></a>        } else {
+<a name="line1073"></a>            $this->default_modifiers[] = $modifiers;
+<a name="line1074"></a>        }
+<a name="line1075"></a>
+<a name="line1076"></a>        return $this;
+<a name="line1077"></a>    }
+<a name="line1078"></a>
+<a name="line1079"></a>    /**
+<a name="line1080"></a>     * Get default modifiers
+<a name="line1081"></a>     *
+<a name="line1082"></a>     * @return array list of default modifiers
+<a name="line1083"></a>     */
+<a name="line1084"></a>    public function getDefaultModifiers()
+<a name="line1085"></a>    {
+<a name="line1086"></a>        return $this->default_modifiers;
+<a name="line1087"></a>    }
+<a name="line1088"></a>
+<a name="line1089"></a>
+<a name="line1090"></a>    /**
+<a name="line1091"></a>     * Set autoload filters
+<a name="line1092"></a>     *
+<a name="line1093"></a>     * @param array $filters filters to load automatically
+<a name="line1094"></a>     * @param string $type "pre", "output", … specify the filter type to set. Defaults to none treating $filters' keys as the appropriate types
+<a name="line1095"></a>     * @return Smarty current Smarty instance for chaining
+<a name="line1096"></a>     */
+<a name="line1097"></a>    public function setAutoloadFilters($filters, $type=null)
+<a name="line1098"></a>    {
+<a name="line1099"></a>        if ($type !== null) {
+<a name="line1100"></a>            $this->autoload_filters[$type] = (array) $filters;
+<a name="line1101"></a>        } else {
+<a name="line1102"></a>            $this->autoload_filters = (array) $filters;
+<a name="line1103"></a>        }
+<a name="line1104"></a>
+<a name="line1105"></a>        return $this;
+<a name="line1106"></a>    }
+<a name="line1107"></a>
+<a name="line1108"></a>    /**
+<a name="line1109"></a>     * Add autoload filters
+<a name="line1110"></a>     *
+<a name="line1111"></a>     * @param array $filters filters to load automatically
+<a name="line1112"></a>     * @param string $type "pre", "output", … specify the filter type to set. Defaults to none treating $filters' keys as the appropriate types
+<a name="line1113"></a>     * @return Smarty current Smarty instance for chaining
+<a name="line1114"></a>     */
+<a name="line1115"></a>    public function addAutoloadFilters($filters, $type=null)
+<a name="line1116"></a>    {
+<a name="line1117"></a>        if ($type !== null) {
+<a name="line1118"></a>            if (!empty($this->autoload_filters[$type])) {
+<a name="line1119"></a>                $this->autoload_filters[$type] = array_merge($this->autoload_filters[$type], (array) $filters);
+<a name="line1120"></a>            } else {
+<a name="line1121"></a>                $this->autoload_filters[$type] = (array) $filters;
+<a name="line1122"></a>            }
+<a name="line1123"></a>        } else {
+<a name="line1124"></a>            foreach ((array) $filters as $key => $value) {
+<a name="line1125"></a>                if (!empty($this->autoload_filters[$key])) {
+<a name="line1126"></a>                    $this->autoload_filters[$key] = array_merge($this->autoload_filters[$key], (array) $value);
+<a name="line1127"></a>                } else {
+<a name="line1128"></a>                    $this->autoload_filters[$key] = (array) $value;
+<a name="line1129"></a>                }
+<a name="line1130"></a>            }
+<a name="line1131"></a>        }
+<a name="line1132"></a>
+<a name="line1133"></a>        return $this;
+<a name="line1134"></a>    }
+<a name="line1135"></a>
+<a name="line1136"></a>    /**
+<a name="line1137"></a>     * Get autoload filters
+<a name="line1138"></a>     *
+<a name="line1139"></a>     * @param string $type type of filter to get autoloads for. Defaults to all autoload filters
+<a name="line1140"></a>     * @return array array( 'type1' => array( 'filter1', 'filter2', … ) ) or array( 'filter1', 'filter2', …) if $type was specified
+<a name="line1141"></a>     */
+<a name="line1142"></a>    public function getAutoloadFilters($type=null)
+<a name="line1143"></a>    {
+<a name="line1144"></a>        if ($type !== null) {
+<a name="line1145"></a>            return isset($this->autoload_filters[$type]) ? $this->autoload_filters[$type] : array();
+<a name="line1146"></a>        }
+<a name="line1147"></a>
+<a name="line1148"></a>        return $this->autoload_filters;
+<a name="line1149"></a>    }
+<a name="line1150"></a>
+<a name="line1151"></a>    /**
+<a name="line1152"></a>     * return name of debugging template
+<a name="line1153"></a>     *
+<a name="line1154"></a>     * @return string
+<a name="line1155"></a>     */
+<a name="line1156"></a>    public function getDebugTemplate()
+<a name="line1157"></a>    {
+<a name="line1158"></a>        return $this->debug_tpl;
+<a name="line1159"></a>    }
+<a name="line1160"></a>
+<a name="line1161"></a>    /**
+<a name="line1162"></a>     * set the debug template
+<a name="line1163"></a>     *
+<a name="line1164"></a>     * @param string $tpl_name
+<a name="line1165"></a>     * @return Smarty current Smarty instance for chaining
+<a name="line1166"></a>     * @throws SmartyException if file is not readable
+<a name="line1167"></a>     */
+<a name="line1168"></a>    public function setDebugTemplate($tpl_name)
+<a name="line1169"></a>    {
+<a name="line1170"></a>        if (!is_readable($tpl_name)) {
+<a name="line1171"></a>            throw new SmartyException("Unknown file '{$tpl_name}'");
+<a name="line1172"></a>        }
+<a name="line1173"></a>        $this->debug_tpl = $tpl_name;
+<a name="line1174"></a>
+<a name="line1175"></a>        return $this;
+<a name="line1176"></a>    }
+<a name="line1177"></a>
+<a name="line1178"></a>    /**
+<a name="line1179"></a>     * creates a template object
+<a name="line1180"></a>     *
+<a name="line1181"></a>     * @param string $template the resource handle of the template file
+<a name="line1182"></a>     * @param mixed $cache_id cache id to be used with this template
+<a name="line1183"></a>     * @param mixed $compile_id compile id to be used with this template
+<a name="line1184"></a>     * @param object $parent next higher level of Smarty variables
+<a name="line1185"></a>     * @param boolean $do_clone flag is Smarty object shall be cloned
+<a name="line1186"></a>     * @return object template object
+<a name="line1187"></a>     */
+<a name="line1188"></a>    public function createTemplate($template, $cache_id = null, $compile_id = null, $parent = null, $do_clone = true)
+<a name="line1189"></a>    {
+<a name="line1190"></a>        if (!empty($cache_id) && (is_object($cache_id) || is_array($cache_id))) {
+<a name="line1191"></a>            $parent = $cache_id;
+<a name="line1192"></a>            $cache_id = null;
+<a name="line1193"></a>        }
+<a name="line1194"></a>        if (!empty($parent) && is_array($parent)) {
+<a name="line1195"></a>            $data = $parent;
+<a name="line1196"></a>            $parent = null;
+<a name="line1197"></a>        } else {
+<a name="line1198"></a>            $data = null;
+<a name="line1199"></a>        }
+<a name="line1200"></a>        // default to cache_id and compile_id of Smarty object
+<a name="line1201"></a>        $cache_id = $cache_id === null ? $this->cache_id : $cache_id;
+<a name="line1202"></a>        $compile_id = $compile_id === null ? $this->compile_id : $compile_id;
+<a name="line1203"></a>        // already in template cache?
+<a name="line1204"></a>        if ($this->allow_ambiguous_resources) {
+<a name="line1205"></a>            $_templateId = Smarty_Resource::getUniqueTemplateName($this, $template) . $cache_id . $compile_id;
+<a name="line1206"></a>        } else {
+<a name="line1207"></a>            $_templateId = $this->joined_template_dir . '#' . $template . $cache_id . $compile_id;
+<a name="line1208"></a>        }
+<a name="line1209"></a>        if (isset($_templateId[150])) {
+<a name="line1210"></a>            $_templateId = sha1($_templateId);
+<a name="line1211"></a>        }
+<a name="line1212"></a>        if ($do_clone) {
+<a name="line1213"></a>            if (isset($this->template_objects[$_templateId])) {
+<a name="line1214"></a>                // return cached template object
+<a name="line1215"></a>                $tpl = clone $this->template_objects[$_templateId];
+<a name="line1216"></a>                $tpl->smarty = clone $tpl->smarty;
+<a name="line1217"></a>                $tpl->parent = $parent;
+<a name="line1218"></a>                $tpl->tpl_vars = array();
+<a name="line1219"></a>                $tpl->config_vars = array();
+<a name="line1220"></a>            } else {
+<a name="line1221"></a>                $tpl = new $this->template_class($template, clone $this, $parent, $cache_id, $compile_id);
+<a name="line1222"></a>            }
+<a name="line1223"></a>        } else {
+<a name="line1224"></a>            if (isset($this->template_objects[$_templateId])) {
+<a name="line1225"></a>                // return cached template object
+<a name="line1226"></a>                $tpl = $this->template_objects[$_templateId];
+<a name="line1227"></a>                $tpl->parent = $parent;
+<a name="line1228"></a>                $tpl->tpl_vars = array();
+<a name="line1229"></a>                $tpl->config_vars = array();
+<a name="line1230"></a>            } else {
+<a name="line1231"></a>                $tpl = new $this->template_class($template, $this, $parent, $cache_id, $compile_id);
+<a name="line1232"></a>            }
+<a name="line1233"></a>        }
+<a name="line1234"></a>        // fill data if present
+<a name="line1235"></a>        if (!empty($data) && is_array($data)) {
+<a name="line1236"></a>            // set up variable values
+<a name="line1237"></a>            foreach ($data as $_key => $_val) {
+<a name="line1238"></a>                $tpl->tpl_vars[$_key] = new Smarty_variable($_val);
+<a name="line1239"></a>            }
+<a name="line1240"></a>        }
+<a name="line1241"></a>        return $tpl;
+<a name="line1242"></a>    }
+<a name="line1243"></a>
+<a name="line1244"></a>
+<a name="line1245"></a>    /**
+<a name="line1246"></a>     * Takes unknown classes and loads plugin files for them
+<a name="line1247"></a>     * class name format: Smarty_PluginType_PluginName
+<a name="line1248"></a>     * plugin filename format: plugintype.pluginname.php
+<a name="line1249"></a>     *
+<a name="line1250"></a>     * @param string $plugin_name    class plugin name to load
+<a name="line1251"></a>     * @param bool   $check          check if already loaded
+<a name="line1252"></a>     * @return string |boolean filepath of loaded file or false
+<a name="line1253"></a>     */
+<a name="line1254"></a>    public function loadPlugin($plugin_name, $check = true)
+<a name="line1255"></a>    {
+<a name="line1256"></a>        // if function or class exists, exit silently (already loaded)
+<a name="line1257"></a>        if ($check && (is_callable($plugin_name) || class_exists($plugin_name, false))) {
+<a name="line1258"></a>            return true;
+<a name="line1259"></a>        }
+<a name="line1260"></a>        // Plugin name is expected to be: Smarty_[Type]_[Name]
+<a name="line1261"></a>        $_name_parts = explode('_', $plugin_name, 3);
+<a name="line1262"></a>        // class name must have three parts to be valid plugin
+<a name="line1263"></a>        // count($_name_parts) < 3 === !isset($_name_parts[2])
+<a name="line1264"></a>        if (!isset($_name_parts[2]) || strtolower($_name_parts[0]) !== 'smarty') {
+<a name="line1265"></a>            throw new SmartyException("plugin {$plugin_name} is not a valid name format");
+<a name="line1266"></a>            return false;
+<a name="line1267"></a>        }
+<a name="line1268"></a>        // if type is "internal", get plugin from sysplugins
+<a name="line1269"></a>        if (strtolower($_name_parts[1]) == 'internal') {
+<a name="line1270"></a>            $file = SMARTY_SYSPLUGINS_DIR . strtolower($plugin_name) . '.php';
+<a name="line1271"></a>            if (file_exists($file)) {
+<a name="line1272"></a>                require_once($file);
+<a name="line1273"></a>                return $file;
+<a name="line1274"></a>            } else {
+<a name="line1275"></a>                return false;
+<a name="line1276"></a>            }
+<a name="line1277"></a>        }
+<a name="line1278"></a>        // plugin filename is expected to be: [type].[name].php
+<a name="line1279"></a>        $_plugin_filename = "{$_name_parts[1]}.{$_name_parts[2]}.php";
+<a name="line1280"></a>
+<a name="line1281"></a>        // loop through plugin dirs and find the plugin
+<a name="line1282"></a>        foreach($this->getPluginsDir() as $_plugin_dir) {
+<a name="line1283"></a>            $names = array(
+<a name="line1284"></a>                $_plugin_dir . $_plugin_filename,
+<a name="line1285"></a>                $_plugin_dir . strtolower($_plugin_filename),
+<a name="line1286"></a>            );
+<a name="line1287"></a>            foreach ($names as $file) {
+<a name="line1288"></a>                if (file_exists($file)) {
+<a name="line1289"></a>                    require_once($file);
+<a name="line1290"></a>                    return $file;
+<a name="line1291"></a>                }
+<a name="line1292"></a>                if ($this->use_include_path && !preg_match('/^([\/\\\\]|[a-zA-Z]:[\/\\\\])/', $_plugin_dir)) {
+<a name="line1293"></a>                    // try PHP include_path
+<a name="line1294"></a>                    if (($file = Smarty_Internal_Get_Include_Path::getIncludePath($file)) !== false) {
+<a name="line1295"></a>                        require_once($file);
+<a name="line1296"></a>                        return $file;
+<a name="line1297"></a>                    }
+<a name="line1298"></a>                }
+<a name="line1299"></a>            }
+<a name="line1300"></a>        }
+<a name="line1301"></a>        // no plugin loaded
+<a name="line1302"></a>        return false;
+<a name="line1303"></a>    }
+<a name="line1304"></a>
+<a name="line1305"></a>    /**
+<a name="line1306"></a>     * Compile all template files
+<a name="line1307"></a>     *
+<a name="line1308"></a>     * @param string $extension file extension
+<a name="line1309"></a>     * @param bool $force_compile force all to recompile
+<a name="line1310"></a>     * @param int $time_limit
+<a name="line1311"></a>     * @param int $max_errors
+<a name="line1312"></a>     * @return integer number of template files recompiled
+<a name="line1313"></a>     */
+<a name="line1314"></a>    public function compileAllTemplates($extention = '.tpl', $force_compile = false, $time_limit = 0, $max_errors = null)
+<a name="line1315"></a>    {
+<a name="line1316"></a>        return Smarty_Internal_Utility::compileAllTemplates($extention, $force_compile, $time_limit, $max_errors, $this);
+<a name="line1317"></a>    }
+<a name="line1318"></a>
+<a name="line1319"></a>    /**
+<a name="line1320"></a>     * Compile all config files
+<a name="line1321"></a>     *
+<a name="line1322"></a>     * @param string $extension file extension
+<a name="line1323"></a>     * @param bool $force_compile force all to recompile
+<a name="line1324"></a>     * @param int $time_limit
+<a name="line1325"></a>     * @param int $max_errors
+<a name="line1326"></a>     * @return integer number of template files recompiled
+<a name="line1327"></a>     */
+<a name="line1328"></a>    public function compileAllConfig($extention = '.conf', $force_compile = false, $time_limit = 0, $max_errors = null)
+<a name="line1329"></a>    {
+<a name="line1330"></a>        return Smarty_Internal_Utility::compileAllConfig($extention, $force_compile, $time_limit, $max_errors, $this);
+<a name="line1331"></a>    }
+<a name="line1332"></a>
+<a name="line1333"></a>    /**
+<a name="line1334"></a>     * Delete compiled template file
+<a name="line1335"></a>     *
+<a name="line1336"></a>     * @param string $resource_name template name
+<a name="line1337"></a>     * @param string $compile_id compile id
+<a name="line1338"></a>     * @param integer $exp_time expiration time
+<a name="line1339"></a>     * @return integer number of template files deleted
+<a name="line1340"></a>     */
+<a name="line1341"></a>    public function clearCompiledTemplate($resource_name = null, $compile_id = null, $exp_time = null)
+<a name="line1342"></a>    {
+<a name="line1343"></a>        return Smarty_Internal_Utility::clearCompiledTemplate($resource_name, $compile_id, $exp_time, $this);
+<a name="line1344"></a>    }
+<a name="line1345"></a>
+<a name="line1346"></a>
+<a name="line1347"></a>    /**
+<a name="line1348"></a>     * Return array of tag/attributes of all tags used by an template
+<a name="line1349"></a>     *
+<a name="line1350"></a>     * @param object $templae template object
+<a name="line1351"></a>     * @return array of tag/attributes
+<a name="line1352"></a>     */
+<a name="line1353"></a>    public function getTags(Smarty_Internal_Template $template)
+<a name="line1354"></a>    {
+<a name="line1355"></a>        return Smarty_Internal_Utility::getTags($template);
+<a name="line1356"></a>    }
+<a name="line1357"></a>
+<a name="line1358"></a>    /**
+<a name="line1359"></a>     * Run installation test
+<a name="line1360"></a>     *
+<a name="line1361"></a>     * @param array $errors Array to write errors into, rather than outputting them
+<a name="line1362"></a>     * @return boolean true if setup is fine, false if something is wrong
+<a name="line1363"></a>     */
+<a name="line1364"></a>    public function testInstall(&$errors=null)
+<a name="line1365"></a>    {
+<a name="line1366"></a>        return Smarty_Internal_Utility::testInstall($this, $errors);
+<a name="line1367"></a>    }
+<a name="line1368"></a>
+<a name="line1369"></a>    /**
+<a name="line1370"></a>     * Error Handler to mute expected messages
+<a name="line1371"></a>     *
+<a name="line1372"></a>     * @link http://php.net/set_error_handler
+<a name="line1373"></a>     * @param integer $errno Error level
+<a name="line1374"></a>     * @return boolean
+<a name="line1375"></a>     */
+<a name="line1376"></a>    public static function mutingErrorHandler($errno, $errstr, $errfile, $errline, $errcontext)
+<a name="line1377"></a>    {
+<a name="line1378"></a>        $_is_muted_directory = false;
+<a name="line1379"></a>
+<a name="line1380"></a>        // add the SMARTY_DIR to the list of muted directories
+<a name="line1381"></a>        if (!isset(Smarty::$_muted_directories[SMARTY_DIR])) {
+<a name="line1382"></a>            $smarty_dir = realpath(SMARTY_DIR);
+<a name="line1383"></a>            Smarty::$_muted_directories[SMARTY_DIR] = array(
+<a name="line1384"></a>                'file' => $smarty_dir,
+<a name="line1385"></a>                'length' => strlen($smarty_dir),
+<a name="line1386"></a>            );
+<a name="line1387"></a>        }
+<a name="line1388"></a>
+<a name="line1389"></a>        // walk the muted directories and test against $errfile
+<a name="line1390"></a>        foreach (Smarty::$_muted_directories as $key => &$dir) {
+<a name="line1391"></a>            if (!$dir) {
+<a name="line1392"></a>                // resolve directory and length for speedy comparisons
+<a name="line1393"></a>                $file = realpath($key);
+<a name="line1394"></a>                $dir = array(
+<a name="line1395"></a>                    'file' => $file,
+<a name="line1396"></a>                    'length' => strlen($file),
+<a name="line1397"></a>                );
+<a name="line1398"></a>            }
+<a name="line1399"></a>            if (!strncmp($errfile, $dir['file'], $dir['length'])) {
+<a name="line1400"></a>                $_is_muted_directory = true;
+<a name="line1401"></a>                break;
+<a name="line1402"></a>            }
+<a name="line1403"></a>        }
+<a name="line1404"></a>
+<a name="line1405"></a>        // pass to next error handler if this error did not occur inside SMARTY_DIR
+<a name="line1406"></a>        // or the error was within smarty but masked to be ignored
+<a name="line1407"></a>        if (!$_is_muted_directory || ($errno && $errno & error_reporting())) {
+<a name="line1408"></a>            if (Smarty::$_previous_error_handler) {
+<a name="line1409"></a>                return call_user_func(Smarty::$_previous_error_handler, $errno, $errstr, $errfile, $errline, $errcontext);
+<a name="line1410"></a>            } else {
+<a name="line1411"></a>                return false;
+<a name="line1412"></a>            }
+<a name="line1413"></a>        }
+<a name="line1414"></a>    }
+<a name="line1415"></a>
+<a name="line1416"></a>    /**
+<a name="line1417"></a>     * Enable error handler to mute expected messages
+<a name="line1418"></a>     *
+<a name="line1419"></a>     * @return void
+<a name="line1420"></a>     */
+<a name="line1421"></a>    public static function muteExpectedErrors()
+<a name="line1422"></a>    {
+<a name="line1423"></a>        /*
+<a name="line1424"></a>            error muting is done because some people implemented custom error_handlers using
+<a name="line1425"></a>            http://php.net/set_error_handler and for some reason did not understand the following paragraph:
+<a name="line1426"></a>
+<a name="line1427"></a>                It is important to remember that the standard PHP error handler is completely bypassed for the
+<a name="line1428"></a>                error types specified by error_types unless the callback function returns FALSE.
+<a name="line1429"></a>                error_reporting() settings will have no effect and your error handler will be called regardless -
+<a name="line1430"></a>                however you are still able to read the current value of error_reporting and act appropriately.
+<a name="line1431"></a>                Of particular note is that this value will be 0 if the statement that caused the error was
+<a name="line1432"></a>                prepended by the @ error-control operator.
+<a name="line1433"></a>
+<a name="line1434"></a>            Smarty deliberately uses @filemtime() over file_exists() and filemtime() in some places. Reasons include
+<a name="line1435"></a>                - @filemtime() is almost twice as fast as using an additional file_exists()
+<a name="line1436"></a>                - between file_exists() and filemtime() a possible race condition is opened,
+<a name="line1437"></a>                  which does not exist using the simple @filemtime() approach.
+<a name="line1438"></a>        */
+<a name="line1439"></a>        $error_handler = array('Smarty', 'mutingErrorHandler');
+<a name="line1440"></a>        $previous = set_error_handler($error_handler);
+<a name="line1441"></a>
+<a name="line1442"></a>        // avoid dead loops
+<a name="line1443"></a>        if ($previous !== $error_handler) {
+<a name="line1444"></a>            Smarty::$_previous_error_handler = $previous;
+<a name="line1445"></a>        }
+<a name="line1446"></a>    }
+<a name="line1447"></a>
+<a name="line1448"></a>    /**
+<a name="line1449"></a>     * Disable error handler muting expected messages
+<a name="line1450"></a>     *
+<a name="line1451"></a>     * @return void
+<a name="line1452"></a>     */
+<a name="line1453"></a>    public static function unmuteExpectedErrors()
+<a name="line1454"></a>    {
+<a name="line1455"></a>        restore_error_handler();
+<a name="line1456"></a>    }
+<a name="line1457"></a>}
+<a name="line1458"></a>
+<a name="line1459"></a>// let PCRE (preg_*) treat strings as ISO-8859-1 if we're not dealing with UTF-8
+<a name="line1460"></a>if (Smarty::$_CHARSET !== 'UTF-8') {
+<a name="line1461"></a>    Smarty::$_UTF8_MODIFIER = '';
+<a name="line1462"></a>}
+<a name="line1463"></a>
+<a name="line1464"></a>/**
+<a name="line1465"></a> * Smarty exception class
+<a name="line1466"></a> * @package Smarty
+<a name="line1467"></a> */
+<a name="line1468"></a>class SmartyException extends Exception {
+<a name="line1469"></a>}
+<a name="line1470"></a>
+<a name="line1471"></a>/**
+<a name="line1472"></a> * Smarty compiler exception class
+<a name="line1473"></a> * @package Smarty
+<a name="line1474"></a> */
+<a name="line1475"></a>class SmartyCompilerException extends SmartyException  {
+<a name="line1476"></a>}
+<a name="line1477"></a>
+<a name="line1478"></a>/**
+<a name="line1479"></a> * Autoloader
+<a name="line1480"></a> */
+<a name="line1481"></a>function smartyAutoload($class)
+<a name="line1482"></a>{
+<a name="line1483"></a>    $_class = strtolower($class);
+<a name="line1484"></a>    $_classes = array(
+<a name="line1485"></a>        'smarty_config_source' => true,
+<a name="line1486"></a>        'smarty_config_compiled' => true,
+<a name="line1487"></a>        'smarty_security' => true,
+<a name="line1488"></a>        'smarty_cacheresource' => true,
+<a name="line1489"></a>        'smarty_cacheresource_custom' => true,
+<a name="line1490"></a>        'smarty_cacheresource_keyvaluestore' => true,
+<a name="line1491"></a>        'smarty_resource' => true,
+<a name="line1492"></a>        'smarty_resource_custom' => true,
+<a name="line1493"></a>        'smarty_resource_uncompiled' => true,
+<a name="line1494"></a>        'smarty_resource_recompiled' => true,
+<a name="line1495"></a>    );
+<a name="line1496"></a>
+<a name="line1497"></a>    if (!strncmp($_class, 'smarty_internal_', 16) || isset($_classes[$_class])) {
+<a name="line1498"></a>        include SMARTY_SYSPLUGINS_DIR . $_class . '.php';
+<a name="line1499"></a>    }
+<a name="line1500"></a>}
+<a name="line1501"></a>
+<a name="line1502"></a>?>
+<a name="line1503"></a></pre>
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../index.html" target="_top">Frames</a>
+<a href="../../../../source/lib/php/smarty/smarty.class.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

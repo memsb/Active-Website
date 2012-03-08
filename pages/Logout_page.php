@@ -1,11 +1,12 @@
 <?php
 
-require_once PAGES . 'Page.php';
+require_once LIB . 'Page.php';
 require_once PAGES . 'Home_page.php';
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
  * The logout page logs out a user and redirects them to the home page
+ * @namespace active
  */
 class Logout_page extends Page{
 

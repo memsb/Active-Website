@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Wed, 07 Mar 2012 14:34:43 +0000">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
 <link rel="start" href="../../overview-summary.html">
@@ -43,47 +43,48 @@
 <a name="line5"></a>/**
 <a name="line6"></a> * @author Martin Buckley - MBuckley@gmail.com
 <a name="line7"></a> * User extends Person to become the object that handles the current site user
-<a name="line8"></a> */
-<a name="line9"></a>class User extends Person {	
-<a name="line10"></a>
-<a name="line11"></a>	/*
-<a name="line12"></a>	 * Constructor requries a database
-<a name="line13"></a>	 * @param Database
-<a name="line14"></a>	 */
-<a name="line15"></a>	public function __construct($db){
-<a name="line16"></a>		parent::__construct($db);
-<a name="line17"></a>	}
-<a name="line18"></a>
-<a name="line19"></a>	/*
-<a name="line20"></a>	 * Checks if a user is currently logged in
-<a name="line21"></a>	 * @return Boolean is the person logged in
-<a name="line22"></a>	 */
-<a name="line23"></a>	public function isLoggedIn(){
-<a name="line24"></a>		return isset($_SESSION['user']);
-<a name="line25"></a>	}
-<a name="line26"></a>
-<a name="line27"></a>	/*
-<a name="line28"></a>	 * Attempts to log a user in
-<a name="line29"></a>	 * @param String password
-<a name="line30"></a>	 * @param String email address
-<a name="line31"></a>	 */
-<a name="line32"></a>	public function login($email, $password){
-<a name="line33"></a>		$hash = $this->hash($email, $password);
-<a name="line34"></a>		$result = $this->db->query("SELECT User_ID FROM Users WHERE Email='$email' AND Password='$hash' LIMIT 0,1");
-<a name="line35"></a>		if( count($result) == 0 )
-<a name="line36"></a>			throw new Exception("Incorrect password.");
-<a name="line37"></a>		
-<a name="line38"></a>		$id = $result[0]['User_ID'];
-<a name="line39"></a>		$this->load($id);
-<a name="line40"></a>		$_SESSION['user'] = $this;
-<a name="line41"></a>	}	
-<a name="line42"></a>
-<a name="line43"></a>	public function logout(){
-<a name="line44"></a>		session_destroy();
-<a name="line45"></a>	}
-<a name="line46"></a>}
-<a name="line47"></a>?>
-<a name="line48"></a></pre>
+<a name="line8"></a> * @namespace active
+<a name="line9"></a> */
+<a name="line10"></a>class User extends Person {	
+<a name="line11"></a>
+<a name="line12"></a>	/*
+<a name="line13"></a>	 * Constructor requries a database
+<a name="line14"></a>	 * @param Database
+<a name="line15"></a>	 */
+<a name="line16"></a>	public function __construct($db){
+<a name="line17"></a>		parent::__construct($db);
+<a name="line18"></a>	}
+<a name="line19"></a>
+<a name="line20"></a>	/*
+<a name="line21"></a>	 * Checks if a user is currently logged in
+<a name="line22"></a>	 * @return Boolean is the person logged in
+<a name="line23"></a>	 */
+<a name="line24"></a>	public function isLoggedIn(){
+<a name="line25"></a>		return isset($_SESSION['user']);
+<a name="line26"></a>	}
+<a name="line27"></a>
+<a name="line28"></a>	/*
+<a name="line29"></a>	 * Attempts to log a user in
+<a name="line30"></a>	 * @param String password
+<a name="line31"></a>	 * @param String email address
+<a name="line32"></a>	 */
+<a name="line33"></a>	public function login($email, $password){
+<a name="line34"></a>		$hash = $this->hash($email, $password);
+<a name="line35"></a>		$result = $this->db->query("SELECT User_ID FROM Users WHERE Email='$email' AND Password='$hash' LIMIT 0,1");
+<a name="line36"></a>		if( count($result) == 0 )
+<a name="line37"></a>			throw new Exception("Incorrect password.");
+<a name="line38"></a>		
+<a name="line39"></a>		$id = $result[0]['User_ID'];
+<a name="line40"></a>		$this->load($id);
+<a name="line41"></a>		$_SESSION['user'] = $this;
+<a name="line42"></a>	}	
+<a name="line43"></a>
+<a name="line44"></a>	public function logout(){
+<a name="line45"></a>		session_destroy();
+<a name="line46"></a>	}
+<a name="line47"></a>}
+<a name="line48"></a>?>
+<a name="line49"></a></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

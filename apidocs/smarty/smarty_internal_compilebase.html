@@ -1,0 +1,222 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:23 +0000">
+
+<link rel="stylesheet" type="text/css" href="../stylesheet.css">
+<link rel="start" href="../overview-summary.html">
+
+<title>Smarty_Internal_CompileBase (PHPDoctor)</title>
+
+</head>
+<body id="definition" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../overview-summary.html">Overview</a></li>
+<li><a href="../smarty/package-summary.html">Namespace</a></li>
+<li class="active">Class</li>
+<li><a href="../smarty/package-tree.html">Tree</a></li>
+<li><a href="../overview-files.html">Files</a></li>
+<li><a href="../deprecated-list.html">Deprecated</a></li>
+<li><a href="../todo-list.html">Todo</a></li>
+<li><a href="../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../index.html" target="_top">Frames</a>
+<a href="../smarty/smarty_internal_compilebase.html" target="_top">No frames</a>
+</div>
+<div class="small_links">
+Summary: <a href="#summary_field">Field</a> | <a href="#summary_method">Method</a> | <a href="#summary_constr">Constr</a>
+Detail: <a href="#detail_field">Field</a> | <a href="#detail_method">Method</a> | <a href="#summary_constr">Constr</a>
+</div>
+<hr>
+
+<div class="qualifiedName">Smarty\Smarty_Internal_CompileBase</div>
+<a href="../source/lib/php/smarty/sysplugins/smarty_internal_compilebase.php.html#line16" class="location">lib/php/Smarty/sysplugins/smarty_internal_compilebase.php at line 16</a>
+
+<h1>Class Smarty_Internal_CompileBase</h1>
+
+<pre class="tree"><strong>Smarty_Internal_CompileBase</strong><br /></pre>
+
+<dl>
+<dt>All Known Subclasses:</dt>
+<dd><a href="../smarty/smarty_internal_compile_assign.html">Smarty_Internal_Compile_Assign</a> <a href="../smarty/smarty_internal_compile_block.html">Smarty_Internal_Compile_Block</a> <a href="../smarty/smarty_internal_compile_blockclose.html">Smarty_Internal_Compile_Blockclose</a> <a href="../smarty/smarty_internal_compile_break.html">Smarty_Internal_Compile_Break</a> <a href="../smarty/smarty_internal_compile_call.html">Smarty_Internal_Compile_Call</a> <a href="../smarty/smarty_internal_compile_capture.html">Smarty_Internal_Compile_Capture</a> <a href="../smarty/smarty_internal_compile_captureclose.html">Smarty_Internal_Compile_CaptureClose</a> <a href="../smarty/smarty_internal_compile_config_load.html">Smarty_Internal_Compile_Config_Load</a> <a href="../smarty/smarty_internal_compile_continue.html">Smarty_Internal_Compile_Continue</a> <a href="../smarty/smarty_internal_compile_debug.html">Smarty_Internal_Compile_Debug</a> <a href="../smarty/smarty_internal_compile_else.html">Smarty_Internal_Compile_Else</a> <a href="../smarty/smarty_internal_compile_elseif.html">Smarty_Internal_Compile_Elseif</a> <a href="../smarty/smarty_internal_compile_eval.html">Smarty_Internal_Compile_Eval</a> <a href="../smarty/smarty_internal_compile_extends.html">Smarty_Internal_Compile_Extends</a> <a href="../smarty/smarty_internal_compile_for.html">Smarty_Internal_Compile_For</a> <a href="../smarty/smarty_internal_compile_forclose.html">Smarty_Internal_Compile_Forclose</a> <a href="../smarty/smarty_internal_compile_foreach.html">Smarty_Internal_Compile_Foreach</a> <a href="../smarty/smarty_internal_compile_foreachclose.html">Smarty_Internal_Compile_Foreachclose</a> <a href="../smarty/smarty_internal_compile_foreachelse.html">Smarty_Internal_Compile_Foreachelse</a> <a href="../smarty/smarty_internal_compile_forelse.html">Smarty_Internal_Compile_Forelse</a> <a href="../smarty/smarty_internal_compile_function.html">Smarty_Internal_Compile_Function</a> <a href="../smarty/smarty_internal_compile_functionclose.html">Smarty_Internal_Compile_Functionclose</a> <a href="../smarty/smarty_internal_compile_if.html">Smarty_Internal_Compile_If</a> <a href="../smarty/smarty_internal_compile_ifclose.html">Smarty_Internal_Compile_Ifclose</a> <a href="../smarty/smarty_internal_compile_include.html">Smarty_Internal_Compile_Include</a> <a href="../smarty/smarty_internal_compile_include_php.html">Smarty_Internal_Compile_Include_Php</a> <a href="../smarty/smarty_internal_compile_insert.html">Smarty_Internal_Compile_Insert</a> <a href="../smarty/smarty_internal_compile_ldelim.html">Smarty_Internal_Compile_Ldelim</a> <a href="../smarty/smarty_internal_compile_nocache.html">Smarty_Internal_Compile_Nocache</a> <a href="../smarty/smarty_internal_compile_nocacheclose.html">Smarty_Internal_Compile_Nocacheclose</a> <a href="../smarty/smarty_internal_compile_private_block_plugin.html">Smarty_Internal_Compile_Private_Block_Plugin</a> <a href="../smarty/smarty_internal_compile_private_function_plugin.html">Smarty_Internal_Compile_Private_Function_Plugin</a> <a href="../smarty/smarty_internal_compile_private_modifier.html">Smarty_Internal_Compile_Private_Modifier</a> <a href="../smarty/smarty_internal_compile_private_object_block_function.html">Smarty_Internal_Compile_Private_Object_Block_Function</a> <a href="../smarty/smarty_internal_compile_private_object_function.html">Smarty_Internal_Compile_Private_Object_Function</a> <a href="../smarty/smarty_internal_compile_private_print_expression.html">Smarty_Internal_Compile_Private_Print_Expression</a> <a href="../smarty/smarty_internal_compile_private_registered_block.html">Smarty_Internal_Compile_Private_Registered_Block</a> <a href="../smarty/smarty_internal_compile_private_registered_function.html">Smarty_Internal_Compile_Private_Registered_Function</a> <a href="../smarty/smarty_internal_compile_private_special_variable.html">Smarty_Internal_Compile_Private_Special_Variable</a> <a href="../smarty/smarty_internal_compile_rdelim.html">Smarty_Internal_Compile_Rdelim</a> <a href="../smarty/smarty_internal_compile_section.html">Smarty_Internal_Compile_Section</a> <a href="../smarty/smarty_internal_compile_sectionclose.html">Smarty_Internal_Compile_Sectionclose</a> <a href="../smarty/smarty_internal_compile_sectionelse.html">Smarty_Internal_Compile_Sectionelse</a> <a href="../smarty/smarty_internal_compile_setfilter.html">Smarty_Internal_Compile_Setfilter</a> <a href="../smarty/smarty_internal_compile_setfilterclose.html">Smarty_Internal_Compile_Setfilterclose</a> <a href="../smarty/smarty_internal_compile_while.html">Smarty_Internal_Compile_While</a> <a href="../smarty/smarty_internal_compile_whileclose.html">Smarty_Internal_Compile_Whileclose</a> </dd>
+</dl>
+
+<hr>
+
+<p class="signature">public abstract  class <strong>Smarty_Internal_CompileBase</strong></p>
+
+<div class="comment" id="overview_description"><p>This class does extend all internal compile plugins</p></div>
+
+<dl>
+<dt>Subpackage:</dt>
+<dd>Compiler</dd>
+</dl>
+<hr>
+
+<table id="summary_field">
+<tr><th colspan="2">Field Summary</th></tr>
+<tr>
+<td class="type"> array</td>
+<td class="description"><p class="name"><a href="#option_flags">$option_flags</a></p><p class="description">Array of names of valid option flags</p></td>
+</tr>
+<tr>
+<td class="type"> array</td>
+<td class="description"><p class="name"><a href="#optional_attributes">$optional_attributes</a></p><p class="description">Array of names of optional attribute required by tag
+use array('_any') if there is no restriction of attributes names</p></td>
+</tr>
+<tr>
+<td class="type"> array</td>
+<td class="description"><p class="name"><a href="#required_attributes">$required_attributes</a></p><p class="description">Array of names of required attribute required by tag</p></td>
+</tr>
+<tr>
+<td class="type"> array</td>
+<td class="description"><p class="name"><a href="#shorttag_order">$shorttag_order</a></p><p class="description">Shorttag attribute order defined by its names</p></td>
+</tr>
+</table>
+
+<table id="summary_method">
+<tr><th colspan="2">Method Summary</th></tr>
+<tr>
+<td class="type"> array</td>
+<td class="description"><p class="name"><a href="#getAttributes()">getAttributes</a>(object compiler, array attributes)</p><p class="description">This function checks if the attributes passed are validThe attributes passed for the tag to compile are checked against the list of required and
+optional attributes. </p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#openTag()">openTag</a>(object compiler, string openTag, mixed data)</p><p class="description">Push opening tag name on stackOptionally additional data can be saved on stack</p></td>
+</tr>
+<tr>
+<td class="type"> mixed</td>
+<td class="description"><p class="name"><a href="#closeTag()">closeTag</a>(object compiler, array|string expectedTag)</p><p class="description">Pop closing tagRaise an error if this stack-top doesn't match with expected opening tags</p></td>
+</tr>
+</table>
+
+<h2 id="detail_field">Field Detail</h2>
+<a href="../source/lib/php/smarty/sysplugins/smarty_internal_compilebase.php.html#line42" class="location">lib/php/Smarty/sysplugins/smarty_internal_compilebase.php at line 42</a>
+
+<h3 id="option_flags">option_flags</h3>
+<code class="signature">public  array <strong>$option_flags</strong> = array('nocache')</code>
+<div class="details">
+<p>Array of names of valid option flags</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/sysplugins/smarty_internal_compilebase.php.html#line30" class="location">lib/php/Smarty/sysplugins/smarty_internal_compilebase.php at line 30</a>
+
+<h3 id="optional_attributes">optional_attributes</h3>
+<code class="signature">public  array <strong>$optional_attributes</strong> = array()</code>
+<div class="details">
+<p>Array of names of optional attribute required by tag
+use array('_any') if there is no restriction of attributes names</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/sysplugins/smarty_internal_compilebase.php.html#line23" class="location">lib/php/Smarty/sysplugins/smarty_internal_compilebase.php at line 23</a>
+
+<h3 id="required_attributes">required_attributes</h3>
+<code class="signature">public  array <strong>$required_attributes</strong> = array()</code>
+<div class="details">
+<p>Array of names of required attribute required by tag</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/sysplugins/smarty_internal_compilebase.php.html#line36" class="location">lib/php/Smarty/sysplugins/smarty_internal_compilebase.php at line 36</a>
+
+<h3 id="shorttag_order">shorttag_order</h3>
+<code class="signature">public  array <strong>$shorttag_order</strong> = array()</code>
+<div class="details">
+<p>Shorttag attribute order defined by its names</p></div>
+
+<hr>
+
+<h2 id="detail_method">Method Detail</h2>
+<a href="../source/lib/php/smarty/sysplugins/smarty_internal_compilebase.php.html#line56" class="location">lib/php/Smarty/sysplugins/smarty_internal_compilebase.php at line 56</a>
+
+<h3 id="getAttributes()">getAttributes</h3>
+<code class="signature">public  array <strong>getAttributes</strong>(object compiler, array attributes)</code>
+<div class="details">
+<p>This function checks if the attributes passed are valid</p><p>The attributes passed for the tag to compile are checked against the list of required and
+optional attributes. Required attributes must be present. Optional attributes are check against
+the corresponding list. The keyword '_any' specifies that any attribute will be accepted
+as valid</p><dl>
+<dt>Parameters:</dt>
+<dd>compiler - compiler object</dd>
+<dd>attributes - attributes applied to the tag</dd>
+<dt>Returns:</dt>
+<dd>of mapped attributes for further processing</dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/sysplugins/smarty_internal_compilebase.php.html#line136" class="location">lib/php/Smarty/sysplugins/smarty_internal_compilebase.php at line 136</a>
+
+<h3 id="openTag()">openTag</h3>
+<code class="signature">public  void <strong>openTag</strong>(object compiler, string openTag, mixed data)</code>
+<div class="details">
+<p>Push opening tag name on stack</p><p>Optionally additional data can be saved on stack</p><dl>
+<dt>Parameters:</dt>
+<dd>compiler - compiler object</dd>
+<dd>openTag - the opening tag's name</dd>
+<dd>data - optional data saved</dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/sysplugins/smarty_internal_compilebase.php.html#line150" class="location">lib/php/Smarty/sysplugins/smarty_internal_compilebase.php at line 150</a>
+
+<h3 id="closeTag()">closeTag</h3>
+<code class="signature">public  mixed <strong>closeTag</strong>(object compiler, array|string expectedTag)</code>
+<div class="details">
+<p>Pop closing tag</p><p>Raise an error if this stack-top doesn't match with expected opening tags</p><dl>
+<dt>Parameters:</dt>
+<dd>compiler - compiler object</dd>
+<dd>expectedTag - the expected opening tag names</dd>
+<dt>Returns:</dt>
+<dd>any type the opening tag's name or saved data</dd>
+</dl>
+</div>
+
+<hr>
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../overview-summary.html">Overview</a></li>
+<li><a href="../smarty/package-summary.html">Namespace</a></li>
+<li class="active">Class</li>
+<li><a href="../smarty/package-tree.html">Tree</a></li>
+<li><a href="../overview-files.html">Files</a></li>
+<li><a href="../deprecated-list.html">Deprecated</a></li>
+<li><a href="../todo-list.html">Todo</a></li>
+<li><a href="../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../index.html" target="_top">Frames</a>
+<a href="../smarty/smarty_internal_compilebase.html" target="_top">No frames</a>
+</div>
+<div class="small_links">
+Summary: <a href="#summary_field">Field</a> | <a href="#summary_method">Method</a> | <a href="#summary_constr">Constr</a>
+Detail: <a href="#detail_field">Field</a> | <a href="#detail_method">Method</a> | <a href="#summary_constr">Constr</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

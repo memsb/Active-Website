@@ -1,9 +1,12 @@
 <?php
 
+require_once LIB . 'Page.php';
 require_once LIB . 'Workouts.php';
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
+ * Graph page is used to return JSON data for display in charts
+ * @namespace active
  */
 class Graph_page extends Page {	
 
@@ -21,7 +24,7 @@ class Graph_page extends Page {
 		parent::__construct();
 
 		if( $this->user->isLoggedIn() )
-			$this->uid = $this->user->user_id;
+			$this->uid = $this->user->user_id;		
 	}
 
 	/*
@@ -31,8 +34,11 @@ class Graph_page extends Page {
 	 * @param Array of parameters
 	 */
 	public function get($data){
-		$this->chart = intval($data['chart']);
-		$this->week = intval($data['week']);
+		if( $this->valid_arg( $data['chart'] ) )
+			$this->chart = intval($data['chart']);
+
+		if( $this->valid_arg( $data['week'] ) )
+			$this->week = intval($data['week']);
 	}
 
 	/*
@@ -49,6 +55,7 @@ class Graph_page extends Page {
 		$this->end = $this->week_days[count($this->week_days)-1];
 		$this->period = date('D jS M', $this->start ) . ' - ' . date('D jS M', $this->end );
 
+		$json = '';
 		switch( $this->chart ){
 			case 1:
 				$json = $this->chart1();

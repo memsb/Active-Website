@@ -1,12 +1,13 @@
 <?php
 
-require_once PAGES . 'Page.php';
+require_once LIB . 'Page.php';
 require_once LIB . 'Person.php';
 
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
  * Allows a user to recover a forgotton password to their email address
+ * @namespace active
  */
 class Recovery_page extends Page{
 

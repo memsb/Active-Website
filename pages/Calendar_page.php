@@ -1,11 +1,13 @@
 <?php
 
+require_once LIB . 'Page.php';
 require_once LIB . 'Calendar.php';
 require_once LIB . 'Workouts.php';
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
  * Calendar page allows access to the calendar class passing it attributes through GET
+ * @namespace active
  */
 class Calendar_page extends Page{
 

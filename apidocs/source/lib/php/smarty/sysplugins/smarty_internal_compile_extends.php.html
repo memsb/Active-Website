@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
+
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css">
+<link rel="start" href="../../../../../overview-summary.html">
+
+<title>lib/php/Smarty/sysplugins/smarty_internal_compile_extends.php (PHPDoctor)</title>
+
+</head>
+<body id="file" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_internal_compile_extends.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<h1>lib/php/Smarty/sysplugins/smarty_internal_compile_extends.php</h1>
+<div class="comment" id="overview_description"><p>Smarty Internal Plugin Compile extend</p><p>Compiles the {extends} tag</p></div>
+
+<hr>
+
+<a name="line1"></a><pre><?php
+<a name="line2"></a>
+<a name="line3"></a>/**
+<a name="line4"></a>* Smarty Internal Plugin Compile extend
+<a name="line5"></a>*
+<a name="line6"></a>* Compiles the {extends} tag
+<a name="line7"></a>*
+<a name="line8"></a>* @package Smarty
+<a name="line9"></a>* @subpackage Compiler
+<a name="line10"></a>* @author Uwe Tews
+<a name="line11"></a>*/
+<a name="line12"></a>
+<a name="line13"></a>/**
+<a name="line14"></a>* Smarty Internal Plugin Compile extend Class
+<a name="line15"></a>*
+<a name="line16"></a>* @package Smarty
+<a name="line17"></a>* @subpackage Compiler
+<a name="line18"></a>*/
+<a name="line19"></a>class Smarty_Internal_Compile_Extends extends Smarty_Internal_CompileBase {
+<a name="line20"></a>
+<a name="line21"></a>    /**
+<a name="line22"></a>    * Attribute definition: Overwrites base class.
+<a name="line23"></a>    *
+<a name="line24"></a>    * @var array
+<a name="line25"></a>    * @see Smarty_Internal_CompileBase
+<a name="line26"></a>    */
+<a name="line27"></a>    public $required_attributes = array('file');
+<a name="line28"></a>    /**
+<a name="line29"></a>    * Attribute definition: Overwrites base class.
+<a name="line30"></a>    *
+<a name="line31"></a>    * @var array
+<a name="line32"></a>    * @see Smarty_Internal_CompileBase
+<a name="line33"></a>    */
+<a name="line34"></a>    public $shorttag_order = array('file');
+<a name="line35"></a>
+<a name="line36"></a>    /**
+<a name="line37"></a>    * Compiles code for the {extends} tag
+<a name="line38"></a>    *
+<a name="line39"></a>    * @param array  $args     array with attributes from parser
+<a name="line40"></a>    * @param object $compiler compiler object
+<a name="line41"></a>    * @return string compiled code
+<a name="line42"></a>    */
+<a name="line43"></a>    public function compile($args, $compiler)
+<a name="line44"></a>    {
+<a name="line45"></a>        static $_is_stringy = array('string' => true, 'eval' => true);
+<a name="line46"></a>        $this->_rdl = preg_quote($compiler->smarty->right_delimiter);
+<a name="line47"></a>        $this->_ldl = preg_quote($compiler->smarty->left_delimiter);
+<a name="line48"></a>        $filepath = $compiler->template->source->filepath;
+<a name="line49"></a>        // check and get attributes
+<a name="line50"></a>        $_attr = $this->getAttributes($compiler, $args);
+<a name="line51"></a>        if ($_attr['nocache'] === true) {
+<a name="line52"></a>            $compiler->trigger_template_error('nocache option not allowed', $compiler->lex->taglineno);
+<a name="line53"></a>        }
+<a name="line54"></a>
+<a name="line55"></a>        $_smarty_tpl = $compiler->template;
+<a name="line56"></a>        $include_file = null;
+<a name="line57"></a>        if (strpos($_attr['file'], '$_tmp') !== false) {
+<a name="line58"></a>            $compiler->trigger_template_error('illegal value for file attribute', $compiler->lex->taglineno);
+<a name="line59"></a>        }
+<a name="line60"></a>        eval('$include_file = ' . $_attr['file'] . ';');
+<a name="line61"></a>        // create template object
+<a name="line62"></a>        $_template = new $compiler->smarty->template_class($include_file, $compiler->smarty, $compiler->template);
+<a name="line63"></a>        // save file dependency
+<a name="line64"></a>        if (isset($_is_stringy[$_template->source->type])) {
+<a name="line65"></a>            $template_sha1 = sha1($include_file);
+<a name="line66"></a>        } else {
+<a name="line67"></a>            $template_sha1 = sha1($_template->source->filepath);
+<a name="line68"></a>        }
+<a name="line69"></a>        if (isset($compiler->template->properties['file_dependency'][$template_sha1])) {
+<a name="line70"></a>            $compiler->trigger_template_error("illegal recursive call of \"{$include_file}\"", $compiler->lex->line - 1);
+<a name="line71"></a>        }
+<a name="line72"></a>        $compiler->template->properties['file_dependency'][$template_sha1] = array($_template->source->filepath, $_template->source->timestamp, $_template->source->type);
+<a name="line73"></a>        $_content = substr($compiler->template->source->content, $compiler->lex->counter - 1);
+<a name="line74"></a>        if (preg_match_all("!({$this->_ldl}block\s(.+?){$this->_rdl})!", $_content, $s) !=
+<a name="line75"></a>        preg_match_all("!({$this->_ldl}/block{$this->_rdl})!", $_content, $c)) {
+<a name="line76"></a>            $compiler->trigger_template_error('unmatched {block} {/block} pairs');
+<a name="line77"></a>        }
+<a name="line78"></a>        preg_match_all("!{$this->_ldl}block\s(.+?){$this->_rdl}|{$this->_ldl}/block{$this->_rdl}|{$this->_ldl}\*([\S\s]*?)\*{$this->_rdl}!", $_content, $_result, PREG_OFFSET_CAPTURE);
+<a name="line79"></a>        $_result_count = count($_result[0]);
+<a name="line80"></a>        $_start = 0;
+<a name="line81"></a>        while ($_start+1 < $_result_count) {
+<a name="line82"></a>            $_end = 0;
+<a name="line83"></a>            $_level = 1;
+<a name="line84"></a>            if (substr($_result[0][$_start][0],0,strlen($compiler->smarty->left_delimiter)+1) == $compiler->smarty->left_delimiter.'*') {
+<a name="line85"></a>                $_start++;
+<a name="line86"></a>                continue;
+<a name="line87"></a>            }
+<a name="line88"></a>            while ($_level != 0) {
+<a name="line89"></a>                $_end++;
+<a name="line90"></a>                if (substr($_result[0][$_start + $_end][0],0,strlen($compiler->smarty->left_delimiter)+1) == $compiler->smarty->left_delimiter.'*') {
+<a name="line91"></a>                    continue;
+<a name="line92"></a>                }
+<a name="line93"></a>                if (!strpos($_result[0][$_start + $_end][0], '/')) {
+<a name="line94"></a>                    $_level++;
+<a name="line95"></a>                } else {
+<a name="line96"></a>                    $_level--;
+<a name="line97"></a>                }
+<a name="line98"></a>            }
+<a name="line99"></a>            $_block_content = str_replace($compiler->smarty->left_delimiter . '$smarty.block.parent' . $compiler->smarty->right_delimiter, '%%%%SMARTY_PARENT%%%%',
+<a name="line100"></a>            substr($_content, $_result[0][$_start][1] + strlen($_result[0][$_start][0]), $_result[0][$_start + $_end][1] - $_result[0][$_start][1] - + strlen($_result[0][$_start][0])));
+<a name="line101"></a>            Smarty_Internal_Compile_Block::saveBlockData($_block_content, $_result[0][$_start][0], $compiler->template, $filepath);
+<a name="line102"></a>            $_start = $_start + $_end + 1;
+<a name="line103"></a>        }
+<a name="line104"></a>        if ($_template->source->type == 'extends') {
+<a name="line105"></a>            $_template->block_data = $compiler->template->block_data;
+<a name="line106"></a>        }
+<a name="line107"></a>        $compiler->template->source->content = $_template->source->content;
+<a name="line108"></a>        if ($_template->source->type == 'extends') {
+<a name="line109"></a>            $compiler->template->block_data = $_template->block_data;
+<a name="line110"></a>            foreach ($_template->source->components as $key => $component) {
+<a name="line111"></a>                $compiler->template->properties['file_dependency'][$key] = array($component->filepath, $component->timestamp, $component->type);
+<a name="line112"></a>            }
+<a name="line113"></a>        }
+<a name="line114"></a>        $compiler->template->source->filepath = $_template->source->filepath;
+<a name="line115"></a>        $compiler->abort_and_recompile = true;
+<a name="line116"></a>        return '';
+<a name="line117"></a>    }
+<a name="line118"></a>
+<a name="line119"></a>}
+<a name="line120"></a>
+<a name="line121"></a>?></pre>
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_internal_compile_extends.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

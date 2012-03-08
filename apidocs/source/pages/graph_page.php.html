@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Wed, 07 Mar 2012 14:34:43 +0000">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
 <link rel="start" href="../../overview-summary.html">
@@ -40,286 +40,288 @@
 <a name="line2"></a>
 <a name="line3"></a>require_once LIB . 'Workouts.php';
 <a name="line4"></a>
-<a name="line5"></a>/*
+<a name="line5"></a>/**
 <a name="line6"></a> * @author Martin Buckley - MBuckley@gmail.com
-<a name="line7"></a> */
-<a name="line8"></a>class Graph_page extends Page {	
-<a name="line9"></a>
-<a name="line10"></a>	private $chart = 0;
-<a name="line11"></a>	private $week = 0;
-<a name="line12"></a>	private $period = '';
-<a name="line13"></a>	private $week_days = array();
-<a name="line14"></a>	private $uid = 1;
-<a name="line15"></a>
-<a name="line16"></a>	/*
-<a name="line17"></a>	 * Page constructor
-<a name="line18"></a>	 * Calls constructor on Page
-<a name="line19"></a>	 */
-<a name="line20"></a>	public function __construct(){		
-<a name="line21"></a>		parent::__construct();
-<a name="line22"></a>
-<a name="line23"></a>		if( $this->user->isLoggedIn() )
-<a name="line24"></a>			$this->uid = $this->user->user_id;
-<a name="line25"></a>	}
-<a name="line26"></a>
-<a name="line27"></a>	/*
-<a name="line28"></a>	 * Get request on page
-<a name="line29"></a>	 * Allows a week to be specified relative to the current week. e.g. -4 = 4 weeks ago
-<a name="line30"></a>	 * Specify chart type using an int
-<a name="line31"></a>	 * @param Array of parameters
-<a name="line32"></a>	 */
-<a name="line33"></a>	public function get($data){
-<a name="line34"></a>		$this->chart = intval($data['chart']);
-<a name="line35"></a>		$this->week = intval($data['week']);
-<a name="line36"></a>	}
-<a name="line37"></a>
-<a name="line38"></a>	/*
-<a name="line39"></a>	 * Standard page visit
-<a name="line40"></a>	 * Displays JSON formatted graph data
-<a name="line41"></a>	 */
-<a name="line42"></a>	public function visit(){
-<a name="line43"></a>		$first = 7 * ($this->week - 1) + 1;
-<a name="line44"></a>		$last = 7 * ($this->week);
-<a name="line45"></a>		for( $i = $first; $i <= $last; $i++ )
-<a name="line46"></a>			$this->week_days[] = mktime(0, 0, 0, date("m"), date("d") + $i, date("Y"));
-<a name="line47"></a>
-<a name="line48"></a>		$this->start = $this->week_days[0];
-<a name="line49"></a>		$this->end = $this->week_days[count($this->week_days)-1];
-<a name="line50"></a>		$this->period = date('D jS M', $this->start ) . ' - ' . date('D jS M', $this->end );
-<a name="line51"></a>
-<a name="line52"></a>		switch( $this->chart ){
-<a name="line53"></a>			case 1:
-<a name="line54"></a>				$json = $this->chart1();
-<a name="line55"></a>				break;
-<a name="line56"></a>			case 2:
-<a name="line57"></a>				$json = $this->chart2();
-<a name="line58"></a>				break;
-<a name="line59"></a>			case 3:
-<a name="line60"></a>				$json = $this->chart3();
-<a name="line61"></a>				break;
-<a name="line62"></a>			case 4:
-<a name="line63"></a>				$json = $this->chart4();
-<a name="line64"></a>				break;
-<a name="line65"></a>			case 5:
-<a name="line66"></a>				$json = $this->chart5();
-<a name="line67"></a>				break;
-<a name="line68"></a>			case 6:
-<a name="line69"></a>				$json = $this->chart6();
-<a name="line70"></a>				break;
-<a name="line71"></a>			default:
+<a name="line7"></a> * Graph page is used to return JSON data for display in charts
+<a name="line8"></a> * @namespace active
+<a name="line9"></a> */
+<a name="line10"></a>class Graph_page extends Page {	
+<a name="line11"></a>
+<a name="line12"></a>	private $chart = 0;
+<a name="line13"></a>	private $week = 0;
+<a name="line14"></a>	private $period = '';
+<a name="line15"></a>	private $week_days = array();
+<a name="line16"></a>	private $uid = 1;
+<a name="line17"></a>
+<a name="line18"></a>	/*
+<a name="line19"></a>	 * Page constructor
+<a name="line20"></a>	 * Calls constructor on Page
+<a name="line21"></a>	 */
+<a name="line22"></a>	public function __construct(){		
+<a name="line23"></a>		parent::__construct();
+<a name="line24"></a>
+<a name="line25"></a>		if( $this->user->isLoggedIn() )
+<a name="line26"></a>			$this->uid = $this->user->user_id;
+<a name="line27"></a>	}
+<a name="line28"></a>
+<a name="line29"></a>	/*
+<a name="line30"></a>	 * Get request on page
+<a name="line31"></a>	 * Allows a week to be specified relative to the current week. e.g. -4 = 4 weeks ago
+<a name="line32"></a>	 * Specify chart type using an int
+<a name="line33"></a>	 * @param Array of parameters
+<a name="line34"></a>	 */
+<a name="line35"></a>	public function get($data){
+<a name="line36"></a>		$this->chart = intval($data['chart']);
+<a name="line37"></a>		$this->week = intval($data['week']);
+<a name="line38"></a>	}
+<a name="line39"></a>
+<a name="line40"></a>	/*
+<a name="line41"></a>	 * Standard page visit
+<a name="line42"></a>	 * Displays JSON formatted graph data
+<a name="line43"></a>	 */
+<a name="line44"></a>	public function visit(){
+<a name="line45"></a>		$first = 7 * ($this->week - 1) + 1;
+<a name="line46"></a>		$last = 7 * ($this->week);
+<a name="line47"></a>		for( $i = $first; $i <= $last; $i++ )
+<a name="line48"></a>			$this->week_days[] = mktime(0, 0, 0, date("m"), date("d") + $i, date("Y"));
+<a name="line49"></a>
+<a name="line50"></a>		$this->start = $this->week_days[0];
+<a name="line51"></a>		$this->end = $this->week_days[count($this->week_days)-1];
+<a name="line52"></a>		$this->period = date('D jS M', $this->start ) . ' - ' . date('D jS M', $this->end );
+<a name="line53"></a>
+<a name="line54"></a>		switch( $this->chart ){
+<a name="line55"></a>			case 1:
+<a name="line56"></a>				$json = $this->chart1();
+<a name="line57"></a>				break;
+<a name="line58"></a>			case 2:
+<a name="line59"></a>				$json = $this->chart2();
+<a name="line60"></a>				break;
+<a name="line61"></a>			case 3:
+<a name="line62"></a>				$json = $this->chart3();
+<a name="line63"></a>				break;
+<a name="line64"></a>			case 4:
+<a name="line65"></a>				$json = $this->chart4();
+<a name="line66"></a>				break;
+<a name="line67"></a>			case 5:
+<a name="line68"></a>				$json = $this->chart5();
+<a name="line69"></a>				break;
+<a name="line70"></a>			case 6:
+<a name="line71"></a>				$json = $this->chart6();
 <a name="line72"></a>				break;
-<a name="line73"></a>		}
-<a name="line74"></a>		echo $json;	
-<a name="line75"></a>	}
-<a name="line76"></a>
-<a name="line77"></a>	/*
-<a name="line78"></a>	 * Gauge showing kcal per week
-<a name="line79"></a>	 * @return JSON graph data
-<a name="line80"></a>	 */
-<a name="line81"></a>	private function chart1(){		
-<a name="line82"></a>		$total_kcal = 0;
-<a name="line83"></a>
-<a name="line84"></a>		$days = $this->workouts_by_date();
-<a name="line85"></a>		foreach($days as $day => $workouts){
-<a name="line86"></a>			$kcal = 0;
-<a name="line87"></a>			foreach($workouts as $workout)
-<a name="line88"></a>				$kcal += $workout->kcal;
-<a name="line89"></a>			$total_kcal += $kcal;
-<a name="line90"></a>		}
-<a name="line91"></a>		
-<a name="line92"></a>		$data = array(
-<a name="line93"></a>				array('Kcal', $total_kcal)
-<a name="line94"></a>			);
-<a name="line95"></a>		$chart = array(
-<a name="line96"></a>				'title' => $this->period,
-<a name="line97"></a>				'format' => array(
-<a name="line98"></a>						array('string', 'Title'),
-<a name="line99"></a>						array('number', 'Value')
-<a name="line100"></a>						),
-<a name="line101"></a>				'data' => $data
-<a name="line102"></a>				);
-<a name="line103"></a>		return json_encode($chart);
-<a name="line104"></a>	}
-<a name="line105"></a>
-<a name="line106"></a>	/*
-<a name="line107"></a>	 * Gauge showing active days per week
-<a name="line108"></a>	 * @return JSON graph data
-<a name="line109"></a>	 */
-<a name="line110"></a>	private function chart2(){
-<a name="line111"></a>		$total_days = 0;
-<a name="line112"></a>
-<a name="line113"></a>		$days = $this->workouts_by_date();
-<a name="line114"></a>		foreach($days as $day => $workouts)
-<a name="line115"></a>			if( count($workouts) > 0 )
-<a name="line116"></a>				$total_days++;		
-<a name="line117"></a>		
-<a name="line118"></a>		$data = array( 
-<a name="line119"></a>				array('Active Days', $total_days)
-<a name="line120"></a>			);
-<a name="line121"></a>		$chart = array(
-<a name="line122"></a>				'title' => $this->period,
-<a name="line123"></a>				'format' => array(
-<a name="line124"></a>						array('string', 'Title'),
-<a name="line125"></a>						array('number', 'Value')
-<a name="line126"></a>						),
-<a name="line127"></a>				'data' => $data
-<a name="line128"></a>				);
-<a name="line129"></a>		return json_encode($chart);
-<a name="line130"></a>	}
-<a name="line131"></a>
-<a name="line132"></a>	/*
-<a name="line133"></a>	 * Gauge showing total time per week
-<a name="line134"></a>	 * @return JSON graph data
-<a name="line135"></a>	 */
-<a name="line136"></a>	private function chart3(){
-<a name="line137"></a>		$total_duration = 0;
-<a name="line138"></a>
-<a name="line139"></a>		$days = $this->workouts_by_date();
-<a name="line140"></a>		foreach($days as $day => $workouts){
-<a name="line141"></a>			$duration = 0;
-<a name="line142"></a>			foreach($workouts as $workout)
-<a name="line143"></a>				$duration += $workout->duration;
-<a name="line144"></a>			$total_duration += $duration;
-<a name="line145"></a>		}
-<a name="line146"></a>		
-<a name="line147"></a>		$data = array(
-<a name="line148"></a>				array('Duration', $total_duration)
-<a name="line149"></a>			);
-<a name="line150"></a>		$chart = array(
-<a name="line151"></a>				'title' => $this->period,
-<a name="line152"></a>				'format' => array(
-<a name="line153"></a>						array('string', 'Title'),
-<a name="line154"></a>						array('number', 'Value')
-<a name="line155"></a>						),
-<a name="line156"></a>				'data' => $data
-<a name="line157"></a>				);
-<a name="line158"></a>		return json_encode($chart);
-<a name="line159"></a>	}
-<a name="line160"></a>
-<a name="line161"></a>	/*
-<a name="line162"></a>	 * Line chart showing kcal per day per week
-<a name="line163"></a>	 * @return JSON graph data
-<a name="line164"></a>	 */
-<a name="line165"></a>	private function chart4(){
-<a name="line166"></a>		$days = $this->workouts_by_date();
-<a name="line167"></a>
-<a name="line168"></a>		$data = array();
-<a name="line169"></a>		foreach($days as $day => $workouts){
-<a name="line170"></a>			$kcal = 0;
-<a name="line171"></a>			foreach($workouts as $workout)
-<a name="line172"></a>				$kcal += $workout->kcal;
-<a name="line173"></a>			$data[] = array($day, $kcal);
-<a name="line174"></a>		}
-<a name="line175"></a>
-<a name="line176"></a>		$chart = array(
-<a name="line177"></a>				'title' => $this->period,
-<a name="line178"></a>				'format' => array(
-<a name="line179"></a>						array('string', 'Day'),
-<a name="line180"></a>						array('number', 'Kcal')
-<a name="line181"></a>						),
-<a name="line182"></a>				'data' => $data
-<a name="line183"></a>				);
-<a name="line184"></a>		return json_encode($chart);
-<a name="line185"></a>	}
-<a name="line186"></a>
-<a name="line187"></a>	/*
-<a name="line188"></a>	 * Bar chart showing workout counts per activity
-<a name="line189"></a>	 * @return JSON graph data
-<a name="line190"></a>	 */
-<a name="line191"></a>	private function chart5(){
-<a name="line192"></a>		$days = $this->workouts_by_date();
-<a name="line193"></a>		$data = array();
-<a name="line194"></a>		$activities = array();
-<a name="line195"></a>		foreach($days as $day => $workouts)
-<a name="line196"></a>			foreach($workouts as $workout)
-<a name="line197"></a>				if( isset($activities[$workout->activity_name]) )
-<a name="line198"></a>					$activities[$workout->activity_name] += 1;
-<a name="line199"></a>				else
-<a name="line200"></a>					$activities[$workout->activity_name] = 0; 			
-<a name="line201"></a>		
-<a name="line202"></a>		foreach($activities as $key => $value)
-<a name="line203"></a>			$data[] = array($key, $value);
-<a name="line204"></a>
-<a name="line205"></a>		if( count($data) == 0 )
-<a name="line206"></a>			$data[] = array('Nothing', 1);
-<a name="line207"></a>
-<a name="line208"></a>		$chart = array(
-<a name="line209"></a>				'title' => $this->period,
-<a name="line210"></a>				'format' => array(
-<a name="line211"></a>						array('string', 'Activity'),
-<a name="line212"></a>						array('number', 'Workouts')
-<a name="line213"></a>						),
-<a name="line214"></a>				'data' => $data
-<a name="line215"></a>				);
-<a name="line216"></a>		return json_encode($chart);
-<a name="line217"></a>	}
-<a name="line218"></a>
-<a name="line219"></a>	/*
-<a name="line220"></a>	 * Pie chart showing total kcal per activity
-<a name="line221"></a>	 * @return JSON graph data
-<a name="line222"></a>	 */
-<a name="line223"></a>	private function chart6(){
-<a name="line224"></a>		$days = $this->workouts_by_date();
-<a name="line225"></a>		$data = array();
-<a name="line226"></a>		$activities = array();
-<a name="line227"></a>		foreach($days as $day => $workouts)
-<a name="line228"></a>			foreach($workouts as $workout)
-<a name="line229"></a>				if( isset($activities[$workout->activity_name]) )
-<a name="line230"></a>					$activities[$workout->activity_name] += $workout->kcal;
-<a name="line231"></a>				else
-<a name="line232"></a>					$activities[$workout->activity_name] = 0; 			
-<a name="line233"></a>		
-<a name="line234"></a>		foreach($activities as $key => $value)
-<a name="line235"></a>			$data[] = array($key, $value);
-<a name="line236"></a>
-<a name="line237"></a>		if( count($data) == 0 )
-<a name="line238"></a>			$data[] = array('Nothing', 1);
-<a name="line239"></a>
-<a name="line240"></a>		$chart = array(
-<a name="line241"></a>				'title' => $this->period,
-<a name="line242"></a>				'format' => array(
-<a name="line243"></a>						array('string', 'Activity'),
-<a name="line244"></a>						array('number', 'Kcal')
-<a name="line245"></a>						),
-<a name="line246"></a>				'data' => $data
-<a name="line247"></a>				);
-<a name="line248"></a>		return json_encode($chart);
-<a name="line249"></a>	}
-<a name="line250"></a>
-<a name="line251"></a>	private function workouts_by_date(){
-<a name="line252"></a>		$days = array();
-<a name="line253"></a>		foreach( $this->week_days as $week_day ){
-<a name="line254"></a>			$day = array();
-<a name="line255"></a>			$workouts = $this->load_workouts_date($this->uid, $week_day);
-<a name="line256"></a>			foreach( $workouts->workouts as $workout )
-<a name="line257"></a>				$day[] = $workout;
-<a name="line258"></a>			$days[date('D', $week_day )] = $day;
-<a name="line259"></a>		}
-<a name="line260"></a>		return $days;
-<a name="line261"></a>	}
-<a name="line262"></a>
-<a name="line263"></a>	/*
-<a name="line264"></a>	 * Loads workouts for a specified user
-<a name="line265"></a>	 * @param Int user id
-<a name="line266"></a>	 * @return Workouts instance
-<a name="line267"></a>	 */
-<a name="line268"></a>	private function load_workouts_date($id, $day){
-<a name="line269"></a>		$workouts = new Workouts();
-<a name="line270"></a>		$date = date('d-M-Y', $day );
-<a name="line271"></a>		$response = $this->xmlGET(EXERCISER . "users/$id/workouts?date=$date");
-<a name="line272"></a>		switch ($response['code']) {
-<a name="line273"></a>			case 200:
-<a name="line274"></a>				$workouts->parse($response['body']);
-<a name="line275"></a>				break;
-<a name="line276"></a>			default:
+<a name="line73"></a>			default:
+<a name="line74"></a>				break;
+<a name="line75"></a>		}
+<a name="line76"></a>		echo $json;	
+<a name="line77"></a>	}
+<a name="line78"></a>
+<a name="line79"></a>	/*
+<a name="line80"></a>	 * Gauge showing kcal per week
+<a name="line81"></a>	 * @return JSON graph data
+<a name="line82"></a>	 */
+<a name="line83"></a>	private function chart1(){		
+<a name="line84"></a>		$total_kcal = 0;
+<a name="line85"></a>
+<a name="line86"></a>		$days = $this->workouts_by_date();
+<a name="line87"></a>		foreach($days as $day => $workouts){
+<a name="line88"></a>			$kcal = 0;
+<a name="line89"></a>			foreach($workouts as $workout)
+<a name="line90"></a>				$kcal += $workout->kcal;
+<a name="line91"></a>			$total_kcal += $kcal;
+<a name="line92"></a>		}
+<a name="line93"></a>		
+<a name="line94"></a>		$data = array(
+<a name="line95"></a>				array('Kcal', $total_kcal)
+<a name="line96"></a>			);
+<a name="line97"></a>		$chart = array(
+<a name="line98"></a>				'title' => $this->period,
+<a name="line99"></a>				'format' => array(
+<a name="line100"></a>						array('string', 'Title'),
+<a name="line101"></a>						array('number', 'Value')
+<a name="line102"></a>						),
+<a name="line103"></a>				'data' => $data
+<a name="line104"></a>				);
+<a name="line105"></a>		return json_encode($chart);
+<a name="line106"></a>	}
+<a name="line107"></a>
+<a name="line108"></a>	/*
+<a name="line109"></a>	 * Gauge showing active days per week
+<a name="line110"></a>	 * @return JSON graph data
+<a name="line111"></a>	 */
+<a name="line112"></a>	private function chart2(){
+<a name="line113"></a>		$total_days = 0;
+<a name="line114"></a>
+<a name="line115"></a>		$days = $this->workouts_by_date();
+<a name="line116"></a>		foreach($days as $day => $workouts)
+<a name="line117"></a>			if( count($workouts) > 0 )
+<a name="line118"></a>				$total_days++;		
+<a name="line119"></a>		
+<a name="line120"></a>		$data = array( 
+<a name="line121"></a>				array('Active Days', $total_days)
+<a name="line122"></a>			);
+<a name="line123"></a>		$chart = array(
+<a name="line124"></a>				'title' => $this->period,
+<a name="line125"></a>				'format' => array(
+<a name="line126"></a>						array('string', 'Title'),
+<a name="line127"></a>						array('number', 'Value')
+<a name="line128"></a>						),
+<a name="line129"></a>				'data' => $data
+<a name="line130"></a>				);
+<a name="line131"></a>		return json_encode($chart);
+<a name="line132"></a>	}
+<a name="line133"></a>
+<a name="line134"></a>	/*
+<a name="line135"></a>	 * Gauge showing total time per week
+<a name="line136"></a>	 * @return JSON graph data
+<a name="line137"></a>	 */
+<a name="line138"></a>	private function chart3(){
+<a name="line139"></a>		$total_duration = 0;
+<a name="line140"></a>
+<a name="line141"></a>		$days = $this->workouts_by_date();
+<a name="line142"></a>		foreach($days as $day => $workouts){
+<a name="line143"></a>			$duration = 0;
+<a name="line144"></a>			foreach($workouts as $workout)
+<a name="line145"></a>				$duration += $workout->duration;
+<a name="line146"></a>			$total_duration += $duration;
+<a name="line147"></a>		}
+<a name="line148"></a>		
+<a name="line149"></a>		$data = array(
+<a name="line150"></a>				array('Duration', $total_duration)
+<a name="line151"></a>			);
+<a name="line152"></a>		$chart = array(
+<a name="line153"></a>				'title' => $this->period,
+<a name="line154"></a>				'format' => array(
+<a name="line155"></a>						array('string', 'Title'),
+<a name="line156"></a>						array('number', 'Value')
+<a name="line157"></a>						),
+<a name="line158"></a>				'data' => $data
+<a name="line159"></a>				);
+<a name="line160"></a>		return json_encode($chart);
+<a name="line161"></a>	}
+<a name="line162"></a>
+<a name="line163"></a>	/*
+<a name="line164"></a>	 * Line chart showing kcal per day per week
+<a name="line165"></a>	 * @return JSON graph data
+<a name="line166"></a>	 */
+<a name="line167"></a>	private function chart4(){
+<a name="line168"></a>		$days = $this->workouts_by_date();
+<a name="line169"></a>
+<a name="line170"></a>		$data = array();
+<a name="line171"></a>		foreach($days as $day => $workouts){
+<a name="line172"></a>			$kcal = 0;
+<a name="line173"></a>			foreach($workouts as $workout)
+<a name="line174"></a>				$kcal += $workout->kcal;
+<a name="line175"></a>			$data[] = array($day, $kcal);
+<a name="line176"></a>		}
+<a name="line177"></a>
+<a name="line178"></a>		$chart = array(
+<a name="line179"></a>				'title' => $this->period,
+<a name="line180"></a>				'format' => array(
+<a name="line181"></a>						array('string', 'Day'),
+<a name="line182"></a>						array('number', 'Kcal')
+<a name="line183"></a>						),
+<a name="line184"></a>				'data' => $data
+<a name="line185"></a>				);
+<a name="line186"></a>		return json_encode($chart);
+<a name="line187"></a>	}
+<a name="line188"></a>
+<a name="line189"></a>	/*
+<a name="line190"></a>	 * Bar chart showing workout counts per activity
+<a name="line191"></a>	 * @return JSON graph data
+<a name="line192"></a>	 */
+<a name="line193"></a>	private function chart5(){
+<a name="line194"></a>		$days = $this->workouts_by_date();
+<a name="line195"></a>		$data = array();
+<a name="line196"></a>		$activities = array();
+<a name="line197"></a>		foreach($days as $day => $workouts)
+<a name="line198"></a>			foreach($workouts as $workout)
+<a name="line199"></a>				if( isset($activities[$workout->activity_name]) )
+<a name="line200"></a>					$activities[$workout->activity_name] += 1;
+<a name="line201"></a>				else
+<a name="line202"></a>					$activities[$workout->activity_name] = 0; 			
+<a name="line203"></a>		
+<a name="line204"></a>		foreach($activities as $key => $value)
+<a name="line205"></a>			$data[] = array($key, $value);
+<a name="line206"></a>
+<a name="line207"></a>		if( count($data) == 0 )
+<a name="line208"></a>			$data[] = array('Nothing', 1);
+<a name="line209"></a>
+<a name="line210"></a>		$chart = array(
+<a name="line211"></a>				'title' => $this->period,
+<a name="line212"></a>				'format' => array(
+<a name="line213"></a>						array('string', 'Activity'),
+<a name="line214"></a>						array('number', 'Workouts')
+<a name="line215"></a>						),
+<a name="line216"></a>				'data' => $data
+<a name="line217"></a>				);
+<a name="line218"></a>		return json_encode($chart);
+<a name="line219"></a>	}
+<a name="line220"></a>
+<a name="line221"></a>	/*
+<a name="line222"></a>	 * Pie chart showing total kcal per activity
+<a name="line223"></a>	 * @return JSON graph data
+<a name="line224"></a>	 */
+<a name="line225"></a>	private function chart6(){
+<a name="line226"></a>		$days = $this->workouts_by_date();
+<a name="line227"></a>		$data = array();
+<a name="line228"></a>		$activities = array();
+<a name="line229"></a>		foreach($days as $day => $workouts)
+<a name="line230"></a>			foreach($workouts as $workout)
+<a name="line231"></a>				if( isset($activities[$workout->activity_name]) )
+<a name="line232"></a>					$activities[$workout->activity_name] += $workout->kcal;
+<a name="line233"></a>				else
+<a name="line234"></a>					$activities[$workout->activity_name] = 0; 			
+<a name="line235"></a>		
+<a name="line236"></a>		foreach($activities as $key => $value)
+<a name="line237"></a>			$data[] = array($key, $value);
+<a name="line238"></a>
+<a name="line239"></a>		if( count($data) == 0 )
+<a name="line240"></a>			$data[] = array('Nothing', 1);
+<a name="line241"></a>
+<a name="line242"></a>		$chart = array(
+<a name="line243"></a>				'title' => $this->period,
+<a name="line244"></a>				'format' => array(
+<a name="line245"></a>						array('string', 'Activity'),
+<a name="line246"></a>						array('number', 'Kcal')
+<a name="line247"></a>						),
+<a name="line248"></a>				'data' => $data
+<a name="line249"></a>				);
+<a name="line250"></a>		return json_encode($chart);
+<a name="line251"></a>	}
+<a name="line252"></a>
+<a name="line253"></a>	private function workouts_by_date(){
+<a name="line254"></a>		$days = array();
+<a name="line255"></a>		foreach( $this->week_days as $week_day ){
+<a name="line256"></a>			$day = array();
+<a name="line257"></a>			$workouts = $this->load_workouts_date($this->uid, $week_day);
+<a name="line258"></a>			foreach( $workouts->workouts as $workout )
+<a name="line259"></a>				$day[] = $workout;
+<a name="line260"></a>			$days[date('D', $week_day )] = $day;
+<a name="line261"></a>		}
+<a name="line262"></a>		return $days;
+<a name="line263"></a>	}
+<a name="line264"></a>
+<a name="line265"></a>	/*
+<a name="line266"></a>	 * Loads workouts for a specified user
+<a name="line267"></a>	 * @param Int user id
+<a name="line268"></a>	 * @return Workouts instance
+<a name="line269"></a>	 */
+<a name="line270"></a>	private function load_workouts_date($id, $day){
+<a name="line271"></a>		$workouts = new Workouts();
+<a name="line272"></a>		$date = date('d-M-Y', $day );
+<a name="line273"></a>		$response = $this->xmlGET(EXERCISER . "users/$id/workouts?date=$date");
+<a name="line274"></a>		switch ($response['code']) {
+<a name="line275"></a>			case 200:
+<a name="line276"></a>				$workouts->parse($response['body']);
 <a name="line277"></a>				break;
-<a name="line278"></a>		}		
-<a name="line279"></a>		return $workouts;
-<a name="line280"></a>	}
-<a name="line281"></a>}
-<a name="line282"></a>
-<a name="line283"></a>?>
-<a name="line284"></a></pre>
+<a name="line278"></a>			default:
+<a name="line279"></a>				break;
+<a name="line280"></a>		}		
+<a name="line281"></a>		return $workouts;
+<a name="line282"></a>	}
+<a name="line283"></a>}
+<a name="line284"></a>
+<a name="line285"></a>?>
+<a name="line286"></a></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

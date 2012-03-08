@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
+
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css">
+<link rel="start" href="../../../../../overview-summary.html">
+
+<title>lib/php/Smarty/plugins/modifier.capitalize.php (PHPDoctor)</title>
+
+</head>
+<body id="file" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/plugins/modifier.capitalize.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<h1>lib/php/Smarty/plugins/modifier.capitalize.php</h1>
+<div class="comment" id="overview_description"><p>Smarty plugin</p></div>
+
+<hr>
+
+<a name="line1"></a><pre><?php
+<a name="line2"></a>/**
+<a name="line3"></a> * Smarty plugin
+<a name="line4"></a> * 
+<a name="line5"></a> * @package Smarty
+<a name="line6"></a> * @subpackage PluginsModifier
+<a name="line7"></a> */
+<a name="line8"></a>
+<a name="line9"></a>/**
+<a name="line10"></a> * Smarty capitalize modifier plugin
+<a name="line11"></a> * 
+<a name="line12"></a> * Type:     modifier<br>
+<a name="line13"></a> * Name:     capitalize<br>
+<a name="line14"></a> * Purpose:  capitalize words in the string
+<a name="line15"></a> *
+<a name="line16"></a> * {@internal {$string|capitalize:true:true} is the fastest option for MBString enabled systems }}
+<a name="line17"></a> *
+<a name="line18"></a> * @param string  $string    string to capitalize
+<a name="line19"></a> * @param boolean $uc_digits also capitalize "x123" to "X123"
+<a name="line20"></a> * @param boolean $lc_rest   capitalize first letters, lowercase all following letters "aAa" to "Aaa"
+<a name="line21"></a> * @return string capitalized string
+<a name="line22"></a> * @author Monte Ohrt <monte at ohrt dot com> 
+<a name="line23"></a> * @author Rodney Rehm
+<a name="line24"></a> */
+<a name="line25"></a>function smarty_modifier_capitalize($string, $uc_digits = false, $lc_rest = false)
+<a name="line26"></a>{
+<a name="line27"></a>    if (Smarty::$_MBSTRING) {
+<a name="line28"></a>        if ($lc_rest) {
+<a name="line29"></a>            // uppercase (including hyphenated words)
+<a name="line30"></a>            $upper_string = mb_convert_case( $string, MB_CASE_TITLE, Smarty::$_CHARSET );
+<a name="line31"></a>        } else {
+<a name="line32"></a>            // uppercase word breaks
+<a name="line33"></a>            $upper_string = preg_replace("!(^|[^\p{L}'])([\p{Ll}])!eS" . Smarty::$_UTF8_MODIFIER, "stripslashes('\\1').mb_convert_case(stripslashes('\\2'),MB_CASE_UPPER, '" . addslashes(Smarty::$_CHARSET) . "')", $string);
+<a name="line34"></a>        }
+<a name="line35"></a>        // check uc_digits case
+<a name="line36"></a>        if (!$uc_digits) {
+<a name="line37"></a>            if (preg_match_all("!\b([\p{L}]*[\p{N}]+[\p{L}]*)\b!" . Smarty::$_UTF8_MODIFIER, $string, $matches, PREG_OFFSET_CAPTURE)) {
+<a name="line38"></a>                foreach($matches[1] as $match) {
+<a name="line39"></a>                    $upper_string = substr_replace($upper_string, mb_strtolower($match[0], Smarty::$_CHARSET), $match[1], strlen($match[0]));
+<a name="line40"></a>                }
+<a name="line41"></a>            } 
+<a name="line42"></a>        }
+<a name="line43"></a>        $upper_string = preg_replace("!((^|\s)['\"])(\w)!e" . Smarty::$_UTF8_MODIFIER, "stripslashes('\\1').mb_convert_case(stripslashes('\\3'),MB_CASE_UPPER, '" . addslashes(Smarty::$_CHARSET) . "')", $upper_string);
+<a name="line44"></a>        return $upper_string;
+<a name="line45"></a>    }
+<a name="line46"></a>    
+<a name="line47"></a>    // lowercase first
+<a name="line48"></a>    if ($lc_rest) {
+<a name="line49"></a>        $string = strtolower($string);
+<a name="line50"></a>    }
+<a name="line51"></a>    // uppercase (including hyphenated words)
+<a name="line52"></a>    $upper_string = preg_replace("!(^|[^\p{L}'])([\p{Ll}])!eS" . Smarty::$_UTF8_MODIFIER, "stripslashes('\\1').ucfirst(stripslashes('\\2'))", $string); 
+<a name="line53"></a>    // check uc_digits case
+<a name="line54"></a>    if (!$uc_digits) {
+<a name="line55"></a>        if (preg_match_all("!\b([\p{L}]*[\p{N}]+[\p{L}]*)\b!" . Smarty::$_UTF8_MODIFIER, $string, $matches, PREG_OFFSET_CAPTURE)) {
+<a name="line56"></a>            foreach($matches[1] as $match) {
+<a name="line57"></a>                $upper_string = substr_replace($upper_string, strtolower($match[0]), $match[1], strlen($match[0]));
+<a name="line58"></a>            }
+<a name="line59"></a>        } 
+<a name="line60"></a>    }
+<a name="line61"></a>    $upper_string = preg_replace("!((^|\s)['\"])(\w)!e" . Smarty::$_UTF8_MODIFIER, "stripslashes('\\1').strtoupper(stripslashes('\\3'))", $upper_string);
+<a name="line62"></a>    return $upper_string;
+<a name="line63"></a>} 
+<a name="line64"></a>
+<a name="line65"></a>?></pre>
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/plugins/modifier.capitalize.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

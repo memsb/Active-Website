@@ -1,5 +1,5 @@
 <?php
-define('ROOT', '/var/www/Active-Website/', true);
+define('ROOT', '', true);
 define('PAGES', ROOT . 'pages/', true);
 define('LIB', ROOT . 'lib/', true);
 define('SMARTY', ROOT . 'smarty/', true);
@@ -10,11 +10,12 @@ define('EXERCISER', 'http://localhost/exerciser/', true);
 define('NOT_FOUND', 'not_found.html', true);
 
 define('HOST', 'localhost', true);
-define('DATABASE', 'active', true);
-define('username', 'active', true);
-define('PASSWORD', 'active', true);
+define('DATABASE', 'memsb-active_zxq_active', true);
+define('USERNAME', '677637_user', true);
+define('PASSWORD', '677637_password', true);
 
 $pages = array(
+		'test' => 'Test_page',
 		'homepage' => 'Home_page',
 		'index' => 'Home_page',
 		'' => 'Home_page',

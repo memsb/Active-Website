@@ -1,10 +1,11 @@
 <?php
 
-require_once PAGES . 'Page.php';
+require_once LIB . 'Page.php';
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
  * The contact page allows users registered and unregisterd to submit feedback
+ * @namespace active
  */
 class Contact_page extends Page{
 

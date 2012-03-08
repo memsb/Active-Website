@@ -1,0 +1,884 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
+
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css">
+<link rel="start" href="../../../../../overview-summary.html">
+
+<title>lib/php/Smarty/sysplugins/smarty_resource.php (PHPDoctor)</title>
+
+</head>
+<body id="file" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_resource.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<h1>lib/php/Smarty/sysplugins/smarty_resource.php</h1>
+<div class="comment" id="overview_description"><p>Smarty Resource Plugin</p></div>
+
+<hr>
+
+<a name="line1"></a><pre><?php
+<a name="line2"></a>/**
+<a name="line3"></a> * Smarty Resource Plugin
+<a name="line4"></a> *
+<a name="line5"></a> * @package Smarty
+<a name="line6"></a> * @subpackage TemplateResources
+<a name="line7"></a> * @author Rodney Rehm
+<a name="line8"></a> */
+<a name="line9"></a>
+<a name="line10"></a>/**
+<a name="line11"></a> * Smarty Resource Plugin
+<a name="line12"></a> *
+<a name="line13"></a> * Base implementation for resource plugins
+<a name="line14"></a> *
+<a name="line15"></a> * @package Smarty
+<a name="line16"></a> * @subpackage TemplateResources
+<a name="line17"></a> */
+<a name="line18"></a>abstract class Smarty_Resource {
+<a name="line19"></a>    /**
+<a name="line20"></a>     * cache for Smarty_Template_Source instances
+<a name="line21"></a>     * @var array
+<a name="line22"></a>     */
+<a name="line23"></a>    public static $sources = array();
+<a name="line24"></a>    /**
+<a name="line25"></a>     * cache for Smarty_Template_Compiled instances
+<a name="line26"></a>     * @var array
+<a name="line27"></a>     */
+<a name="line28"></a>    public static $compileds = array();
+<a name="line29"></a>    /**
+<a name="line30"></a>     * cache for Smarty_Resource instances
+<a name="line31"></a>     * @var array
+<a name="line32"></a>     */
+<a name="line33"></a>    public static $resources = array();
+<a name="line34"></a>    /**
+<a name="line35"></a>     * resource types provided by the core
+<a name="line36"></a>     * @var array
+<a name="line37"></a>     */
+<a name="line38"></a>    protected static $sysplugins = array(
+<a name="line39"></a>        'file' => true,
+<a name="line40"></a>        'string' => true,
+<a name="line41"></a>        'extends' => true,
+<a name="line42"></a>        'stream' => true,
+<a name="line43"></a>        'eval' => true,
+<a name="line44"></a>        'php' => true
+<a name="line45"></a>    );
+<a name="line46"></a>
+<a name="line47"></a>    /**
+<a name="line48"></a>     * Name of the Class to compile this resource's contents with
+<a name="line49"></a>     * @var string
+<a name="line50"></a>     */
+<a name="line51"></a>    public $compiler_class = 'Smarty_Internal_SmartyTemplateCompiler';
+<a name="line52"></a>
+<a name="line53"></a>    /**
+<a name="line54"></a>     * Name of the Class to tokenize this resource's contents with
+<a name="line55"></a>     * @var string
+<a name="line56"></a>     */
+<a name="line57"></a>    public $template_lexer_class = 'Smarty_Internal_Templatelexer';
+<a name="line58"></a>
+<a name="line59"></a>    /**
+<a name="line60"></a>     * Name of the Class to parse this resource's contents with
+<a name="line61"></a>     * @var string
+<a name="line62"></a>     */
+<a name="line63"></a>    public $template_parser_class = 'Smarty_Internal_Templateparser';
+<a name="line64"></a>
+<a name="line65"></a>    /**
+<a name="line66"></a>     * Load template's source into current template object
+<a name="line67"></a>     *
+<a name="line68"></a>     * {@internal The loaded source is assigned to $_template->source->content directly.}}
+<a name="line69"></a>     *
+<a name="line70"></a>     * @param Smarty_Template_Source $source source object
+<a name="line71"></a>     * @return string template source
+<a name="line72"></a>     * @throws SmartyException if source cannot be loaded
+<a name="line73"></a>     */
+<a name="line74"></a>    public abstract function getContent(Smarty_Template_Source $source);
+<a name="line75"></a>
+<a name="line76"></a>    /**
+<a name="line77"></a>     * populate Source Object with meta data from Resource
+<a name="line78"></a>     *
+<a name="line79"></a>     * @param Smarty_Template_Source   $source source object
+<a name="line80"></a>     * @param Smarty_Internal_Template $_template     template object
+<a name="line81"></a>     */
+<a name="line82"></a>    public abstract function populate(Smarty_Template_Source $source, Smarty_Internal_Template $_template=null);
+<a name="line83"></a>
+<a name="line84"></a>    /**
+<a name="line85"></a>     * populate Source Object with timestamp and exists from Resource
+<a name="line86"></a>     *
+<a name="line87"></a>     * @param Smarty_Template_Source $source source object
+<a name="line88"></a>     */
+<a name="line89"></a>    public function populateTimestamp(Smarty_Template_Source $source)
+<a name="line90"></a>    {
+<a name="line91"></a>        // intentionally left blank
+<a name="line92"></a>    }
+<a name="line93"></a>
+<a name="line94"></a>
+<a name="line95"></a>    /**
+<a name="line96"></a>     * modify resource_name according to resource handlers specifications
+<a name="line97"></a>     *
+<a name="line98"></a>     * @param Smarty $smarty        Smarty instance
+<a name="line99"></a>     * @param string $resource_name resource_name to make unique
+<a name="line100"></a>     * @return string unique resource name
+<a name="line101"></a>     */
+<a name="line102"></a>    protected function buildUniqueResourceName(Smarty $smarty, $resource_name)
+<a name="line103"></a>    {
+<a name="line104"></a>        return get_class($this) . '#' . $smarty->joined_template_dir . '#' . $resource_name;
+<a name="line105"></a>    }
+<a name="line106"></a>
+<a name="line107"></a>    /**
+<a name="line108"></a>     * populate Compiled Object with compiled filepath
+<a name="line109"></a>     *
+<a name="line110"></a>     * @param Smarty_Template_Compiled $compiled  compiled object
+<a name="line111"></a>     * @param Smarty_Internal_Template $_template template object
+<a name="line112"></a>     */
+<a name="line113"></a>    public function populateCompiledFilepath(Smarty_Template_Compiled $compiled, Smarty_Internal_Template $_template)
+<a name="line114"></a>    {
+<a name="line115"></a>        $_compile_id = isset($_template->compile_id) ? preg_replace('![^\w\|]+!', '_', $_template->compile_id) : null;
+<a name="line116"></a>        $_filepath = $compiled->source->uid;
+<a name="line117"></a>        // if use_sub_dirs, break file into directories
+<a name="line118"></a>        if ($_template->smarty->use_sub_dirs) {
+<a name="line119"></a>            $_filepath = substr($_filepath, 0, 2) . DS
+<a name="line120"></a>             . substr($_filepath, 2, 2) . DS
+<a name="line121"></a>             . substr($_filepath, 4, 2) . DS
+<a name="line122"></a>             . $_filepath;
+<a name="line123"></a>        }
+<a name="line124"></a>        $_compile_dir_sep = $_template->smarty->use_sub_dirs ? DS : '^';
+<a name="line125"></a>        if (isset($_compile_id)) {
+<a name="line126"></a>            $_filepath = $_compile_id . $_compile_dir_sep . $_filepath;
+<a name="line127"></a>        }
+<a name="line128"></a>        // caching token
+<a name="line129"></a>        if ($_template->caching) {
+<a name="line130"></a>            $_cache = '.cache';
+<a name="line131"></a>        } else {
+<a name="line132"></a>            $_cache = '';
+<a name="line133"></a>        }
+<a name="line134"></a>        $_compile_dir = $_template->smarty->getCompileDir();
+<a name="line135"></a>        // set basename if not specified
+<a name="line136"></a>        $_basename = $this->getBasename($compiled->source);
+<a name="line137"></a>        if ($_basename === null) {
+<a name="line138"></a>            $_basename = basename( preg_replace('![^\w\/]+!', '_', $compiled->source->name) );
+<a name="line139"></a>        }
+<a name="line140"></a>        // separate (optional) basename by dot
+<a name="line141"></a>        if ($_basename) {
+<a name="line142"></a>            $_basename = '.' . $_basename;
+<a name="line143"></a>        }
+<a name="line144"></a>
+<a name="line145"></a>        $compiled->filepath = $_compile_dir . $_filepath . '.' . $compiled->source->type . $_basename . $_cache . '.php';
+<a name="line146"></a>    }
+<a name="line147"></a>
+<a name="line148"></a>    /**
+<a name="line149"></a>     * build template filepath by traversing the template_dir array
+<a name="line150"></a>     *
+<a name="line151"></a>     * @param Smarty_Template_Source   $source    source object
+<a name="line152"></a>     * @param Smarty_Internal_Template $_template template object
+<a name="line153"></a>     * @return string fully qualified filepath
+<a name="line154"></a>     * @throws SmartyException if default template handler is registered but not callable
+<a name="line155"></a>     */
+<a name="line156"></a>    protected function buildFilepath(Smarty_Template_Source $source, Smarty_Internal_Template $_template=null)
+<a name="line157"></a>    {
+<a name="line158"></a>        $file = $source->name;
+<a name="line159"></a>        if ($source instanceof Smarty_Config_Source) {
+<a name="line160"></a>            $_directories = $source->smarty->getConfigDir();
+<a name="line161"></a>            $_default_handler = $source->smarty->default_config_handler_func;
+<a name="line162"></a>        } else {
+<a name="line163"></a>            $_directories = $source->smarty->getTemplateDir();
+<a name="line164"></a>            $_default_handler = $source->smarty->default_template_handler_func;
+<a name="line165"></a>        }
+<a name="line166"></a>
+<a name="line167"></a>        // go relative to a given template?
+<a name="line168"></a>        $_file_is_dotted = $file[0] == '.' && ($file[1] == '.' || $file[1] == '/' || $file[1] == "\\");
+<a name="line169"></a>        if ($_template && $_template->parent instanceof Smarty_Internal_Template && $_file_is_dotted) {
+<a name="line170"></a>            if ($_template->parent->source->type != 'file' && $_template->parent->source->type != 'extends' && !$_template->parent->allow_relative_path) {
+<a name="line171"></a>                throw new SmartyException("Template '{$file}' cannot be relative to template of resource type '{$_template->parent->source->type}'");
+<a name="line172"></a>            }
+<a name="line173"></a>            $file = dirname($_template->parent->source->filepath) . DS . $file;
+<a name="line174"></a>            $_file_exact_match = true;
+<a name="line175"></a>            if (!preg_match('/^([\/\\\\]|[a-zA-Z]:[\/\\\\])/', $file)) {
+<a name="line176"></a>                // the path gained from the parent template is relative to the current working directory
+<a name="line177"></a>                // as expansions (like include_path) have already been done
+<a name="line178"></a>                $file = getcwd() . DS . $file;
+<a name="line179"></a>            }
+<a name="line180"></a>        }
+<a name="line181"></a>
+<a name="line182"></a>        // resolve relative path
+<a name="line183"></a>        if (!preg_match('/^([\/\\\\]|[a-zA-Z]:[\/\\\\])/', $file)) {
+<a name="line184"></a>            $_was_relative_prefix = $file[0] == '.' ? substr($file, 0, strpos($file, '|')) : null;
+<a name="line185"></a>            $_path = DS . trim($file, '/\\');
+<a name="line186"></a>            $_was_relative = true;
+<a name="line187"></a>        } else {
+<a name="line188"></a>            $_path = $file;
+<a name="line189"></a>        }
+<a name="line190"></a>        // don't we all just love windows?
+<a name="line191"></a>        $_path = str_replace('\\', '/', $_path);
+<a name="line192"></a>        // resolve simples
+<a name="line193"></a>        $_path = preg_replace('#(/\./(\./)*)|/{2,}#', '/', $_path);
+<a name="line194"></a>        // resolve parents
+<a name="line195"></a>        while (true) {
+<a name="line196"></a>            $_parent = strpos($_path, '/../');
+<a name="line197"></a>            if ($_parent === false) {
+<a name="line198"></a>                break;
+<a name="line199"></a>            } else if ($_parent === 0) {
+<a name="line200"></a>                $_path = substr($_path, 3);
+<a name="line201"></a>                break;
+<a name="line202"></a>            }
+<a name="line203"></a>            $_pos = strrpos($_path, '/', $_parent - strlen($_path) - 1);
+<a name="line204"></a>            if ($_pos === false) {
+<a name="line205"></a>                // don't we all just love windows?
+<a name="line206"></a>                $_pos = $_parent;
+<a name="line207"></a>            }
+<a name="line208"></a>            $_path = substr_replace($_path, '', $_pos, $_parent + 3 - $_pos);
+<a name="line209"></a>        }
+<a name="line210"></a>        if (DS != '/') {
+<a name="line211"></a>            // don't we all just love windows?
+<a name="line212"></a>            $_path = str_replace('/', '\\', $_path);
+<a name="line213"></a>        }
+<a name="line214"></a>        // revert to relative
+<a name="line215"></a>        if (isset($_was_relative)) {
+<a name="line216"></a>            if (isset($_was_relative_prefix)){
+<a name="line217"></a>                $_path = $_was_relative_prefix . $_path;
+<a name="line218"></a>            } else {
+<a name="line219"></a>                $_path = substr($_path, 1);
+<a name="line220"></a>            }
+<a name="line221"></a>        }
+<a name="line222"></a>
+<a name="line223"></a>        // this is only required for directories
+<a name="line224"></a>        $file = rtrim($_path, '/\\');
+<a name="line225"></a>
+<a name="line226"></a>        // files relative to a template only get one shot
+<a name="line227"></a>        if (isset($_file_exact_match)) {
+<a name="line228"></a>            return $this->fileExists($source, $file) ? $file : false;
+<a name="line229"></a>        }
+<a name="line230"></a>
+<a name="line231"></a>        // template_dir index?
+<a name="line232"></a>        if (preg_match('#^\[(?P<key>[^\]]+)\](?P<file>.+)$#', $file, $match)) {
+<a name="line233"></a>            $_directory = null;
+<a name="line234"></a>            // try string indexes
+<a name="line235"></a>            if (isset($_directories[$match['key']])) {
+<a name="line236"></a>                $_directory = $_directories[$match['key']];
+<a name="line237"></a>            } else if (is_numeric($match['key'])) {
+<a name="line238"></a>                // try numeric index
+<a name="line239"></a>                $match['key'] = (int) $match['key'];
+<a name="line240"></a>                if (isset($_directories[$match['key']])) {
+<a name="line241"></a>                    $_directory = $_directories[$match['key']];
+<a name="line242"></a>                } else {
+<a name="line243"></a>                    // try at location index
+<a name="line244"></a>                    $keys = array_keys($_directories);
+<a name="line245"></a>                    $_directory = $_directories[$keys[$match['key']]];
+<a name="line246"></a>                }
+<a name="line247"></a>            }
+<a name="line248"></a>
+<a name="line249"></a>            if ($_directory) {
+<a name="line250"></a>                $_file = substr($file, strpos($file, ']') + 1);
+<a name="line251"></a>                $_filepath = $_directory . $_file;
+<a name="line252"></a>                if ($this->fileExists($source, $_filepath)) {
+<a name="line253"></a>                    return $_filepath;
+<a name="line254"></a>                }
+<a name="line255"></a>            }
+<a name="line256"></a>        }
+<a name="line257"></a>
+<a name="line258"></a>        // relative file name?
+<a name="line259"></a>        if (!preg_match('/^([\/\\\\]|[a-zA-Z]:[\/\\\\])/', $file)) {
+<a name="line260"></a>            foreach ($_directories as $_directory) {
+<a name="line261"></a>                $_filepath = $_directory . $file;
+<a name="line262"></a>                if ($this->fileExists($source, $_filepath)) {
+<a name="line263"></a>                    return $_filepath;
+<a name="line264"></a>                }
+<a name="line265"></a>                if ($source->smarty->use_include_path && !preg_match('/^([\/\\\\]|[a-zA-Z]:[\/\\\\])/', $_directory)) {
+<a name="line266"></a>                    // try PHP include_path
+<a name="line267"></a>                    if (($_filepath = Smarty_Internal_Get_Include_Path::getIncludePath($_filepath)) !== false) {
+<a name="line268"></a>                        if ($this->fileExists($source, $_filepath)) {
+<a name="line269"></a>                            return $_filepath;
+<a name="line270"></a>                        }
+<a name="line271"></a>                    }
+<a name="line272"></a>                }
+<a name="line273"></a>            }
+<a name="line274"></a>        }
+<a name="line275"></a>
+<a name="line276"></a>        // try absolute filepath
+<a name="line277"></a>        if ($this->fileExists($source, $file)) {
+<a name="line278"></a>            return $file;
+<a name="line279"></a>        }
+<a name="line280"></a>
+<a name="line281"></a>        // no tpl file found
+<a name="line282"></a>        if ($_default_handler) {
+<a name="line283"></a>            if (!is_callable($_default_handler)) {
+<a name="line284"></a>                if ($source instanceof Smarty_Config_Source) {
+<a name="line285"></a>                    throw new SmartyException("Default config handler not callable");
+<a name="line286"></a>                } else {
+<a name="line287"></a>                    throw new SmartyException("Default template handler not callable");
+<a name="line288"></a>                }
+<a name="line289"></a>            }
+<a name="line290"></a>            $_return = call_user_func_array($_default_handler,
+<a name="line291"></a>                array($source->type, $source->name, &$_content, &$_timestamp, $source->smarty));
+<a name="line292"></a>            if (is_string($_return)) {
+<a name="line293"></a>                $source->timestamp = @filemtime($_return);
+<a name="line294"></a>                $source->exists = !!$source->timestamp;
+<a name="line295"></a>                return $_return;
+<a name="line296"></a>            } elseif ($_return === true) {
+<a name="line297"></a>                $source->content = $_content;
+<a name="line298"></a>                $source->timestamp = $_timestamp;
+<a name="line299"></a>                $source->exists = true;
+<a name="line300"></a>                return $_filepath;
+<a name="line301"></a>            }
+<a name="line302"></a>        }
+<a name="line303"></a>
+<a name="line304"></a>        // give up
+<a name="line305"></a>        return false;
+<a name="line306"></a>    }
+<a name="line307"></a>
+<a name="line308"></a>    /**
+<a name="line309"></a>     * test is file exists and save timestamp
+<a name="line310"></a>     *
+<a name="line311"></a>     * @param Smarty_Template_Source   $source    source object
+<a name="line312"></a>     * @param string $file file name
+<a name="line313"></a>     * @return bool  true if file exists
+<a name="line314"></a>     */
+<a name="line315"></a>    protected function fileExists(Smarty_Template_Source $source, $file)
+<a name="line316"></a>    {
+<a name="line317"></a>        $source->timestamp = @filemtime($file);
+<a name="line318"></a>        return $source->exists = !!$source->timestamp;
+<a name="line319"></a>
+<a name="line320"></a>    }
+<a name="line321"></a>
+<a name="line322"></a>    /**
+<a name="line323"></a>     * Determine basename for compiled filename
+<a name="line324"></a>     *
+<a name="line325"></a>     * @param Smarty_Template_Source $source source object
+<a name="line326"></a>     * @return string resource's basename
+<a name="line327"></a>     */
+<a name="line328"></a>    protected function getBasename(Smarty_Template_Source $source)
+<a name="line329"></a>    {
+<a name="line330"></a>        return null;
+<a name="line331"></a>    }
+<a name="line332"></a>
+<a name="line333"></a>    /**
+<a name="line334"></a>     * Load Resource Handler
+<a name="line335"></a>     *
+<a name="line336"></a>     * @param Smarty $smarty    smarty object
+<a name="line337"></a>     * @param string $type      name of the resource
+<a name="line338"></a>     * @return Smarty_Resource Resource Handler
+<a name="line339"></a>     */
+<a name="line340"></a>    public static function load(Smarty $smarty, $type)
+<a name="line341"></a>    {
+<a name="line342"></a>        // try smarty's cache
+<a name="line343"></a>        if (isset($smarty->_resource_handlers[$type])) {
+<a name="line344"></a>            return $smarty->_resource_handlers[$type];
+<a name="line345"></a>        }
+<a name="line346"></a>
+<a name="line347"></a>        // try registered resource
+<a name="line348"></a>        if (isset($smarty->registered_resources[$type])) {
+<a name="line349"></a>            if ($smarty->registered_resources[$type] instanceof Smarty_Resource) {
+<a name="line350"></a>                $smarty->_resource_handlers[$type] = $smarty->registered_resources[$type];
+<a name="line351"></a>                // note registered to smarty is not kept unique!
+<a name="line352"></a>                return $smarty->_resource_handlers[$type];
+<a name="line353"></a>            }
+<a name="line354"></a>
+<a name="line355"></a>            if (!isset(self::$resources['registered'])) {
+<a name="line356"></a>                self::$resources['registered'] = new Smarty_Internal_Resource_Registered();
+<a name="line357"></a>            }
+<a name="line358"></a>            if (!isset($smarty->_resource_handlers[$type])) {
+<a name="line359"></a>                $smarty->_resource_handlers[$type] = self::$resources['registered'];
+<a name="line360"></a>            }
+<a name="line361"></a>
+<a name="line362"></a>            return $smarty->_resource_handlers[$type];
+<a name="line363"></a>        }
+<a name="line364"></a>
+<a name="line365"></a>        // try sysplugins dir
+<a name="line366"></a>        if (isset(self::$sysplugins[$type])) {
+<a name="line367"></a>            if (!isset(self::$resources[$type])) {
+<a name="line368"></a>                $_resource_class = 'Smarty_Internal_Resource_' . ucfirst($type);
+<a name="line369"></a>                self::$resources[$type] = new $_resource_class();
+<a name="line370"></a>            }
+<a name="line371"></a>            return $smarty->_resource_handlers[$type] = self::$resources[$type];
+<a name="line372"></a>        }
+<a name="line373"></a>
+<a name="line374"></a>        // try plugins dir
+<a name="line375"></a>        $_resource_class = 'Smarty_Resource_' . ucfirst($type);
+<a name="line376"></a>        if ($smarty->loadPlugin($_resource_class)) {
+<a name="line377"></a>            if (isset(self::$resources[$type])) {
+<a name="line378"></a>                return $smarty->_resource_handlers[$type] = self::$resources[$type];
+<a name="line379"></a>            }
+<a name="line380"></a>
+<a name="line381"></a>            if (class_exists($_resource_class, false)) {
+<a name="line382"></a>                self::$resources[$type] = new $_resource_class();
+<a name="line383"></a>                return $smarty->_resource_handlers[$type] = self::$resources[$type];
+<a name="line384"></a>            } else {
+<a name="line385"></a>                $smarty->registerResource($type, array(
+<a name="line386"></a>                    "smarty_resource_{$type}_source",
+<a name="line387"></a>                    "smarty_resource_{$type}_timestamp",
+<a name="line388"></a>                    "smarty_resource_{$type}_secure",
+<a name="line389"></a>                    "smarty_resource_{$type}_trusted"
+<a name="line390"></a>                ));
+<a name="line391"></a>
+<a name="line392"></a>                // give it another try, now that the resource is registered properly
+<a name="line393"></a>                return self::load($smarty, $type);
+<a name="line394"></a>            }
+<a name="line395"></a>        }
+<a name="line396"></a>
+<a name="line397"></a>        // try streams
+<a name="line398"></a>        $_known_stream = stream_get_wrappers();
+<a name="line399"></a>        if (in_array($type, $_known_stream)) {
+<a name="line400"></a>            // is known stream
+<a name="line401"></a>            if (is_object($smarty->security_policy)) {
+<a name="line402"></a>                $smarty->security_policy->isTrustedStream($type);
+<a name="line403"></a>            }
+<a name="line404"></a>            if (!isset(self::$resources['stream'])) {
+<a name="line405"></a>                self::$resources['stream'] = new Smarty_Internal_Resource_Stream();
+<a name="line406"></a>            }
+<a name="line407"></a>            return $smarty->_resource_handlers[$type] = self::$resources['stream'];
+<a name="line408"></a>        }
+<a name="line409"></a>
+<a name="line410"></a>        // TODO: try default_(template|config)_handler
+<a name="line411"></a>
+<a name="line412"></a>        // give up
+<a name="line413"></a>        throw new SmartyException("Unkown resource type '{$type}'");
+<a name="line414"></a>    }
+<a name="line415"></a>
+<a name="line416"></a>    /**
+<a name="line417"></a>     * extract resource_type and resource_name from template_resource and config_resource
+<a name="line418"></a>     *
+<a name="line419"></a>     * @note "C:/foo.tpl" was forced to file resource up till Smarty 3.1.3 (including).
+<a name="line420"></a>     * @param string  $resource_name    template_resource or config_resource to parse
+<a name="line421"></a>     * @param string  $default_resource the default resource_type defined in $smarty
+<a name="line422"></a>     * @param string &$name             the parsed resource name
+<a name="line423"></a>     * @param string &$type             the parsed resource type
+<a name="line424"></a>     * @return void
+<a name="line425"></a>     */
+<a name="line426"></a>    protected static function parseResourceName($resource_name, $default_resource, &$name, &$type)
+<a name="line427"></a>    {
+<a name="line428"></a>        $parts = explode(':', $resource_name, 2);
+<a name="line429"></a>        if (!isset($parts[1]) || !isset($parts[0][1])) {
+<a name="line430"></a>            // no resource given, use default
+<a name="line431"></a>            // or single character before the colon is not a resource type, but part of the filepath
+<a name="line432"></a>            $type = $default_resource;
+<a name="line433"></a>            $name = $resource_name;
+<a name="line434"></a>        } else {
+<a name="line435"></a>            $type = $parts[0];
+<a name="line436"></a>            $name = $parts[1];
+<a name="line437"></a>        }
+<a name="line438"></a>    }
+<a name="line439"></a>
+<a name="line440"></a>
+<a name="line441"></a>    /**
+<a name="line442"></a>     * modify resource_name according to resource handlers specifications
+<a name="line443"></a>     *
+<a name="line444"></a>     * @param Smarty $smarty        Smarty instance
+<a name="line445"></a>     * @param string $resource_name resource_name to make unique
+<a name="line446"></a>     * @return string unique resource name
+<a name="line447"></a>     */
+<a name="line448"></a>
+<a name="line449"></a>    /**
+<a name="line450"></a>     * modify template_resource according to resource handlers specifications
+<a name="line451"></a>     *
+<a name="line452"></a>     * @param string $smarty            Smarty instance
+<a name="line453"></a>     * @param string $template_resource template_resource to extracate resource handler and name of
+<a name="line454"></a>     * @return string unique resource name
+<a name="line455"></a>     */
+<a name="line456"></a>    public static function getUniqueTemplateName($smarty, $template_resource)
+<a name="line457"></a>    {
+<a name="line458"></a>        self::parseResourceName($template_resource, $smarty->default_resource_type, $name, $type);
+<a name="line459"></a>        // TODO: optimize for Smarty's internal resource types
+<a name="line460"></a>        $resource = Smarty_Resource::load($smarty, $type);
+<a name="line461"></a>        return $resource->buildUniqueResourceName($smarty, $name);
+<a name="line462"></a>    }
+<a name="line463"></a>
+<a name="line464"></a>    /**
+<a name="line465"></a>     * initialize Source Object for given resource
+<a name="line466"></a>     *
+<a name="line467"></a>     * Either [$_template] or [$smarty, $template_resource] must be specified
+<a name="line468"></a>     *
+<a name="line469"></a>     * @param Smarty_Internal_Template $_template         template object
+<a name="line470"></a>     * @param Smarty                   $smarty            smarty object
+<a name="line471"></a>     * @param string                   $template_resource resource identifier
+<a name="line472"></a>     * @return Smarty_Template_Source Source Object
+<a name="line473"></a>     */
+<a name="line474"></a>    public static function source(Smarty_Internal_Template $_template=null, Smarty $smarty=null, $template_resource=null)
+<a name="line475"></a>    {
+<a name="line476"></a>        if ($_template) {
+<a name="line477"></a>            $smarty = $_template->smarty;
+<a name="line478"></a>            $template_resource = $_template->template_resource;
+<a name="line479"></a>        }
+<a name="line480"></a>
+<a name="line481"></a>        // parse resource_name, load resource handler, identify unique resource name
+<a name="line482"></a>        self::parseResourceName($template_resource, $smarty->default_resource_type, $name, $type);
+<a name="line483"></a>        $resource = Smarty_Resource::load($smarty, $type);
+<a name="line484"></a>        $unique_resource_name = $resource->buildUniqueResourceName($smarty, $name);
+<a name="line485"></a>
+<a name="line486"></a>        // check runtime cache
+<a name="line487"></a>        $_cache_key = 'template|' . $unique_resource_name;
+<a name="line488"></a>        if (isset(self::$sources[$_cache_key])) {
+<a name="line489"></a>            return self::$sources[$_cache_key];
+<a name="line490"></a>        }
+<a name="line491"></a>
+<a name="line492"></a>        // create source
+<a name="line493"></a>        $source = new Smarty_Template_Source($resource, $smarty, $template_resource, $type, $name, $unique_resource_name);
+<a name="line494"></a>        $resource->populate($source, $_template);
+<a name="line495"></a>
+<a name="line496"></a>        // runtime cache
+<a name="line497"></a>        self::$sources[$_cache_key] = $source;
+<a name="line498"></a>        return $source;
+<a name="line499"></a>    }
+<a name="line500"></a>
+<a name="line501"></a>    /**
+<a name="line502"></a>     * initialize Config Source Object for given resource
+<a name="line503"></a>     *
+<a name="line504"></a>     * @param Smarty_Internal_Config $_config config object
+<a name="line505"></a>     * @return Smarty_Config_Source Source Object
+<a name="line506"></a>     */
+<a name="line507"></a>    public static function config(Smarty_Internal_Config $_config)
+<a name="line508"></a>    {
+<a name="line509"></a>        static $_incompatible_resources = array('eval' => true, 'string' => true, 'extends' => true, 'php' => true);
+<a name="line510"></a>        $config_resource = $_config->config_resource;
+<a name="line511"></a>        $smarty = $_config->smarty;
+<a name="line512"></a>
+<a name="line513"></a>        // parse resource_name
+<a name="line514"></a>        self::parseResourceName($config_resource, $smarty->default_config_type, $name, $type);
+<a name="line515"></a>
+<a name="line516"></a>        // make sure configs are not loaded via anything smarty can't handle
+<a name="line517"></a>        if (isset($_incompatible_resources[$type])) {
+<a name="line518"></a>            throw new SmartyException ("Unable to use resource '{$type}' for config");
+<a name="line519"></a>        }
+<a name="line520"></a>
+<a name="line521"></a>        // load resource handler, identify unique resource name
+<a name="line522"></a>        $resource = Smarty_Resource::load($smarty, $type);
+<a name="line523"></a>        $unique_resource_name = $resource->buildUniqueResourceName($smarty, $name);
+<a name="line524"></a>
+<a name="line525"></a>        // check runtime cache
+<a name="line526"></a>        $_cache_key = 'config|' . $unique_resource_name;
+<a name="line527"></a>        if (isset(self::$sources[$_cache_key])) {
+<a name="line528"></a>            return self::$sources[$_cache_key];
+<a name="line529"></a>        }
+<a name="line530"></a>
+<a name="line531"></a>        // create source
+<a name="line532"></a>        $source = new Smarty_Config_Source($resource, $smarty, $config_resource, $type, $name, $unique_resource_name);
+<a name="line533"></a>        $resource->populate($source, null);
+<a name="line534"></a>
+<a name="line535"></a>        // runtime cache
+<a name="line536"></a>        self::$sources[$_cache_key] = $source;
+<a name="line537"></a>        return $source;
+<a name="line538"></a>    }
+<a name="line539"></a>
+<a name="line540"></a>}
+<a name="line541"></a>
+<a name="line542"></a>/**
+<a name="line543"></a> * Smarty Resource Data Object
+<a name="line544"></a> *
+<a name="line545"></a> * Meta Data Container for Template Files
+<a name="line546"></a> *
+<a name="line547"></a> * @package Smarty
+<a name="line548"></a> * @subpackage TemplateResources
+<a name="line549"></a> * @author Rodney Rehm
+<a name="line550"></a> *
+<a name="line551"></a> * @property integer $timestamp Source Timestamp
+<a name="line552"></a> * @property boolean $exists    Source Existance
+<a name="line553"></a> * @property boolean $template  Extended Template reference
+<a name="line554"></a> * @property string  $content   Source Content
+<a name="line555"></a> */
+<a name="line556"></a>class Smarty_Template_Source {
+<a name="line557"></a>
+<a name="line558"></a>    /**
+<a name="line559"></a>     * Name of the Class to compile this resource's contents with
+<a name="line560"></a>     * @var string
+<a name="line561"></a>     */
+<a name="line562"></a>    public $compiler_class = null;
+<a name="line563"></a>
+<a name="line564"></a>    /**
+<a name="line565"></a>     * Name of the Class to tokenize this resource's contents with
+<a name="line566"></a>     * @var string
+<a name="line567"></a>     */
+<a name="line568"></a>    public $template_lexer_class = null;
+<a name="line569"></a>
+<a name="line570"></a>    /**
+<a name="line571"></a>     * Name of the Class to parse this resource's contents with
+<a name="line572"></a>     * @var string
+<a name="line573"></a>     */
+<a name="line574"></a>    public $template_parser_class = null;
+<a name="line575"></a>
+<a name="line576"></a>    /**
+<a name="line577"></a>     * Unique Template ID
+<a name="line578"></a>     * @var string
+<a name="line579"></a>     */
+<a name="line580"></a>    public $uid = null;
+<a name="line581"></a>
+<a name="line582"></a>    /**
+<a name="line583"></a>     * Template Resource (Smarty_Internal_Template::$template_resource)
+<a name="line584"></a>     * @var string
+<a name="line585"></a>     */
+<a name="line586"></a>    public $resource = null;
+<a name="line587"></a>
+<a name="line588"></a>    /**
+<a name="line589"></a>     * Resource Type
+<a name="line590"></a>     * @var string
+<a name="line591"></a>     */
+<a name="line592"></a>    public $type = null;
+<a name="line593"></a>
+<a name="line594"></a>    /**
+<a name="line595"></a>     * Resource Name
+<a name="line596"></a>     * @var string
+<a name="line597"></a>     */
+<a name="line598"></a>    public $name = null;
+<a name="line599"></a>
+<a name="line600"></a>    /**
+<a name="line601"></a>     * Unique Resource Name
+<a name="line602"></a>     * @var string
+<a name="line603"></a>     */
+<a name="line604"></a>    public $unique_resource = null;
+<a name="line605"></a>
+<a name="line606"></a>    /**
+<a name="line607"></a>     * Source Filepath
+<a name="line608"></a>     * @var string
+<a name="line609"></a>     */
+<a name="line610"></a>    public $filepath = null;
+<a name="line611"></a>
+<a name="line612"></a>    /**
+<a name="line613"></a>     * Source is bypassing compiler
+<a name="line614"></a>     * @var boolean
+<a name="line615"></a>     */
+<a name="line616"></a>    public $uncompiled = null;
+<a name="line617"></a>
+<a name="line618"></a>    /**
+<a name="line619"></a>     * Source must be recompiled on every occasion
+<a name="line620"></a>     * @var boolean
+<a name="line621"></a>     */
+<a name="line622"></a>    public $recompiled = null;
+<a name="line623"></a>
+<a name="line624"></a>    /**
+<a name="line625"></a>     * The Components an extended template is made of
+<a name="line626"></a>     * @var array
+<a name="line627"></a>     */
+<a name="line628"></a>    public $components = null;
+<a name="line629"></a>
+<a name="line630"></a>    /**
+<a name="line631"></a>     * Resource Handler
+<a name="line632"></a>     * @var Smarty_Resource
+<a name="line633"></a>     */
+<a name="line634"></a>    public $handler = null;
+<a name="line635"></a>
+<a name="line636"></a>    /**
+<a name="line637"></a>     * Smarty instance
+<a name="line638"></a>     * @var Smarty
+<a name="line639"></a>     */
+<a name="line640"></a>    public $smarty = null;
+<a name="line641"></a>
+<a name="line642"></a>    /**
+<a name="line643"></a>     * create Source Object container
+<a name="line644"></a>     *
+<a name="line645"></a>     * @param Smarty_Resource $handler          Resource Handler this source object communicates with
+<a name="line646"></a>     * @param Smarty          $smarty           Smarty instance this source object belongs to
+<a name="line647"></a>     * @param string          $resource         full template_resource
+<a name="line648"></a>     * @param string          $type             type of resource
+<a name="line649"></a>     * @param string          $name             resource name
+<a name="line650"></a>     * @param string          $unique_resource  unqiue resource name
+<a name="line651"></a>     */
+<a name="line652"></a>    public function __construct(Smarty_Resource $handler, Smarty $smarty, $resource, $type, $name, $unique_resource)
+<a name="line653"></a>    {
+<a name="line654"></a>        $this->handler = $handler; // Note: prone to circular references
+<a name="line655"></a>
+<a name="line656"></a>        $this->compiler_class = $handler->compiler_class;
+<a name="line657"></a>        $this->template_lexer_class = $handler->template_lexer_class;
+<a name="line658"></a>        $this->template_parser_class = $handler->template_parser_class;
+<a name="line659"></a>        $this->uncompiled = $this->handler instanceof Smarty_Resource_Uncompiled;
+<a name="line660"></a>        $this->recompiled = $this->handler instanceof Smarty_Resource_Recompiled;
+<a name="line661"></a>
+<a name="line662"></a>        $this->smarty = $smarty;
+<a name="line663"></a>        $this->resource = $resource;
+<a name="line664"></a>        $this->type = $type;
+<a name="line665"></a>        $this->name = $name;
+<a name="line666"></a>        $this->unique_resource = $unique_resource;
+<a name="line667"></a>    }
+<a name="line668"></a>
+<a name="line669"></a>    /**
+<a name="line670"></a>     * get a Compiled Object of this source
+<a name="line671"></a>     *
+<a name="line672"></a>     * @param Smarty_Internal_Template $_template template objet
+<a name="line673"></a>     * @return Smarty_Template_Compiled compiled object
+<a name="line674"></a>     */
+<a name="line675"></a>    public function getCompiled(Smarty_Internal_Template $_template)
+<a name="line676"></a>    {
+<a name="line677"></a>        // check runtime cache
+<a name="line678"></a>        $_cache_key = $this->unique_resource . '#' . $_template->compile_id;
+<a name="line679"></a>        if (isset(Smarty_Resource::$compileds[$_cache_key])) {
+<a name="line680"></a>            return Smarty_Resource::$compileds[$_cache_key];
+<a name="line681"></a>        }
+<a name="line682"></a>
+<a name="line683"></a>        $compiled = new Smarty_Template_Compiled($this);
+<a name="line684"></a>        $this->handler->populateCompiledFilepath($compiled, $_template);
+<a name="line685"></a>        $compiled->timestamp = @filemtime($compiled->filepath);
+<a name="line686"></a>        $compiled->exists = !!$compiled->timestamp;
+<a name="line687"></a>
+<a name="line688"></a>        // runtime cache
+<a name="line689"></a>        Smarty_Resource::$compileds[$_cache_key] = $compiled;
+<a name="line690"></a>
+<a name="line691"></a>        return $compiled;
+<a name="line692"></a>    }
+<a name="line693"></a>
+<a name="line694"></a>    /**
+<a name="line695"></a>     * render the uncompiled source
+<a name="line696"></a>     *
+<a name="line697"></a>     * @param Smarty_Internal_Template $_template template object
+<a name="line698"></a>     */
+<a name="line699"></a>    public function renderUncompiled(Smarty_Internal_Template $_template)
+<a name="line700"></a>    {
+<a name="line701"></a>        return $this->handler->renderUncompiled($this, $_template);
+<a name="line702"></a>    }
+<a name="line703"></a>
+<a name="line704"></a>    /**
+<a name="line705"></a>     * <<magic>> Generic Setter.
+<a name="line706"></a>     *
+<a name="line707"></a>     * @param string $property_name valid: timestamp, exists, content, template
+<a name="line708"></a>     * @param mixed  $value        new value (is not checked)
+<a name="line709"></a>     * @throws SmartyException if $property_name is not valid
+<a name="line710"></a>     */
+<a name="line711"></a>    public function __set($property_name, $value)
+<a name="line712"></a>    {
+<a name="line713"></a>        switch ($property_name) {
+<a name="line714"></a>            // regular attributes
+<a name="line715"></a>            case 'timestamp':
+<a name="line716"></a>            case 'exists':
+<a name="line717"></a>            case 'content':
+<a name="line718"></a>            // required for extends: only
+<a name="line719"></a>            case 'template':
+<a name="line720"></a>                $this->$property_name = $value;
+<a name="line721"></a>                break;
+<a name="line722"></a>
+<a name="line723"></a>            default:
+<a name="line724"></a>                throw new SmartyException("invalid source property '$property_name'.");
+<a name="line725"></a>        }
+<a name="line726"></a>    }
+<a name="line727"></a>
+<a name="line728"></a>    /**
+<a name="line729"></a>     * <<magic>> Generic getter.
+<a name="line730"></a>     *
+<a name="line731"></a>     * @param string $property_name valid: timestamp, exists, content
+<a name="line732"></a>     * @return mixed
+<a name="line733"></a>     * @throws SmartyException if $property_name is not valid
+<a name="line734"></a>     */
+<a name="line735"></a>    public function __get($property_name)
+<a name="line736"></a>    {
+<a name="line737"></a>        switch ($property_name) {
+<a name="line738"></a>            case 'timestamp':
+<a name="line739"></a>            case 'exists':
+<a name="line740"></a>                $this->handler->populateTimestamp($this);
+<a name="line741"></a>                return $this->$property_name;
+<a name="line742"></a>
+<a name="line743"></a>            case 'content':
+<a name="line744"></a>                return $this->content = $this->handler->getContent($this);
+<a name="line745"></a>
+<a name="line746"></a>            default:
+<a name="line747"></a>                throw new SmartyException("source property '$property_name' does not exist.");
+<a name="line748"></a>        }
+<a name="line749"></a>    }
+<a name="line750"></a>
+<a name="line751"></a>}
+<a name="line752"></a>
+<a name="line753"></a>/**
+<a name="line754"></a> * Smarty Resource Data Object
+<a name="line755"></a> *
+<a name="line756"></a> * Meta Data Container for Template Files
+<a name="line757"></a> *
+<a name="line758"></a> * @package Smarty
+<a name="line759"></a> * @subpackage TemplateResources
+<a name="line760"></a> * @author Rodney Rehm
+<a name="line761"></a> *
+<a name="line762"></a> * @property string $content compiled content
+<a name="line763"></a> */
+<a name="line764"></a>class Smarty_Template_Compiled {
+<a name="line765"></a>
+<a name="line766"></a>    /**
+<a name="line767"></a>     * Compiled Filepath
+<a name="line768"></a>     * @var string
+<a name="line769"></a>     */
+<a name="line770"></a>    public $filepath = null;
+<a name="line771"></a>
+<a name="line772"></a>    /**
+<a name="line773"></a>     * Compiled Timestamp
+<a name="line774"></a>     * @var integer
+<a name="line775"></a>     */
+<a name="line776"></a>    public $timestamp = null;
+<a name="line777"></a>
+<a name="line778"></a>    /**
+<a name="line779"></a>     * Compiled Existance
+<a name="line780"></a>     * @var boolean
+<a name="line781"></a>     */
+<a name="line782"></a>    public $exists = false;
+<a name="line783"></a>
+<a name="line784"></a>    /**
+<a name="line785"></a>     * Compiled Content Loaded
+<a name="line786"></a>     * @var boolean
+<a name="line787"></a>     */
+<a name="line788"></a>    public $loaded = false;
+<a name="line789"></a>
+<a name="line790"></a>    /**
+<a name="line791"></a>     * Template was compiled
+<a name="line792"></a>     * @var boolean
+<a name="line793"></a>     */
+<a name="line794"></a>    public $isCompiled = false;
+<a name="line795"></a>
+<a name="line796"></a>    /**
+<a name="line797"></a>     * Source Object
+<a name="line798"></a>     * @var Smarty_Template_Source
+<a name="line799"></a>     */
+<a name="line800"></a>    public $source = null;
+<a name="line801"></a>
+<a name="line802"></a>    /**
+<a name="line803"></a>     * Metadata properties
+<a name="line804"></a>     *
+<a name="line805"></a>     * populated by Smarty_Internal_Template::decodeProperties()
+<a name="line806"></a>     * @var array
+<a name="line807"></a>     */
+<a name="line808"></a>    public $_properties = null;
+<a name="line809"></a>
+<a name="line810"></a>    /**
+<a name="line811"></a>     * create Compiled Object container
+<a name="line812"></a>     *
+<a name="line813"></a>     * @param Smarty_Template_Source $source source object this compiled object belongs to
+<a name="line814"></a>     */
+<a name="line815"></a>    public function __construct(Smarty_Template_Source $source)
+<a name="line816"></a>    {
+<a name="line817"></a>        $this->source = $source;
+<a name="line818"></a>    }
+<a name="line819"></a>
+<a name="line820"></a>}
+<a name="line821"></a>
+<a name="line822"></a>?></pre>
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_resource.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

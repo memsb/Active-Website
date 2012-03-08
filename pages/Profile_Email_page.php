@@ -1,11 +1,12 @@
 <?php
 
-require_once PAGES . 'Profile.php';
+require_once LIB . 'Profile.php';
 require_once PAGES . 'Home_page.php';
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
  * Allows a user to update their email address
+ * @namespace active
  */
 class Profile_Email_page extends Profile {
 

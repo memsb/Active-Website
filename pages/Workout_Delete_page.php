@@ -1,12 +1,13 @@
 <?php
 
-require_once PAGES . 'Page.php';
+require_once LIB . 'Page.php';
 require_once PAGES . 'Workouts_page.php';
 require_once LIB . 'Workout.php';
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
  * Allows a user to Delete their own workout
+ * @namespace active
  */
 class Workout_Delete_page extends Page{
 

@@ -5,6 +5,7 @@ require_once LIB . 'Person.php';
 /**
  * @author Martin Buckley - MBuckley@gmail.com
  * Persons stores an internal list of Person
+ * @namespace active
  */
 class Persons {
 

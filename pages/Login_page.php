@@ -1,10 +1,11 @@
 <?php
 
-require_once PAGES . 'Page.php';
+require_once LIB . 'Page.php';
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
  * Login page handles login attempts and displays an error message with login box on login failure
+ * @namespace active
  */
 class Login_page extends Page {
 

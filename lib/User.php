@@ -5,6 +5,7 @@ require_once LIB . 'Person.php';
 /**
  * @author Martin Buckley - MBuckley@gmail.com
  * User extends Person to become the object that handles the current site user
+ * @namespace active
  */
 class User extends Person {	
 

@@ -2,25 +2,24 @@
 namespace active;
 
 require_once 'config.php';
-require_once 'lib/smarty.php';
+require_once LIB . 'smarty.php';
 
-/**
- * Class autoloader automatically attempts to find and include undeclared classes
- *
- */
+//Class autoloader automatically attempts to find and include undeclared classes
 function autoload($class_name) {
 	include PAGES . $class_name . '.php';
 }
 
 spl_autoload_register(__NAMESPACE__ . '\autoload');
 
-/**
- * Parses the URI to find the requested page name
- * REquires that the dispatcher is placed in the root directory
- */
-$root = dirname($_SERVER['SCRIPT_NAME']) . '/';
-$uri = $_SERVER['REDIRECT_URL'];
-$page_requested = strtolower(str_replace($root, '', $uri));
+
+// Parses the URI to find the requested page name
+// Requires that the dispatcher is placed in the root directory
+$root = dirname($_SERVER['SCRIPT_NAME']);
+$uri = pathinfo($_SERVER['REDIRECT_URL']);
+$page_requested = '';
+
+if( strcmp($root, $uri['dirname']) == 0 )
+	$page_requested = strtolower( $uri['filename'] );
 
 // 404 if page not found.
 if( ! isset($pages[$page_requested]) ){	

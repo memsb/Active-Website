@@ -1,0 +1,204 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
+
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css">
+<link rel="start" href="../../../../../overview-summary.html">
+
+<title>lib/php/Smarty/sysplugins/smarty_internal_compile_insert.php (PHPDoctor)</title>
+
+</head>
+<body id="file" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_internal_compile_insert.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<h1>lib/php/Smarty/sysplugins/smarty_internal_compile_insert.php</h1>
+<div class="comment" id="overview_description"><p>Smarty Internal Plugin Compile Insert</p><p>Compiles the {insert} tag</p></div>
+
+<hr>
+
+<a name="line1"></a><pre><?php
+<a name="line2"></a>
+<a name="line3"></a>/**
+<a name="line4"></a> * Smarty Internal Plugin Compile Insert
+<a name="line5"></a> *
+<a name="line6"></a> * Compiles the {insert} tag
+<a name="line7"></a> *
+<a name="line8"></a> * @package Smarty
+<a name="line9"></a> * @subpackage Compiler
+<a name="line10"></a> * @author Uwe Tews
+<a name="line11"></a> */
+<a name="line12"></a>
+<a name="line13"></a>/**
+<a name="line14"></a> * Smarty Internal Plugin Compile Insert Class
+<a name="line15"></a> *
+<a name="line16"></a> * @package Smarty
+<a name="line17"></a> * @subpackage Compiler
+<a name="line18"></a> */
+<a name="line19"></a>class Smarty_Internal_Compile_Insert extends Smarty_Internal_CompileBase {
+<a name="line20"></a>
+<a name="line21"></a>    /**
+<a name="line22"></a>     * Attribute definition: Overwrites base class.
+<a name="line23"></a>     *
+<a name="line24"></a>     * @var array
+<a name="line25"></a>     * @see Smarty_Internal_CompileBase
+<a name="line26"></a>     */
+<a name="line27"></a>    public $required_attributes = array('name');
+<a name="line28"></a>    /**
+<a name="line29"></a>     * Attribute definition: Overwrites base class.
+<a name="line30"></a>     *
+<a name="line31"></a>     * @var array
+<a name="line32"></a>     * @see Smarty_Internal_CompileBase
+<a name="line33"></a>     */
+<a name="line34"></a>    public $shorttag_order = array('name');
+<a name="line35"></a>    /**
+<a name="line36"></a>     * Attribute definition: Overwrites base class.
+<a name="line37"></a>     *
+<a name="line38"></a>     * @var array
+<a name="line39"></a>     * @see Smarty_Internal_CompileBase
+<a name="line40"></a>     */
+<a name="line41"></a>    public $optional_attributes = array('_any');
+<a name="line42"></a>
+<a name="line43"></a>    /**
+<a name="line44"></a>     * Compiles code for the {insert} tag
+<a name="line45"></a>     *
+<a name="line46"></a>     * @param array  $args     array with attributes from parser
+<a name="line47"></a>     * @param object $compiler compiler object
+<a name="line48"></a>     * @return string compiled code
+<a name="line49"></a>     */
+<a name="line50"></a>    public function compile($args, $compiler)
+<a name="line51"></a>    {
+<a name="line52"></a>        // check and get attributes
+<a name="line53"></a>        $_attr = $this->getAttributes($compiler, $args);
+<a name="line54"></a>        // never compile as nocache code
+<a name="line55"></a>        $compiler->suppressNocacheProcessing = true;
+<a name="line56"></a>        $compiler->tag_nocache = true;
+<a name="line57"></a>        $_smarty_tpl = $compiler->template;
+<a name="line58"></a>        $_name = null;
+<a name="line59"></a>        $_script = null;
+<a name="line60"></a>
+<a name="line61"></a>        $_output = '<?php ';
+<a name="line62"></a>        // save posible attributes
+<a name="line63"></a>        eval('$_name = ' . $_attr['name'] . ';');
+<a name="line64"></a>        if (isset($_attr['assign'])) {
+<a name="line65"></a>            // output will be stored in a smarty variable instead of being displayed
+<a name="line66"></a>            $_assign = $_attr['assign'];
+<a name="line67"></a>            // create variable to make shure that the compiler knows about its nocache status
+<a name="line68"></a>            $compiler->template->tpl_vars[trim($_attr['assign'], "'")] = new Smarty_Variable(null, true);
+<a name="line69"></a>        }
+<a name="line70"></a>        if (isset($_attr['script'])) {
+<a name="line71"></a>            // script which must be included
+<a name="line72"></a>            $_function = "smarty_insert_{$_name}";
+<a name="line73"></a>            $_smarty_tpl = $compiler->template;
+<a name="line74"></a>            $_filepath = false;
+<a name="line75"></a>            eval('$_script = ' . $_attr['script'] . ';');
+<a name="line76"></a>            if (!isset($compiler->smarty->security_policy) && file_exists($_script)) {
+<a name="line77"></a>                $_filepath = $_script;
+<a name="line78"></a>            } else {
+<a name="line79"></a>                if (isset($compiler->smarty->security_policy)) {
+<a name="line80"></a>                    $_dir = $compiler->smarty->security_policy->trusted_dir;
+<a name="line81"></a>                } else {
+<a name="line82"></a>                    $_dir = $compiler->smarty->trusted_dir;
+<a name="line83"></a>                }
+<a name="line84"></a>                if (!empty($_dir)) {
+<a name="line85"></a>                    foreach((array)$_dir as $_script_dir) {
+<a name="line86"></a>                        $_script_dir = rtrim($_script_dir, '/\\') . DS;
+<a name="line87"></a>                        if (file_exists($_script_dir . $_script)) {
+<a name="line88"></a>                            $_filepath = $_script_dir . $_script;
+<a name="line89"></a>                            break;
+<a name="line90"></a>                        }
+<a name="line91"></a>                    }
+<a name="line92"></a>                }
+<a name="line93"></a>            }
+<a name="line94"></a>            if ($_filepath == false) {
+<a name="line95"></a>                $compiler->trigger_template_error("{insert} missing script file '{$_script}'", $compiler->lex->taglineno);
+<a name="line96"></a>            }
+<a name="line97"></a>            // code for script file loading
+<a name="line98"></a>            $_output .= "require_once '{$_filepath}' ;";
+<a name="line99"></a>            require_once $_filepath;
+<a name="line100"></a>            if (!is_callable($_function)) {
+<a name="line101"></a>                $compiler->trigger_template_error(" {insert} function '{$_function}' is not callable in script file '{$_script}'", $compiler->lex->taglineno);
+<a name="line102"></a>            }
+<a name="line103"></a>        } else {
+<a name="line104"></a>            $_filepath = 'null';
+<a name="line105"></a>            $_function = "insert_{$_name}";
+<a name="line106"></a>            // function in PHP script ?
+<a name="line107"></a>            if (!is_callable($_function)) {
+<a name="line108"></a>                // try plugin
+<a name="line109"></a>                if (!$_function = $compiler->getPlugin($_name, 'insert')) {
+<a name="line110"></a>                    $compiler->trigger_template_error("{insert} no function or plugin found for '{$_name}'", $compiler->lex->taglineno);
+<a name="line111"></a>                }
+<a name="line112"></a>            }
+<a name="line113"></a>        }
+<a name="line114"></a>        // delete {insert} standard attributes
+<a name="line115"></a>        unset($_attr['name'], $_attr['assign'], $_attr['script'], $_attr['nocache']);
+<a name="line116"></a>        // convert attributes into parameter array string
+<a name="line117"></a>        $_paramsArray = array();
+<a name="line118"></a>        foreach ($_attr as $_key => $_value) {
+<a name="line119"></a>            $_paramsArray[] = "'$_key' => $_value";
+<a name="line120"></a>        }
+<a name="line121"></a>        $_params = 'array(' . implode(", ", $_paramsArray) . ')';
+<a name="line122"></a>        // call insert
+<a name="line123"></a>        if (isset($_assign)) {
+<a name="line124"></a>            if ($_smarty_tpl->caching) {
+<a name="line125"></a>                $_output .= "echo Smarty_Internal_Nocache_Insert::compile ('{$_function}',{$_params}, \$_smarty_tpl, '{$_filepath}',{$_assign});?>";
+<a name="line126"></a>            } else {
+<a name="line127"></a>                $_output .= "\$_smarty_tpl->assign({$_assign} , {$_function} ({$_params},\$_smarty_tpl), true);?>";
+<a name="line128"></a>            }
+<a name="line129"></a>        } else {
+<a name="line130"></a>            $compiler->has_output = true;
+<a name="line131"></a>            if ($_smarty_tpl->caching) {
+<a name="line132"></a>                $_output .= "echo Smarty_Internal_Nocache_Insert::compile ('{$_function}',{$_params}, \$_smarty_tpl, '{$_filepath}');?>";
+<a name="line133"></a>            } else {
+<a name="line134"></a>                $_output .= "echo {$_function}({$_params},\$_smarty_tpl);?>";
+<a name="line135"></a>            }
+<a name="line136"></a>        }
+<a name="line137"></a>        return $_output;
+<a name="line138"></a>    }
+<a name="line139"></a>
+<a name="line140"></a>}
+<a name="line141"></a>
+<a name="line142"></a>?></pre>
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_internal_compile_insert.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

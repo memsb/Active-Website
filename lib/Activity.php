@@ -3,6 +3,7 @@
 /**
  * @author Martin Buckley - MBuckley@gmail.com
  * Activity encapsulates the properties and functions of an activity
+ * @namespace active
  */
 class Activity{
 

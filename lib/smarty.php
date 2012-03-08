@@ -1,7 +1,7 @@
 <?php
 
 // put full path to Smarty.class.php
-require('/usr/local/lib/php/Smarty/Smarty.class.php');
+require(LIB . 'php/Smarty/Smarty.class.php');
 $smarty = new Smarty();
 
 $smarty->setTemplateDir(SMARTY . 'templates');

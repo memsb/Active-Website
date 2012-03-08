@@ -1,0 +1,708 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:22 +0000">
+
+<link rel="stylesheet" type="text/css" href="../stylesheet.css">
+<link rel="start" href="../overview-summary.html">
+
+<title>SmartyBC (PHPDoctor)</title>
+
+</head>
+<body id="definition" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../overview-summary.html">Overview</a></li>
+<li><a href="../smarty/package-summary.html">Namespace</a></li>
+<li class="active">Class</li>
+<li><a href="../smarty/package-tree.html">Tree</a></li>
+<li><a href="../overview-files.html">Files</a></li>
+<li><a href="../deprecated-list.html">Deprecated</a></li>
+<li><a href="../todo-list.html">Todo</a></li>
+<li><a href="../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../index.html" target="_top">Frames</a>
+<a href="../smarty/smartybc.html" target="_top">No frames</a>
+</div>
+<div class="small_links">
+Summary: <a href="#summary_field">Field</a> | <a href="#summary_method">Method</a> | <a href="#summary_constr">Constr</a>
+Detail: <a href="#detail_field">Field</a> | <a href="#detail_method">Method</a> | <a href="#summary_constr">Constr</a>
+</div>
+<hr>
+
+<div class="qualifiedName">Smarty\SmartyBC</div>
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line42" class="location">lib/php/Smarty/SmartyBC.class.php at line 42</a>
+
+<h1>Class SmartyBC</h1>
+
+<pre class="tree"><a href="../smarty/smarty_internal_data.html">Smarty_Internal_Data</a><br>    └─<a href="../smarty/smarty_internal_templatebase.html">Smarty_Internal_TemplateBase</a><br>       └─<a href="../smarty/smarty.html">Smarty</a><br>          └─<strong>SmartyBC</strong><br /></pre>
+
+<hr>
+
+<p class="signature">public  class <strong>SmartyBC</strong><br>extends <a href="../smarty/smarty.html">Smarty</a>
+
+</p>
+
+<div class="comment" id="overview_description"><p>Smarty Backward Compatability Wrapper Class</p></div>
+
+<dl>
+<dt>Subpackage:</dt>
+<dd>Template</dd>
+</dl>
+<hr>
+
+<table id="summary_field">
+<tr><th colspan="2">Field Summary</th></tr>
+<tr>
+<td class="type"> string</td>
+<td class="description"><p class="name"><a href="#_version">$_version</a></p><p class="description">Smarty 2 BC</p></td>
+</tr>
+</table>
+
+<table class="inherit">
+<tr><th colspan="2">Fields inherited from Smarty\Smarty</th></tr>
+<tr><td><a href="../smarty/smarty.html#_cacheresource_handlers">_cacheresource_handlers</a>, <a href="../smarty/smarty.html#_current_file">_current_file</a>, <a href="../smarty/smarty.html#_dir_perms">_dir_perms</a>, <a href="../smarty/smarty.html#_file_perms">_file_perms</a>, <a href="../smarty/smarty.html#_parserdebug">_parserdebug</a>, <a href="../smarty/smarty.html#_resource_handlers">_resource_handlers</a>, <a href="../smarty/smarty.html#_smarty_vars">_smarty_vars</a>, <a href="../smarty/smarty.html#_tag_stack">_tag_stack</a>, <a href="../smarty/smarty.html#autoload_filters">autoload_filters</a>, <a href="../smarty/smarty.html#default_modifiers">default_modifiers</a>, <a href="../smarty/smarty.html#escape_html">escape_html</a>, <a href="../smarty/smarty.html#merged_templates_func">merged_templates_func</a>, <a href="../smarty/smarty.html#registered_cache_resources">registered_cache_resources</a>, <a href="../smarty/smarty.html#registered_classes">registered_classes</a>, <a href="../smarty/smarty.html#registered_filters">registered_filters</a>, <a href="../smarty/smarty.html#registered_objects">registered_objects</a>, <a href="../smarty/smarty.html#registered_resources">registered_resources</a>, <a href="../smarty/smarty.html#smarty">smarty</a>, <a href="../smarty/smarty.html#start_time">start_time</a></td></tr></table>
+
+<table id="summary_constructor">
+<tr><th colspan="2">Constructor Summary</th></tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#__construct()">__construct</a>(array options)</p><p class="description">Initialize new SmartyBC object</p></td>
+</tr>
+</table>
+
+<table id="summary_method">
+<tr><th colspan="2">Method Summary</th></tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#assign_by_ref()">assign_by_ref</a>(string tpl_var, mixed &$value, mixed value)</p><p class="description">wrapper for assign_by_ref</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#append_by_ref()">append_by_ref</a>(string tpl_var, mixed &$value, boolean merge, mixed value)</p><p class="description">wrapper for append_by_ref</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#clear_assign()">clear_assign</a>(string tpl_var)</p><p class="description">clear the given assigned template variable.</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#register_function()">register_function</a>(string function, string function_impl, bool cacheable, mixed cache_attrs)</p><p class="description">Registers custom function to be used in templates</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#unregister_function()">unregister_function</a>(string function)</p><p class="description">Unregisters custom function</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#register_object()">register_object</a>(string object, object object_impl, array allowed, boolean smarty_args, array block_functs, mixed block_methods)</p><p class="description">Registers object to be used in templates</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#unregister_object()">unregister_object</a>(string object)</p><p class="description">Unregisters object</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#register_block()">register_block</a>(string block, string block_impl, bool cacheable, mixed cache_attrs)</p><p class="description">Registers block function to be used in templates</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#unregister_block()">unregister_block</a>(string block)</p><p class="description">Unregisters block function</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#register_compiler_function()">register_compiler_function</a>(string function, string function_impl, bool cacheable)</p><p class="description">Registers compiler function</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#unregister_compiler_function()">unregister_compiler_function</a>(string function)</p><p class="description">Unregisters compiler function</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#register_modifier()">register_modifier</a>(string modifier, string modifier_impl)</p><p class="description">Registers modifier to be used in templates</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#unregister_modifier()">unregister_modifier</a>(string modifier)</p><p class="description">Unregisters modifier</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#register_resource()">register_resource</a>(string type, array functions)</p><p class="description">Registers a resource to fetch a template</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#unregister_resource()">unregister_resource</a>(string type)</p><p class="description">Unregisters a resource</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#register_prefilter()">register_prefilter</a>(callable function)</p><p class="description">Registers a prefilter function to apply
+to a template before compiling</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#unregister_prefilter()">unregister_prefilter</a>(callable function)</p><p class="description">Unregisters a prefilter function</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#register_postfilter()">register_postfilter</a>(callable function)</p><p class="description">Registers a postfilter function to apply
+to a compiled template after compilation</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#unregister_postfilter()">unregister_postfilter</a>(callable function)</p><p class="description">Unregisters a postfilter function</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#register_outputfilter()">register_outputfilter</a>(callable function)</p><p class="description">Registers an output filter function to apply
+to a template output</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#unregister_outputfilter()">unregister_outputfilter</a>(callable function)</p><p class="description">Unregisters an outputfilter function</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#load_filter()">load_filter</a>(string type, string name)</p><p class="description">load a filter of specified type and name</p></td>
+</tr>
+<tr>
+<td class="type"> boolean</td>
+<td class="description"><p class="name"><a href="#clear_cache()">clear_cache</a>(string tpl_file, string cache_id, string compile_id, string exp_time)</p><p class="description">clear cached content for the given template and cache id</p></td>
+</tr>
+<tr>
+<td class="type"> boolean</td>
+<td class="description"><p class="name"><a href="#clear_all_cache()">clear_all_cache</a>(string exp_time)</p><p class="description">clear the entire contents of cache (all templates)</p></td>
+</tr>
+<tr>
+<td class="type"> boolean</td>
+<td class="description"><p class="name"><a href="#is_cached()">is_cached</a>(string tpl_file, string cache_id, string compile_id)</p><p class="description">test to see if valid cache exists for this template</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#clear_all_assign()">clear_all_assign</a>()</p><p class="description">clear all the assigned template variables.</p></td>
+</tr>
+<tr>
+<td class="type"> boolean</td>
+<td class="description"><p class="name"><a href="#clear_compiled_tpl()">clear_compiled_tpl</a>(string tpl_file, string compile_id, string exp_time)</p><p class="description">clears compiled version of specified template resource,
+or all compiled template files if one is not specified.
+</p></td>
+</tr>
+<tr>
+<td class="type"> boolean</td>
+<td class="description"><p class="name"><a href="#template_exists()">template_exists</a>(string tpl_file)</p><p class="description">Checks whether requested template exists.</p></td>
+</tr>
+<tr>
+<td class="type"> array</td>
+<td class="description"><p class="name"><a href="#get_template_vars()">get_template_vars</a>(string name)</p><p class="description">Returns an array containing template variables</p></td>
+</tr>
+<tr>
+<td class="type"> array</td>
+<td class="description"><p class="name"><a href="#get_config_vars()">get_config_vars</a>(string name)</p><p class="description">Returns an array containing config variables</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#config_load()">config_load</a>(string file, string section, string scope)</p><p class="description">load configuration values</p></td>
+</tr>
+<tr>
+<td class="type"> object</td>
+<td class="description"><p class="name"><a href="#get_registered_object()">get_registered_object</a>(string name)</p><p class="description">return a reference to a registered object</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#clear_config()">clear_config</a>(string var)</p><p class="description">clear configuration values</p></td>
+</tr>
+<tr>
+<td class="type"> void</td>
+<td class="description"><p class="name"><a href="#trigger_error()">trigger_error</a>(string error_msg, integer error_type)</p><p class="description">trigger Smarty error</p></td>
+</tr>
+</table>
+
+<table class="inherit">
+<tr><th colspan="2">Methods inherited from Smarty\Smarty</th></tr>
+<tr><td><a href="../smarty/smarty.html#__construct()">__construct</a>, <a href="../smarty/smarty.html#addAutoloadFilters()">addAutoloadFilters</a>, <a href="../smarty/smarty.html#addConfigDir()">addConfigDir</a>, <a href="../smarty/smarty.html#addDefaultModifiers()">addDefaultModifiers</a>, <a href="../smarty/smarty.html#addPluginsDir()">addPluginsDir</a>, <a href="../smarty/smarty.html#addTemplateDir()">addTemplateDir</a>, <a href="../smarty/smarty.html#clearAllCache()">clearAllCache</a>, <a href="../smarty/smarty.html#clearCache()">clearCache</a>, <a href="../smarty/smarty.html#clearCompiledTemplate()">clearCompiledTemplate</a>, <a href="../smarty/smarty.html#compileAllConfig()">compileAllConfig</a>, <a href="../smarty/smarty.html#compileAllTemplates()">compileAllTemplates</a>, <a href="../smarty/smarty.html#createTemplate()">createTemplate</a>, <a href="../smarty/smarty.html#disableSecurity()">disableSecurity</a>, <a href="../smarty/smarty.html#enableSecurity()">enableSecurity</a>, <a href="../smarty/smarty.html#getAutoloadFilters()">getAutoloadFilters</a>, <a href="../smarty/smarty.html#getCacheDir()">getCacheDir</a>, <a href="../smarty/smarty.html#getCompileDir()">getCompileDir</a>, <a href="../smarty/smarty.html#getConfigDir()">getConfigDir</a>, <a href="../smarty/smarty.html#getDebugTemplate()">getDebugTemplate</a>, <a href="../smarty/smarty.html#getDefaultModifiers()">getDefaultModifiers</a>, <a href="../smarty/smarty.html#getGlobal()">getGlobal</a>, <a href="../smarty/smarty.html#getPluginsDir()">getPluginsDir</a>, <a href="../smarty/smarty.html#getTags()">getTags</a>, <a href="../smarty/smarty.html#getTemplateDir()">getTemplateDir</a>, <a href="../smarty/smarty.html#loadPlugin()">loadPlugin</a>, <a href="../smarty/smarty.html#muteExpectedErrors()">muteExpectedErrors</a>, <a href="../smarty/smarty.html#mutingErrorHandler()">mutingErrorHandler</a>, <a href="../smarty/smarty.html#setAutoloadFilters()">setAutoloadFilters</a>, <a href="../smarty/smarty.html#setCacheDir()">setCacheDir</a>, <a href="../smarty/smarty.html#setCompileDir()">setCompileDir</a>, <a href="../smarty/smarty.html#setConfigDir()">setConfigDir</a>, <a href="../smarty/smarty.html#setDebugTemplate()">setDebugTemplate</a>, <a href="../smarty/smarty.html#setDefaultModifiers()">setDefaultModifiers</a>, <a href="../smarty/smarty.html#setPluginsDir()">setPluginsDir</a>, <a href="../smarty/smarty.html#setTemplateDir()">setTemplateDir</a>, <a href="../smarty/smarty.html#templateExists()">templateExists</a>, <a href="../smarty/smarty.html#testInstall()">testInstall</a>, <a href="../smarty/smarty.html#unmuteExpectedErrors()">unmuteExpectedErrors</a></td></tr></table>
+
+<table class="inherit">
+<tr><th colspan="2">Methods inherited from Smarty\Smarty_Internal_TemplateBase</th></tr>
+<tr><td><a href="../smarty/smarty_internal_templatebase.html#createData()">createData</a>, <a href="../smarty/smarty_internal_templatebase.html#display()">display</a>, <a href="../smarty/smarty_internal_templatebase.html#fetch()">fetch</a>, <a href="../smarty/smarty_internal_templatebase.html#getRegisteredObject()">getRegisteredObject</a>, <a href="../smarty/smarty_internal_templatebase.html#isCached()">isCached</a>, <a href="../smarty/smarty_internal_templatebase.html#loadFilter()">loadFilter</a>, <a href="../smarty/smarty_internal_templatebase.html#registerCacheResource()">registerCacheResource</a>, <a href="../smarty/smarty_internal_templatebase.html#registerClass()">registerClass</a>, <a href="../smarty/smarty_internal_templatebase.html#registerDefaultConfigHandler()">registerDefaultConfigHandler</a>, <a href="../smarty/smarty_internal_templatebase.html#registerDefaultPluginHandler()">registerDefaultPluginHandler</a>, <a href="../smarty/smarty_internal_templatebase.html#registerDefaultTemplateHandler()">registerDefaultTemplateHandler</a>, <a href="../smarty/smarty_internal_templatebase.html#registerFilter()">registerFilter</a>, <a href="../smarty/smarty_internal_templatebase.html#registerObject()">registerObject</a>, <a href="../smarty/smarty_internal_templatebase.html#registerPlugin()">registerPlugin</a>, <a href="../smarty/smarty_internal_templatebase.html#registerResource()">registerResource</a>, <a href="../smarty/smarty_internal_templatebase.html#unloadFilter()">unloadFilter</a>, <a href="../smarty/smarty_internal_templatebase.html#unregisterCacheResource()">unregisterCacheResource</a>, <a href="../smarty/smarty_internal_templatebase.html#unregisterFilter()">unregisterFilter</a>, <a href="../smarty/smarty_internal_templatebase.html#unregisterObject()">unregisterObject</a>, <a href="../smarty/smarty_internal_templatebase.html#unregisterPlugin()">unregisterPlugin</a>, <a href="../smarty/smarty_internal_templatebase.html#unregisterResource()">unregisterResource</a></td></tr></table>
+
+<table class="inherit">
+<tr><th colspan="2">Methods inherited from Smarty\Smarty_Internal_Data</th></tr>
+<tr><td><a href="../smarty/smarty_internal_data.html#append()">append</a>, <a href="../smarty/smarty_internal_data.html#appendByRef()">appendByRef</a>, <a href="../smarty/smarty_internal_data.html#assign()">assign</a>, <a href="../smarty/smarty_internal_data.html#assignByRef()">assignByRef</a>, <a href="../smarty/smarty_internal_data.html#assignGlobal()">assignGlobal</a>, <a href="../smarty/smarty_internal_data.html#clearAllAssign()">clearAllAssign</a>, <a href="../smarty/smarty_internal_data.html#clearAssign()">clearAssign</a>, <a href="../smarty/smarty_internal_data.html#clearConfig()">clearConfig</a>, <a href="../smarty/smarty_internal_data.html#configLoad()">configLoad</a>, <a href="../smarty/smarty_internal_data.html#getConfigVariable()">getConfigVariable</a>, <a href="../smarty/smarty_internal_data.html#getConfigVars()">getConfigVars</a>, <a href="../smarty/smarty_internal_data.html#getStreamVariable()">getStreamVariable</a>, <a href="../smarty/smarty_internal_data.html#getTemplateVars()">getTemplateVars</a>, <a href="../smarty/smarty_internal_data.html#getVariable()">getVariable</a></td></tr></table>
+
+<h2 id="detail_field">Field Detail</h2>
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line48" class="location">lib/php/Smarty/SmartyBC.class.php at line 48</a>
+
+<h3 id="_version">_version</h3>
+<code class="signature">public  string <strong>$_version</strong> = self::SMARTY_VERSION</code>
+<div class="details">
+<p>Smarty 2 BC</p></div>
+
+<hr>
+
+<h2 id="detail_method">Constructor Detail</h2>
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line55" class="location">lib/php/Smarty/SmartyBC.class.php at line 55</a>
+
+<h3 id="__construct()">__construct</h3>
+<code class="signature">public  void <strong>__construct</strong>(array options)</code>
+<div class="details">
+<p>Initialize new SmartyBC object</p><dl>
+<dt>Parameters:</dt>
+<dd>options - options to set during initialization, e.g. array( 'forceCompile' => false )</dd>
+</dl>
+</div>
+
+<hr>
+
+<h2 id="detail_method">Method Detail</h2>
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line68" class="location">lib/php/Smarty/SmartyBC.class.php at line 68</a>
+
+<h3 id="assign_by_ref()">assign_by_ref</h3>
+<code class="signature">public  void <strong>assign_by_ref</strong>(string tpl_var, mixed &$value, mixed value)</code>
+<div class="details">
+<p>wrapper for assign_by_ref</p><dl>
+<dt>Parameters:</dt>
+<dd>tpl_var - the template variable name</dd>
+<dd>&$value - the referenced value to assign</dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line80" class="location">lib/php/Smarty/SmartyBC.class.php at line 80</a>
+
+<h3 id="append_by_ref()">append_by_ref</h3>
+<code class="signature">public  void <strong>append_by_ref</strong>(string tpl_var, mixed &$value, boolean merge, mixed value)</code>
+<div class="details">
+<p>wrapper for append_by_ref</p><dl>
+<dt>Parameters:</dt>
+<dd>tpl_var - the template variable name</dd>
+<dd>&$value - the referenced value to append</dd>
+<dd>merge - flag if array elements shall be merged</dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line90" class="location">lib/php/Smarty/SmartyBC.class.php at line 90</a>
+
+<h3 id="clear_assign()">clear_assign</h3>
+<code class="signature">public  void <strong>clear_assign</strong>(string tpl_var)</code>
+<div class="details">
+<p>clear the given assigned template variable.</p><dl>
+<dt>Parameters:</dt>
+<dd>tpl_var - the template variable to clear</dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line103" class="location">lib/php/Smarty/SmartyBC.class.php at line 103</a>
+
+<h3 id="register_function()">register_function</h3>
+<code class="signature">public  void <strong>register_function</strong>(string function, string function_impl, bool cacheable, mixed cache_attrs)</code>
+<div class="details">
+<p>Registers custom function to be used in templates</p><dl>
+<dt>Parameters:</dt>
+<dd>function - the name of the template function</dd>
+<dd>function_impl - the name of the PHP function to register</dd>
+<dd></dd>
+<dd></dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line113" class="location">lib/php/Smarty/SmartyBC.class.php at line 113</a>
+
+<h3 id="unregister_function()">unregister_function</h3>
+<code class="signature">public  void <strong>unregister_function</strong>(string function)</code>
+<div class="details">
+<p>Unregisters custom function</p><dl>
+<dt>Parameters:</dt>
+<dd>function - name of template function</dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line127" class="location">lib/php/Smarty/SmartyBC.class.php at line 127</a>
+
+<h3 id="register_object()">register_object</h3>
+<code class="signature">public  void <strong>register_object</strong>(string object, object object_impl, array allowed, boolean smarty_args, array block_functs, mixed block_methods)</code>
+<div class="details">
+<p>Registers object to be used in templates</p><dl>
+<dt>Parameters:</dt>
+<dd>object - name of template object</dd>
+<dd>object_impl - the referenced PHP object to register</dd>
+<dd>allowed - list of allowed methods (empty = all)</dd>
+<dd>smarty_args - smarty argument format, else traditional</dd>
+<dd>block_functs - list of methods that are block format</dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line139" class="location">lib/php/Smarty/SmartyBC.class.php at line 139</a>
+
+<h3 id="unregister_object()">unregister_object</h3>
+<code class="signature">public  void <strong>unregister_object</strong>(string object)</code>
+<div class="details">
+<p>Unregisters object</p><dl>
+<dt>Parameters:</dt>
+<dd>object - name of template object</dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line152" class="location">lib/php/Smarty/SmartyBC.class.php at line 152</a>
+
+<h3 id="register_block()">register_block</h3>
+<code class="signature">public  void <strong>register_block</strong>(string block, string block_impl, bool cacheable, mixed cache_attrs)</code>
+<div class="details">
+<p>Registers block function to be used in templates</p><dl>
+<dt>Parameters:</dt>
+<dd>block - name of template block</dd>
+<dd>block_impl - PHP function to register</dd>
+<dd></dd>
+<dd></dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line162" class="location">lib/php/Smarty/SmartyBC.class.php at line 162</a>
+
+<h3 id="unregister_block()">unregister_block</h3>
+<code class="signature">public  void <strong>unregister_block</strong>(string block)</code>
+<div class="details">
+<p>Unregisters block function</p><dl>
+<dt>Parameters:</dt>
+<dd>block - name of template function</dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line174" class="location">lib/php/Smarty/SmartyBC.class.php at line 174</a>
+
+<h3 id="register_compiler_function()">register_compiler_function</h3>
+<code class="signature">public  void <strong>register_compiler_function</strong>(string function, string function_impl, bool cacheable)</code>
+<div class="details">
+<p>Registers compiler function</p><dl>
+<dt>Parameters:</dt>
+<dd>function - name of template function</dd>
+<dd>function_impl - name of PHP function to register</dd>
+<dd></dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line184" class="location">lib/php/Smarty/SmartyBC.class.php at line 184</a>
+
+<h3 id="unregister_compiler_function()">unregister_compiler_function</h3>
+<code class="signature">public  void <strong>unregister_compiler_function</strong>(string function)</code>
+<div class="details">
+<p>Unregisters compiler function</p><dl>
+<dt>Parameters:</dt>
+<dd>function - name of template function</dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line195" class="location">lib/php/Smarty/SmartyBC.class.php at line 195</a>
+
+<h3 id="register_modifier()">register_modifier</h3>
+<code class="signature">public  void <strong>register_modifier</strong>(string modifier, string modifier_impl)</code>
+<div class="details">
+<p>Registers modifier to be used in templates</p><dl>
+<dt>Parameters:</dt>
+<dd>modifier - name of template modifier</dd>
+<dd>modifier_impl - name of PHP function to register</dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line205" class="location">lib/php/Smarty/SmartyBC.class.php at line 205</a>
+
+<h3 id="unregister_modifier()">unregister_modifier</h3>
+<code class="signature">public  void <strong>unregister_modifier</strong>(string modifier)</code>
+<div class="details">
+<p>Unregisters modifier</p><dl>
+<dt>Parameters:</dt>
+<dd>modifier - name of template modifier</dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line216" class="location">lib/php/Smarty/SmartyBC.class.php at line 216</a>
+
+<h3 id="register_resource()">register_resource</h3>
+<code class="signature">public  void <strong>register_resource</strong>(string type, array functions)</code>
+<div class="details">
+<p>Registers a resource to fetch a template</p><dl>
+<dt>Parameters:</dt>
+<dd>type - name of resource</dd>
+<dd>functions - array of functions to handle resource</dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line226" class="location">lib/php/Smarty/SmartyBC.class.php at line 226</a>
+
+<h3 id="unregister_resource()">unregister_resource</h3>
+<code class="signature">public  void <strong>unregister_resource</strong>(string type)</code>
+<div class="details">
+<p>Unregisters a resource</p><dl>
+<dt>Parameters:</dt>
+<dd>type - name of resource</dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line237" class="location">lib/php/Smarty/SmartyBC.class.php at line 237</a>
+
+<h3 id="register_prefilter()">register_prefilter</h3>
+<code class="signature">public  void <strong>register_prefilter</strong>(callable function)</code>
+<div class="details">
+<p>Registers a prefilter function to apply
+to a template before compiling</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line247" class="location">lib/php/Smarty/SmartyBC.class.php at line 247</a>
+
+<h3 id="unregister_prefilter()">unregister_prefilter</h3>
+<code class="signature">public  void <strong>unregister_prefilter</strong>(callable function)</code>
+<div class="details">
+<p>Unregisters a prefilter function</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line258" class="location">lib/php/Smarty/SmartyBC.class.php at line 258</a>
+
+<h3 id="register_postfilter()">register_postfilter</h3>
+<code class="signature">public  void <strong>register_postfilter</strong>(callable function)</code>
+<div class="details">
+<p>Registers a postfilter function to apply
+to a compiled template after compilation</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line268" class="location">lib/php/Smarty/SmartyBC.class.php at line 268</a>
+
+<h3 id="unregister_postfilter()">unregister_postfilter</h3>
+<code class="signature">public  void <strong>unregister_postfilter</strong>(callable function)</code>
+<div class="details">
+<p>Unregisters a postfilter function</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line279" class="location">lib/php/Smarty/SmartyBC.class.php at line 279</a>
+
+<h3 id="register_outputfilter()">register_outputfilter</h3>
+<code class="signature">public  void <strong>register_outputfilter</strong>(callable function)</code>
+<div class="details">
+<p>Registers an output filter function to apply
+to a template output</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line289" class="location">lib/php/Smarty/SmartyBC.class.php at line 289</a>
+
+<h3 id="unregister_outputfilter()">unregister_outputfilter</h3>
+<code class="signature">public  void <strong>unregister_outputfilter</strong>(callable function)</code>
+<div class="details">
+<p>Unregisters an outputfilter function</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line300" class="location">lib/php/Smarty/SmartyBC.class.php at line 300</a>
+
+<h3 id="load_filter()">load_filter</h3>
+<code class="signature">public  void <strong>load_filter</strong>(string type, string name)</code>
+<div class="details">
+<p>load a filter of specified type and name</p><dl>
+<dt>Parameters:</dt>
+<dd>type - filter type</dd>
+<dd>name - filter name</dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line314" class="location">lib/php/Smarty/SmartyBC.class.php at line 314</a>
+
+<h3 id="clear_cache()">clear_cache</h3>
+<code class="signature">public  boolean <strong>clear_cache</strong>(string tpl_file, string cache_id, string compile_id, string exp_time)</code>
+<div class="details">
+<p>clear cached content for the given template and cache id</p><dl>
+<dt>Parameters:</dt>
+<dd>tpl_file - name of template file</dd>
+<dd>cache_id - name of cache_id</dd>
+<dd>compile_id - name of compile_id</dd>
+<dd>exp_time - expiration time</dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line325" class="location">lib/php/Smarty/SmartyBC.class.php at line 325</a>
+
+<h3 id="clear_all_cache()">clear_all_cache</h3>
+<code class="signature">public  boolean <strong>clear_all_cache</strong>(string exp_time)</code>
+<div class="details">
+<p>clear the entire contents of cache (all templates)</p><dl>
+<dt>Parameters:</dt>
+<dd>exp_time - expire time</dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line338" class="location">lib/php/Smarty/SmartyBC.class.php at line 338</a>
+
+<h3 id="is_cached()">is_cached</h3>
+<code class="signature">public  boolean <strong>is_cached</strong>(string tpl_file, string cache_id, string compile_id)</code>
+<div class="details">
+<p>test to see if valid cache exists for this template</p><dl>
+<dt>Parameters:</dt>
+<dd>tpl_file - name of template file</dd>
+<dd></dd>
+<dd></dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line346" class="location">lib/php/Smarty/SmartyBC.class.php at line 346</a>
+
+<h3 id="clear_all_assign()">clear_all_assign</h3>
+<code class="signature">public  void <strong>clear_all_assign</strong>()</code>
+<div class="details">
+<p>clear all the assigned template variables.</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line361" class="location">lib/php/Smarty/SmartyBC.class.php at line 361</a>
+
+<h3 id="clear_compiled_tpl()">clear_compiled_tpl</h3>
+<code class="signature">public  boolean <strong>clear_compiled_tpl</strong>(string tpl_file, string compile_id, string exp_time)</code>
+<div class="details">
+<p>clears compiled version of specified template resource,
+or all compiled template files if one is not specified.
+This function is for advanced use only, not normally needed.</p><dl>
+<dt>Returns:</dt>
+<dd>results of {@link smarty_core_rm_auto()}</dd>
+</dl>
+</div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line372" class="location">lib/php/Smarty/SmartyBC.class.php at line 372</a>
+
+<h3 id="template_exists()">template_exists</h3>
+<code class="signature">public  boolean <strong>template_exists</strong>(string tpl_file)</code>
+<div class="details">
+<p>Checks whether requested template exists.</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line383" class="location">lib/php/Smarty/SmartyBC.class.php at line 383</a>
+
+<h3 id="get_template_vars()">get_template_vars</h3>
+<code class="signature">public  array <strong>get_template_vars</strong>(string name)</code>
+<div class="details">
+<p>Returns an array containing template variables</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line394" class="location">lib/php/Smarty/SmartyBC.class.php at line 394</a>
+
+<h3 id="get_config_vars()">get_config_vars</h3>
+<code class="signature">public  array <strong>get_config_vars</strong>(string name)</code>
+<div class="details">
+<p>Returns an array containing config variables</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line406" class="location">lib/php/Smarty/SmartyBC.class.php at line 406</a>
+
+<h3 id="config_load()">config_load</h3>
+<code class="signature">public  void <strong>config_load</strong>(string file, string section, string scope)</code>
+<div class="details">
+<p>load configuration values</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line417" class="location">lib/php/Smarty/SmartyBC.class.php at line 417</a>
+
+<h3 id="get_registered_object()">get_registered_object</h3>
+<code class="signature">public  object <strong>get_registered_object</strong>(string name)</code>
+<div class="details">
+<p>return a reference to a registered object</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line427" class="location">lib/php/Smarty/SmartyBC.class.php at line 427</a>
+
+<h3 id="clear_config()">clear_config</h3>
+<code class="signature">public  void <strong>clear_config</strong>(string var)</code>
+<div class="details">
+<p>clear configuration values</p></div>
+
+<hr>
+
+<a href="../source/lib/php/smarty/smartybc.class.php.html#line438" class="location">lib/php/Smarty/SmartyBC.class.php at line 438</a>
+
+<h3 id="trigger_error()">trigger_error</h3>
+<code class="signature">public  void <strong>trigger_error</strong>(string error_msg, integer error_type)</code>
+<div class="details">
+<p>trigger Smarty error</p></div>
+
+<hr>
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../overview-summary.html">Overview</a></li>
+<li><a href="../smarty/package-summary.html">Namespace</a></li>
+<li class="active">Class</li>
+<li><a href="../smarty/package-tree.html">Tree</a></li>
+<li><a href="../overview-files.html">Files</a></li>
+<li><a href="../deprecated-list.html">Deprecated</a></li>
+<li><a href="../todo-list.html">Todo</a></li>
+<li><a href="../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../index.html" target="_top">Frames</a>
+<a href="../smarty/smartybc.html" target="_top">No frames</a>
+</div>
+<div class="small_links">
+Summary: <a href="#summary_field">Field</a> | <a href="#summary_method">Method</a> | <a href="#summary_constr">Constr</a>
+Detail: <a href="#detail_field">Field</a> | <a href="#detail_method">Method</a> | <a href="#summary_constr">Constr</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

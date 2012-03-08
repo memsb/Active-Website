@@ -7,6 +7,7 @@ require_once LIB . 'User.php';
 /**
  * @author Martin Buckley - MBuckley@gmail.com
  * Stats holds the statistics for the web service
+ * @namespace active
  */
 class Stats {
 

@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
+
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css">
+<link rel="start" href="../../../../../overview-summary.html">
+
+<title>lib/php/Smarty/sysplugins/smarty_internal_compile_function.php (PHPDoctor)</title>
+
+</head>
+<body id="file" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_internal_compile_function.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<h1>lib/php/Smarty/sysplugins/smarty_internal_compile_function.php</h1>
+<div class="comment" id="overview_description"><p>Smarty Internal Plugin Compile Function</p><p>Compiles the {function} {/function} tags</p></div>
+
+<hr>
+
+<a name="line1"></a><pre><?php
+<a name="line2"></a>/**
+<a name="line3"></a> * Smarty Internal Plugin Compile Function
+<a name="line4"></a> *
+<a name="line5"></a> * Compiles the {function} {/function} tags
+<a name="line6"></a> *
+<a name="line7"></a> * @package Smarty
+<a name="line8"></a> * @subpackage Compiler
+<a name="line9"></a> * @author Uwe Tews
+<a name="line10"></a> */
+<a name="line11"></a>
+<a name="line12"></a>/**
+<a name="line13"></a> * Smarty Internal Plugin Compile Function Class
+<a name="line14"></a> *
+<a name="line15"></a> * @package Smarty
+<a name="line16"></a> * @subpackage Compiler
+<a name="line17"></a> */
+<a name="line18"></a>class Smarty_Internal_Compile_Function extends Smarty_Internal_CompileBase {
+<a name="line19"></a>
+<a name="line20"></a>    /**
+<a name="line21"></a>     * Attribute definition: Overwrites base class.
+<a name="line22"></a>     *
+<a name="line23"></a>     * @var array
+<a name="line24"></a>     * @see Smarty_Internal_CompileBase
+<a name="line25"></a>     */
+<a name="line26"></a>    public $required_attributes = array('name');
+<a name="line27"></a>    /**
+<a name="line28"></a>     * Attribute definition: Overwrites base class.
+<a name="line29"></a>     *
+<a name="line30"></a>     * @var array
+<a name="line31"></a>     * @see Smarty_Internal_CompileBase
+<a name="line32"></a>     */
+<a name="line33"></a>    public $shorttag_order = array('name');
+<a name="line34"></a>    /**
+<a name="line35"></a>     * Attribute definition: Overwrites base class.
+<a name="line36"></a>     *
+<a name="line37"></a>     * @var array
+<a name="line38"></a>     * @see Smarty_Internal_CompileBase
+<a name="line39"></a>     */
+<a name="line40"></a>    public $optional_attributes = array('_any');
+<a name="line41"></a>
+<a name="line42"></a>    /**
+<a name="line43"></a>     * Compiles code for the {function} tag
+<a name="line44"></a>     *
+<a name="line45"></a>     * @param array $args array with attributes from parser
+<a name="line46"></a>     * @param object $compiler compiler object
+<a name="line47"></a>     * @param array $parameter array with compilation parameter
+<a name="line48"></a>     * @return boolean true
+<a name="line49"></a>     */
+<a name="line50"></a>    public function compile($args, $compiler, $parameter)
+<a name="line51"></a>    {
+<a name="line52"></a>        // check and get attributes
+<a name="line53"></a>        $_attr = $this->getAttributes($compiler, $args);
+<a name="line54"></a>
+<a name="line55"></a>        if ($_attr['nocache'] === true) {
+<a name="line56"></a>            $compiler->trigger_template_error('nocache option not allowed', $compiler->lex->taglineno);
+<a name="line57"></a>        }
+<a name="line58"></a>        unset($_attr['nocache']);
+<a name="line59"></a>        $save = array($_attr, $compiler->parser->current_buffer,
+<a name="line60"></a>            $compiler->template->has_nocache_code, $compiler->template->required_plugins);
+<a name="line61"></a>        $this->openTag($compiler, 'function', $save);
+<a name="line62"></a>        $_name = trim($_attr['name'], "'\"");
+<a name="line63"></a>        unset($_attr['name']);
+<a name="line64"></a>        // set flag that we are compiling a template function
+<a name="line65"></a>        $compiler->compiles_template_function = true;
+<a name="line66"></a>        $compiler->template->properties['function'][$_name]['parameter'] = array();
+<a name="line67"></a>        $_smarty_tpl = $compiler->template;
+<a name="line68"></a>        foreach ($_attr as $_key => $_data) {
+<a name="line69"></a>            eval ('$tmp='.$_data.';');
+<a name="line70"></a>            $compiler->template->properties['function'][$_name]['parameter'][$_key] = $tmp;
+<a name="line71"></a>        }
+<a name="line72"></a>        $compiler->smarty->template_functions[$_name]['parameter'] = $compiler->template->properties['function'][$_name]['parameter'];
+<a name="line73"></a>        if ($compiler->template->caching) {
+<a name="line74"></a>            $output = '';
+<a name="line75"></a>        } else {
+<a name="line76"></a>            $output = "<?php if (!function_exists('smarty_template_function_{$_name}')) {
+<a name="line77"></a>    function smarty_template_function_{$_name}(\$_smarty_tpl,\$params) {
+<a name="line78"></a>    \$saved_tpl_vars = \$_smarty_tpl->tpl_vars;
+<a name="line79"></a>    foreach (\$_smarty_tpl->smarty->template_functions['{$_name}']['parameter'] as \$key => \$value) {\$_smarty_tpl->tpl_vars[\$key] = new Smarty_variable(\$value);};
+<a name="line80"></a>    foreach (\$params as \$key => \$value) {\$_smarty_tpl->tpl_vars[\$key] = new Smarty_variable(\$value);}?>";
+<a name="line81"></a>        }
+<a name="line82"></a>        // Init temporay context
+<a name="line83"></a>        $compiler->template->required_plugins = array('compiled' => array(), 'nocache' => array());
+<a name="line84"></a>        $compiler->parser->current_buffer = new _smarty_template_buffer($compiler->parser);
+<a name="line85"></a>        $compiler->parser->current_buffer->append_subtree(new _smarty_tag($compiler->parser, $output));
+<a name="line86"></a>        $compiler->template->has_nocache_code = false;
+<a name="line87"></a>        $compiler->has_code = false;
+<a name="line88"></a>        $compiler->template->properties['function'][$_name]['compiled'] = '';
+<a name="line89"></a>        return true;
+<a name="line90"></a>    }
+<a name="line91"></a>
+<a name="line92"></a>}
+<a name="line93"></a>
+<a name="line94"></a>/**
+<a name="line95"></a> * Smarty Internal Plugin Compile Functionclose Class
+<a name="line96"></a> *
+<a name="line97"></a> * @package Smarty
+<a name="line98"></a> * @subpackage Compiler
+<a name="line99"></a> */
+<a name="line100"></a>class Smarty_Internal_Compile_Functionclose extends Smarty_Internal_CompileBase {
+<a name="line101"></a>
+<a name="line102"></a>    /**
+<a name="line103"></a>     * Compiles code for the {/function} tag
+<a name="line104"></a>     *
+<a name="line105"></a>     * @param array $args array with attributes from parser
+<a name="line106"></a>     * @param object $compiler compiler object
+<a name="line107"></a>     * @param array $parameter array with compilation parameter
+<a name="line108"></a>     * @return boolean true
+<a name="line109"></a>     */
+<a name="line110"></a>    public function compile($args, $compiler, $parameter)
+<a name="line111"></a>    {
+<a name="line112"></a>        $_attr = $this->getAttributes($compiler, $args);
+<a name="line113"></a>        $saved_data = $this->closeTag($compiler, array('function'));
+<a name="line114"></a>        $_name = trim($saved_data[0]['name'], "'\"");
+<a name="line115"></a>        // build plugin include code
+<a name="line116"></a>        $plugins_string = '';
+<a name="line117"></a>        if (!empty($compiler->template->required_plugins['compiled'])) {
+<a name="line118"></a>            $plugins_string = '<?php ';
+<a name="line119"></a>            foreach($compiler->template->required_plugins['compiled'] as $tmp) {
+<a name="line120"></a>                foreach($tmp as $data) {
+<a name="line121"></a>                    $plugins_string .= "if (!is_callable('{$data['function']}')) include '{$data['file']}';\n";
+<a name="line122"></a>                }
+<a name="line123"></a>            }
+<a name="line124"></a>            $plugins_string .= '?>';
+<a name="line125"></a>        }
+<a name="line126"></a>        if (!empty($compiler->template->required_plugins['nocache'])) {
+<a name="line127"></a>            $plugins_string .= "<?php echo '/*%%SmartyNocache:{$compiler->template->properties['nocache_hash']}%%*/<?php ";
+<a name="line128"></a>            foreach($compiler->template->required_plugins['nocache'] as $tmp) {
+<a name="line129"></a>                foreach($tmp as $data) {
+<a name="line130"></a>                    $plugins_string .= "if (!is_callable(\'{$data['function']}\')) include \'{$data['file']}\';\n";
+<a name="line131"></a>                }
+<a name="line132"></a>            }
+<a name="line133"></a>            $plugins_string .= "?>/*/%%SmartyNocache:{$compiler->template->properties['nocache_hash']}%%*/';?>\n";
+<a name="line134"></a>        }
+<a name="line135"></a>         // remove last line break from function definition
+<a name="line136"></a>         $last = count($compiler->parser->current_buffer->subtrees) - 1;
+<a name="line137"></a>         if ($compiler->parser->current_buffer->subtrees[$last] instanceof _smarty_linebreak) {
+<a name="line138"></a>             unset($compiler->parser->current_buffer->subtrees[$last]);
+<a name="line139"></a>         }
+<a name="line140"></a>        // if caching save template function for possible nocache call
+<a name="line141"></a>        if ($compiler->template->caching) {
+<a name="line142"></a>            $compiler->template->properties['function'][$_name]['compiled'] .= $plugins_string
+<a name="line143"></a>             . $compiler->parser->current_buffer->to_smarty_php();
+<a name="line144"></a>            $compiler->template->properties['function'][$_name]['nocache_hash'] = $compiler->template->properties['nocache_hash'];
+<a name="line145"></a>            $compiler->template->properties['function'][$_name]['has_nocache_code'] = $compiler->template->has_nocache_code;
+<a name="line146"></a>            $compiler->template->properties['function'][$_name]['called_functions'] = $compiler->called_functions;
+<a name="line147"></a>            $compiler->called_functions = array();
+<a name="line148"></a>            $compiler->smarty->template_functions[$_name] = $compiler->template->properties['function'][$_name];
+<a name="line149"></a>            $compiler->has_code = false;
+<a name="line150"></a>            $output = true;
+<a name="line151"></a>        } else {
+<a name="line152"></a>            $output = $plugins_string . $compiler->parser->current_buffer->to_smarty_php() . "<?php \$_smarty_tpl->tpl_vars = \$saved_tpl_vars;}}?>\n";
+<a name="line153"></a>        }
+<a name="line154"></a>        // reset flag that we are compiling a template function
+<a name="line155"></a>        $compiler->compiles_template_function = false;
+<a name="line156"></a>        // restore old compiler status
+<a name="line157"></a>        $compiler->parser->current_buffer = $saved_data[1];
+<a name="line158"></a>        $compiler->template->has_nocache_code = $compiler->template->has_nocache_code | $saved_data[2];
+<a name="line159"></a>        $compiler->template->required_plugins = $saved_data[3];
+<a name="line160"></a>        return $output;
+<a name="line161"></a>    }
+<a name="line162"></a>
+<a name="line163"></a>}
+<a name="line164"></a>
+<a name="line165"></a>?></pre>
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_internal_compile_function.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

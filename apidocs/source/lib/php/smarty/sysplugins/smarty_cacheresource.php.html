@@ -1,0 +1,443 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
+
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css">
+<link rel="start" href="../../../../../overview-summary.html">
+
+<title>lib/php/Smarty/sysplugins/smarty_cacheresource.php (PHPDoctor)</title>
+
+</head>
+<body id="file" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_cacheresource.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<h1>lib/php/Smarty/sysplugins/smarty_cacheresource.php</h1>
+<div class="comment" id="overview_description"><p>Smarty Internal Plugin</p></div>
+
+<hr>
+
+<a name="line1"></a><pre><?php
+<a name="line2"></a>/**
+<a name="line3"></a>* Smarty Internal Plugin
+<a name="line4"></a>*
+<a name="line5"></a>* @package Smarty
+<a name="line6"></a>* @subpackage Cacher
+<a name="line7"></a>*/
+<a name="line8"></a>
+<a name="line9"></a>/**
+<a name="line10"></a>* Cache Handler API
+<a name="line11"></a>*
+<a name="line12"></a>* @package Smarty
+<a name="line13"></a>* @subpackage Cacher
+<a name="line14"></a>* @author Rodney Rehm
+<a name="line15"></a>*/
+<a name="line16"></a>abstract class Smarty_CacheResource {
+<a name="line17"></a>    /**
+<a name="line18"></a>    * cache for Smarty_CacheResource instances
+<a name="line19"></a>    * @var array
+<a name="line20"></a>    */
+<a name="line21"></a>    public static $resources = array();
+<a name="line22"></a>
+<a name="line23"></a>    /**
+<a name="line24"></a>    * resource types provided by the core
+<a name="line25"></a>    * @var array
+<a name="line26"></a>    */
+<a name="line27"></a>    protected static $sysplugins = array(
+<a name="line28"></a>        'file' => true,
+<a name="line29"></a>    );
+<a name="line30"></a>
+<a name="line31"></a>    /**
+<a name="line32"></a>    * populate Cached Object with meta data from Resource
+<a name="line33"></a>    *
+<a name="line34"></a>    * @param Smarty_Template_Cached $cached cached object
+<a name="line35"></a>    * @param Smarty_Internal_Template $_template template object
+<a name="line36"></a>    * @return void
+<a name="line37"></a>    */
+<a name="line38"></a>    public abstract function populate(Smarty_Template_Cached $cached, Smarty_Internal_Template $_template);
+<a name="line39"></a>
+<a name="line40"></a>    /**
+<a name="line41"></a>    * populate Cached Object with timestamp and exists from Resource
+<a name="line42"></a>    *
+<a name="line43"></a>    * @param Smarty_Template_Cached $source cached object
+<a name="line44"></a>    * @return void
+<a name="line45"></a>    */
+<a name="line46"></a>    public abstract function populateTimestamp(Smarty_Template_Cached $cached);
+<a name="line47"></a>
+<a name="line48"></a>    /**
+<a name="line49"></a>    * Read the cached template and process header
+<a name="line50"></a>    *
+<a name="line51"></a>    * @param Smarty_Internal_Template $_template template object
+<a name="line52"></a>    * @param Smarty_Template_Cached $cached cached object
+<a name="line53"></a>    * @return booelan true or false if the cached content does not exist
+<a name="line54"></a>    */
+<a name="line55"></a>    public abstract function process(Smarty_Internal_Template $_template, Smarty_Template_Cached $cached=null);
+<a name="line56"></a>
+<a name="line57"></a>    /**
+<a name="line58"></a>    * Write the rendered template output to cache
+<a name="line59"></a>    *
+<a name="line60"></a>    * @param Smarty_Internal_Template $_template template object
+<a name="line61"></a>    * @param string $content content to cache
+<a name="line62"></a>    * @return boolean success
+<a name="line63"></a>    */
+<a name="line64"></a>    public abstract function writeCachedContent(Smarty_Internal_Template $_template, $content);
+<a name="line65"></a>
+<a name="line66"></a>    /**
+<a name="line67"></a>    * Return cached content
+<a name="line68"></a>    *
+<a name="line69"></a>    * @param Smarty_Internal_Template $_template template object
+<a name="line70"></a>    * @param string $content content of cache
+<a name="line71"></a>    */
+<a name="line72"></a>    public function getCachedContent(Smarty_Internal_Template $_template)
+<a name="line73"></a>    {
+<a name="line74"></a>        if ($_template->cached->handler->process($_template)) {
+<a name="line75"></a>            ob_start();
+<a name="line76"></a>            $_template->properties['unifunc']($_template);
+<a name="line77"></a>            return ob_get_clean();
+<a name="line78"></a>        }
+<a name="line79"></a>        return null;
+<a name="line80"></a>    }
+<a name="line81"></a>
+<a name="line82"></a>    /**
+<a name="line83"></a>    * Empty cache
+<a name="line84"></a>    *
+<a name="line85"></a>    * @param Smarty $smarty Smarty object
+<a name="line86"></a>    * @param integer $exp_time expiration time (number of seconds, not timestamp)
+<a name="line87"></a>    * @return integer number of cache files deleted
+<a name="line88"></a>    */
+<a name="line89"></a>    public abstract function clearAll(Smarty $smarty, $exp_time=null);
+<a name="line90"></a>
+<a name="line91"></a>    /**
+<a name="line92"></a>    * Empty cache for a specific template
+<a name="line93"></a>    *
+<a name="line94"></a>    * @param Smarty $smarty Smarty object
+<a name="line95"></a>    * @param string $resource_name template name
+<a name="line96"></a>    * @param string $cache_id cache id
+<a name="line97"></a>    * @param string $compile_id compile id
+<a name="line98"></a>    * @param integer $exp_time expiration time (number of seconds, not timestamp)
+<a name="line99"></a>    * @return integer number of cache files deleted
+<a name="line100"></a>    */
+<a name="line101"></a>    public abstract function clear(Smarty $smarty, $resource_name, $cache_id, $compile_id, $exp_time);
+<a name="line102"></a>
+<a name="line103"></a>
+<a name="line104"></a>    public function locked(Smarty $smarty, Smarty_Template_Cached $cached)
+<a name="line105"></a>    {
+<a name="line106"></a>        // theoretically locking_timeout should be checked against time_limit (max_execution_time)
+<a name="line107"></a>        $start = microtime(true);
+<a name="line108"></a>        $hadLock = null;
+<a name="line109"></a>        while ($this->hasLock($smarty, $cached)) {
+<a name="line110"></a>            $hadLock = true;
+<a name="line111"></a>            if (microtime(true) - $start > $smarty->locking_timeout) {
+<a name="line112"></a>                // abort waiting for lock release
+<a name="line113"></a>                return false;
+<a name="line114"></a>            }
+<a name="line115"></a>            sleep(1);
+<a name="line116"></a>        }
+<a name="line117"></a>        return $hadLock;
+<a name="line118"></a>    }
+<a name="line119"></a>
+<a name="line120"></a>    public function hasLock(Smarty $smarty, Smarty_Template_Cached $cached)
+<a name="line121"></a>    {
+<a name="line122"></a>        // check if lock exists
+<a name="line123"></a>        return false;
+<a name="line124"></a>    }
+<a name="line125"></a>
+<a name="line126"></a>    public function acquireLock(Smarty $smarty, Smarty_Template_Cached $cached)
+<a name="line127"></a>    {
+<a name="line128"></a>        // create lock
+<a name="line129"></a>        return true;
+<a name="line130"></a>    }
+<a name="line131"></a>
+<a name="line132"></a>    public function releaseLock(Smarty $smarty, Smarty_Template_Cached $cached)
+<a name="line133"></a>    {
+<a name="line134"></a>        // release lock
+<a name="line135"></a>        return true;
+<a name="line136"></a>    }
+<a name="line137"></a>
+<a name="line138"></a>
+<a name="line139"></a>    /**
+<a name="line140"></a>    * Load Cache Resource Handler
+<a name="line141"></a>    *
+<a name="line142"></a>    * @param Smarty $smarty Smarty object
+<a name="line143"></a>    * @param string $type name of the cache resource
+<a name="line144"></a>    * @return Smarty_CacheResource Cache Resource Handler
+<a name="line145"></a>    */
+<a name="line146"></a>    public static function load(Smarty $smarty, $type = null)
+<a name="line147"></a>    {
+<a name="line148"></a>        if (!isset($type)) {
+<a name="line149"></a>            $type = $smarty->caching_type;
+<a name="line150"></a>        }
+<a name="line151"></a>
+<a name="line152"></a>        // try smarty's cache
+<a name="line153"></a>        if (isset($smarty->_cacheresource_handlers[$type])) {
+<a name="line154"></a>            return $smarty->_cacheresource_handlers[$type];
+<a name="line155"></a>        }
+<a name="line156"></a>        
+<a name="line157"></a>        // try registered resource
+<a name="line158"></a>        if (isset($smarty->registered_cache_resources[$type])) {
+<a name="line159"></a>            // do not cache these instances as they may vary from instance to instance
+<a name="line160"></a>            return $smarty->_cacheresource_handlers[$type] = $smarty->registered_cache_resources[$type];
+<a name="line161"></a>        }
+<a name="line162"></a>        // try sysplugins dir
+<a name="line163"></a>        if (isset(self::$sysplugins[$type])) {
+<a name="line164"></a>            if (!isset(self::$resources[$type])) {
+<a name="line165"></a>                $cache_resource_class = 'Smarty_Internal_CacheResource_' . ucfirst($type);
+<a name="line166"></a>                self::$resources[$type] = new $cache_resource_class();
+<a name="line167"></a>            }
+<a name="line168"></a>            return $smarty->_cacheresource_handlers[$type] = self::$resources[$type];
+<a name="line169"></a>        }
+<a name="line170"></a>        // try plugins dir
+<a name="line171"></a>        $cache_resource_class = 'Smarty_CacheResource_' . ucfirst($type);
+<a name="line172"></a>        if ($smarty->loadPlugin($cache_resource_class)) {
+<a name="line173"></a>            if (!isset(self::$resources[$type])) {
+<a name="line174"></a>                self::$resources[$type] = new $cache_resource_class();
+<a name="line175"></a>            }
+<a name="line176"></a>            return $smarty->_cacheresource_handlers[$type] = self::$resources[$type];
+<a name="line177"></a>        }
+<a name="line178"></a>        // give up
+<a name="line179"></a>        throw new SmartyException("Unable to load cache resource '{$type}'");
+<a name="line180"></a>    }
+<a name="line181"></a>
+<a name="line182"></a>    /**
+<a name="line183"></a>    * Invalid Loaded Cache Files
+<a name="line184"></a>    *
+<a name="line185"></a>    * @param Smarty $smarty Smarty object
+<a name="line186"></a>    */
+<a name="line187"></a>    public static function invalidLoadedCache(Smarty $smarty)
+<a name="line188"></a>    {
+<a name="line189"></a>        foreach ($smarty->template_objects as $tpl) {
+<a name="line190"></a>            if (isset($tpl->cached)) {
+<a name="line191"></a>                $tpl->cached->valid = false;
+<a name="line192"></a>                $tpl->cached->processed = false;
+<a name="line193"></a>            }
+<a name="line194"></a>        }
+<a name="line195"></a>    }
+<a name="line196"></a>}
+<a name="line197"></a>
+<a name="line198"></a>/**
+<a name="line199"></a>* Smarty Resource Data Object
+<a name="line200"></a>*
+<a name="line201"></a>* Cache Data Container for Template Files
+<a name="line202"></a>*
+<a name="line203"></a>* @package Smarty
+<a name="line204"></a>* @subpackage TemplateResources
+<a name="line205"></a>* @author Rodney Rehm
+<a name="line206"></a>*/
+<a name="line207"></a>class Smarty_Template_Cached {
+<a name="line208"></a>    /**
+<a name="line209"></a>    * Source Filepath
+<a name="line210"></a>    * @var string
+<a name="line211"></a>    */
+<a name="line212"></a>    public $filepath = false;
+<a name="line213"></a>
+<a name="line214"></a>    /**
+<a name="line215"></a>    * Source Content
+<a name="line216"></a>    * @var string
+<a name="line217"></a>    */
+<a name="line218"></a>    public $content = null;
+<a name="line219"></a>
+<a name="line220"></a>    /**
+<a name="line221"></a>    * Source Timestamp
+<a name="line222"></a>    * @var integer
+<a name="line223"></a>    */
+<a name="line224"></a>    public $timestamp = false;
+<a name="line225"></a>
+<a name="line226"></a>    /**
+<a name="line227"></a>    * Source Existance
+<a name="line228"></a>    * @var boolean
+<a name="line229"></a>    */
+<a name="line230"></a>    public $exists = false;
+<a name="line231"></a>
+<a name="line232"></a>    /**
+<a name="line233"></a>    * Cache Is Valid
+<a name="line234"></a>    * @var boolean
+<a name="line235"></a>    */
+<a name="line236"></a>    public $valid = false;
+<a name="line237"></a>
+<a name="line238"></a>    /**
+<a name="line239"></a>    * Cache was processed
+<a name="line240"></a>    * @var boolean
+<a name="line241"></a>    */
+<a name="line242"></a>    public $processed = false;
+<a name="line243"></a>
+<a name="line244"></a>    /**
+<a name="line245"></a>    * CacheResource Handler
+<a name="line246"></a>    * @var Smarty_CacheResource
+<a name="line247"></a>    */
+<a name="line248"></a>    public $handler = null;
+<a name="line249"></a>
+<a name="line250"></a>    /**
+<a name="line251"></a>    * Template Compile Id (Smarty_Internal_Template::$compile_id)
+<a name="line252"></a>    * @var string
+<a name="line253"></a>    */
+<a name="line254"></a>    public $compile_id = null;
+<a name="line255"></a>
+<a name="line256"></a>    /**
+<a name="line257"></a>    * Template Cache Id (Smarty_Internal_Template::$cache_id)
+<a name="line258"></a>    * @var string
+<a name="line259"></a>    */
+<a name="line260"></a>    public $cache_id = null;
+<a name="line261"></a>
+<a name="line262"></a>    /**
+<a name="line263"></a>    * Id for cache locking
+<a name="line264"></a>    * @var string
+<a name="line265"></a>    */
+<a name="line266"></a>    public $lock_id = null;
+<a name="line267"></a>
+<a name="line268"></a>    /**
+<a name="line269"></a>    * flag that cache is locked by this instance
+<a name="line270"></a>    * @var bool
+<a name="line271"></a>    */
+<a name="line272"></a>    public $is_locked = false;
+<a name="line273"></a>
+<a name="line274"></a>    /**
+<a name="line275"></a>    * Source Object
+<a name="line276"></a>    * @var Smarty_Template_Source
+<a name="line277"></a>    */
+<a name="line278"></a>    public $source = null;
+<a name="line279"></a>
+<a name="line280"></a>    /**
+<a name="line281"></a>    * create Cached Object container
+<a name="line282"></a>    *
+<a name="line283"></a>    * @param Smarty_Internal_Template $_template template object
+<a name="line284"></a>    */
+<a name="line285"></a>    public function __construct(Smarty_Internal_Template $_template)
+<a name="line286"></a>    {
+<a name="line287"></a>        $this->compile_id = $_template->compile_id;
+<a name="line288"></a>        $this->cache_id = $_template->cache_id;
+<a name="line289"></a>        $this->source = $_template->source;
+<a name="line290"></a>        $_template->cached = $this;
+<a name="line291"></a>        $smarty = $_template->smarty;
+<a name="line292"></a>
+<a name="line293"></a>        //
+<a name="line294"></a>        // load resource handler
+<a name="line295"></a>        //
+<a name="line296"></a>        $this->handler = $handler = Smarty_CacheResource::load($smarty); // Note: prone to circular references
+<a name="line297"></a>
+<a name="line298"></a>        //
+<a name="line299"></a>        //    check if cache is valid
+<a name="line300"></a>        //
+<a name="line301"></a>        if (!($_template->caching == Smarty::CACHING_LIFETIME_CURRENT || $_template->caching == Smarty::CACHING_LIFETIME_SAVED) || $_template->source->recompiled) {
+<a name="line302"></a>            $handler->populate($this, $_template);
+<a name="line303"></a>            return;
+<a name="line304"></a>        }
+<a name="line305"></a>        while (true) {
+<a name="line306"></a>            while (true) {
+<a name="line307"></a>                $handler->populate($this, $_template);
+<a name="line308"></a>                if ($this->timestamp === false || $smarty->force_compile || $smarty->force_cache) {
+<a name="line309"></a>                    $this->valid = false;
+<a name="line310"></a>                } else {
+<a name="line311"></a>                    $this->valid = true;
+<a name="line312"></a>                }
+<a name="line313"></a>                if ($this->valid && $_template->caching == Smarty::CACHING_LIFETIME_CURRENT && $_template->cache_lifetime >= 0 && time() > ($this->timestamp + $_template->cache_lifetime)) {
+<a name="line314"></a>                    // lifetime expired
+<a name="line315"></a>                    $this->valid = false;
+<a name="line316"></a>                }
+<a name="line317"></a>                if ($this->valid || !$_template->smarty->cache_locking) {
+<a name="line318"></a>                    break;
+<a name="line319"></a>                }
+<a name="line320"></a>                if (!$this->handler->locked($_template->smarty, $this)) {
+<a name="line321"></a>                    $this->handler->acquireLock($_template->smarty, $this);
+<a name="line322"></a>                    break 2;
+<a name="line323"></a>                }
+<a name="line324"></a>            }
+<a name="line325"></a>            if ($this->valid) {
+<a name="line326"></a>                if (!$_template->smarty->cache_locking || $this->handler->locked($_template->smarty, $this) === null) {
+<a name="line327"></a>                    // load cache file for the following checks
+<a name="line328"></a>                    if ($smarty->debugging) {
+<a name="line329"></a>                        Smarty_Internal_Debug::start_cache($_template);
+<a name="line330"></a>                    }
+<a name="line331"></a>                    if($handler->process($_template, $this) === false) {
+<a name="line332"></a>                        $this->valid = false;
+<a name="line333"></a>                    } else {
+<a name="line334"></a>                        $this->processed = true;
+<a name="line335"></a>                    }
+<a name="line336"></a>                    if ($smarty->debugging) {
+<a name="line337"></a>                        Smarty_Internal_Debug::end_cache($_template);
+<a name="line338"></a>                    }
+<a name="line339"></a>                } else {
+<a name="line340"></a>                    continue;
+<a name="line341"></a>                }
+<a name="line342"></a>            } else {
+<a name="line343"></a>                return;
+<a name="line344"></a>            }
+<a name="line345"></a>            if ($this->valid && $_template->caching === Smarty::CACHING_LIFETIME_SAVED && $_template->properties['cache_lifetime'] >= 0 && (time() > ($_template->cached->timestamp + $_template->properties['cache_lifetime']))) {
+<a name="line346"></a>                $this->valid = false;
+<a name="line347"></a>            }
+<a name="line348"></a>            if (!$this->valid && $_template->smarty->cache_locking) {
+<a name="line349"></a>                $this->handler->acquireLock($_template->smarty, $this);
+<a name="line350"></a>                return;
+<a name="line351"></a>            } else {
+<a name="line352"></a>                return;
+<a name="line353"></a>            }
+<a name="line354"></a>        }
+<a name="line355"></a>    }
+<a name="line356"></a>
+<a name="line357"></a>    /**
+<a name="line358"></a>    * Write this cache object to handler
+<a name="line359"></a>    *
+<a name="line360"></a>    * @param Smarty_Internal_Template $_template template object
+<a name="line361"></a>    * @param string $content content to cache
+<a name="line362"></a>    * @return boolean success
+<a name="line363"></a>    */
+<a name="line364"></a>    public function write(Smarty_Internal_Template $_template, $content)
+<a name="line365"></a>    {
+<a name="line366"></a>        if (!$_template->source->recompiled) {
+<a name="line367"></a>            if ($this->handler->writeCachedContent($_template, $content)) {
+<a name="line368"></a>                $this->timestamp = time();
+<a name="line369"></a>                $this->exists = true;
+<a name="line370"></a>                $this->valid = true;
+<a name="line371"></a>                if ($_template->smarty->cache_locking) {
+<a name="line372"></a>                    $this->handler->releaseLock($_template->smarty, $this);
+<a name="line373"></a>                }
+<a name="line374"></a>                return true;
+<a name="line375"></a>            }
+<a name="line376"></a>        }
+<a name="line377"></a>        return false;
+<a name="line378"></a>    }
+<a name="line379"></a>
+<a name="line380"></a>}
+<a name="line381"></a>?></pre>
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_cacheresource.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

@@ -5,9 +5,9 @@ require_once ROOT . 'config.php';
 /**
  *	@author Martin Buckley - MBuckley@gmail.com
  *	DataBase Abstraction layer controlls access to the database.
- *	@namespace Exerciser
+ *	@namespace active
  */
-class Database{
+class Database {
 
 	private $host = '';
 	private $database = '';
@@ -37,8 +37,8 @@ class Database{
 
 	/**
 	 * Sanitises the variable to prevent SQL injection
-	 * @param String the value
-	 * @return String the sanitised value
+	 * @param String
+	 * @return String
 	 */
 	public function clean($value){
 		return mysql_real_escape_string($value);

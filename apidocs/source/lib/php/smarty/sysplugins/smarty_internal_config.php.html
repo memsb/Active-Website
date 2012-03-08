@@ -1,0 +1,365 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
+
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css">
+<link rel="start" href="../../../../../overview-summary.html">
+
+<title>lib/php/Smarty/sysplugins/smarty_internal_config.php (PHPDoctor)</title>
+
+</head>
+<body id="file" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_internal_config.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<h1>lib/php/Smarty/sysplugins/smarty_internal_config.php</h1>
+<div class="comment" id="overview_description"><p>Smarty Internal Plugin Config</p></div>
+
+<hr>
+
+<a name="line1"></a><pre><?php
+<a name="line2"></a>/**
+<a name="line3"></a> * Smarty Internal Plugin Config
+<a name="line4"></a> *
+<a name="line5"></a> * @package Smarty
+<a name="line6"></a> * @subpackage Config
+<a name="line7"></a> * @author Uwe Tews
+<a name="line8"></a> */
+<a name="line9"></a>
+<a name="line10"></a>/**
+<a name="line11"></a> * Smarty Internal Plugin Config
+<a name="line12"></a> *
+<a name="line13"></a> * Main class for config variables
+<a name="line14"></a> *
+<a name="line15"></a> * @package Smarty
+<a name="line16"></a> * @subpackage Config
+<a name="line17"></a> *
+<a name="line18"></a> * @property Smarty_Config_Source   $source
+<a name="line19"></a> * @property Smarty_Config_Compiled $compiled
+<a name="line20"></a> * @ignore
+<a name="line21"></a> */
+<a name="line22"></a>class Smarty_Internal_Config {
+<a name="line23"></a>
+<a name="line24"></a>    /**
+<a name="line25"></a>     * Samrty instance
+<a name="line26"></a>     *
+<a name="line27"></a>     * @var Smarty object
+<a name="line28"></a>     */
+<a name="line29"></a>    public $smarty = null;
+<a name="line30"></a>    /**
+<a name="line31"></a>     * Object of config var storage
+<a name="line32"></a>     *
+<a name="line33"></a>     * @var object
+<a name="line34"></a>     */
+<a name="line35"></a>    public $data = null;
+<a name="line36"></a>    /**
+<a name="line37"></a>     * Config resource
+<a name="line38"></a>     * @var string
+<a name="line39"></a>     */
+<a name="line40"></a>    public $config_resource = null;
+<a name="line41"></a>    /**
+<a name="line42"></a>     * Compiled config file
+<a name="line43"></a>     *
+<a name="line44"></a>     * @var string
+<a name="line45"></a>     */
+<a name="line46"></a>    public $compiled_config = null;
+<a name="line47"></a>    /**
+<a name="line48"></a>     * filepath of compiled config file
+<a name="line49"></a>     *
+<a name="line50"></a>     * @var string
+<a name="line51"></a>     */
+<a name="line52"></a>    public $compiled_filepath = null;
+<a name="line53"></a>    /**
+<a name="line54"></a>     * Filemtime of compiled config Filemtime
+<a name="line55"></a>     *
+<a name="line56"></a>     * @var int
+<a name="line57"></a>     */
+<a name="line58"></a>    public $compiled_timestamp = null;
+<a name="line59"></a>    /**
+<a name="line60"></a>     * flag if compiled config file is invalid and must be (re)compiled
+<a name="line61"></a>     * @var bool
+<a name="line62"></a>     */
+<a name="line63"></a>    public $mustCompile = null;
+<a name="line64"></a>    /**
+<a name="line65"></a>     * Config file compiler object
+<a name="line66"></a>     *
+<a name="line67"></a>     * @var Smarty_Internal_Config_File_Compiler object
+<a name="line68"></a>     */
+<a name="line69"></a>    public $compiler_object = null;
+<a name="line70"></a>
+<a name="line71"></a>    /**
+<a name="line72"></a>     * Constructor of config file object
+<a name="line73"></a>     *
+<a name="line74"></a>     * @param string $config_resource config file resource name
+<a name="line75"></a>     * @param Smarty $smarty Smarty instance
+<a name="line76"></a>     * @param object $data object for config vars storage
+<a name="line77"></a>     */
+<a name="line78"></a>    public function __construct($config_resource, $smarty, $data = null)
+<a name="line79"></a>    {
+<a name="line80"></a>        $this->data = $data;
+<a name="line81"></a>        $this->smarty = $smarty;
+<a name="line82"></a>        $this->config_resource = $config_resource;
+<a name="line83"></a>    }
+<a name="line84"></a>
+<a name="line85"></a>    /**
+<a name="line86"></a>     * Returns the compiled  filepath
+<a name="line87"></a>     *
+<a name="line88"></a>     * @return string the compiled filepath
+<a name="line89"></a>     */
+<a name="line90"></a>    public function getCompiledFilepath()
+<a name="line91"></a>    {
+<a name="line92"></a>        return $this->compiled_filepath === null ?
+<a name="line93"></a>                ($this->compiled_filepath = $this->buildCompiledFilepath()) :
+<a name="line94"></a>                $this->compiled_filepath;
+<a name="line95"></a>    }
+<a name="line96"></a>
+<a name="line97"></a>    /**
+<a name="line98"></a>     * Get file path.
+<a name="line99"></a>     *
+<a name="line100"></a>     * @return string
+<a name="line101"></a>     */
+<a name="line102"></a>    public function buildCompiledFilepath()
+<a name="line103"></a>    {
+<a name="line104"></a>        $_compile_id = isset($this->smarty->compile_id) ? preg_replace('![^\w\|]+!', '_', $this->smarty->compile_id) : null;
+<a name="line105"></a>        $_flag = (int) $this->smarty->config_read_hidden + (int) $this->smarty->config_booleanize * 2
+<a name="line106"></a>                + (int) $this->smarty->config_overwrite * 4;
+<a name="line107"></a>        $_filepath = sha1($this->source->name . $_flag);
+<a name="line108"></a>        // if use_sub_dirs, break file into directories
+<a name="line109"></a>        if ($this->smarty->use_sub_dirs) {
+<a name="line110"></a>            $_filepath = substr($_filepath, 0, 2) . DS
+<a name="line111"></a>                    . substr($_filepath, 2, 2) . DS
+<a name="line112"></a>                    . substr($_filepath, 4, 2) . DS
+<a name="line113"></a>                    . $_filepath;
+<a name="line114"></a>        }
+<a name="line115"></a>        $_compile_dir_sep = $this->smarty->use_sub_dirs ? DS : '^';
+<a name="line116"></a>        if (isset($_compile_id)) {
+<a name="line117"></a>            $_filepath = $_compile_id . $_compile_dir_sep . $_filepath;
+<a name="line118"></a>        }
+<a name="line119"></a>        $_compile_dir = $this->smarty->getCompileDir();
+<a name="line120"></a>        return $_compile_dir . $_filepath . '.' . basename($this->source->name) . '.config' . '.php';
+<a name="line121"></a>    }
+<a name="line122"></a>
+<a name="line123"></a>    /**
+<a name="line124"></a>     * Returns the timpestamp of the compiled file
+<a name="line125"></a>     *
+<a name="line126"></a>     * @return integer the file timestamp
+<a name="line127"></a>     */
+<a name="line128"></a>    public function getCompiledTimestamp()
+<a name="line129"></a>    {
+<a name="line130"></a>        return $this->compiled_timestamp === null
+<a name="line131"></a>            ? ($this->compiled_timestamp = (file_exists($this->getCompiledFilepath())) ? filemtime($this->getCompiledFilepath()) : false)
+<a name="line132"></a>            : $this->compiled_timestamp;
+<a name="line133"></a>    }
+<a name="line134"></a>
+<a name="line135"></a>    /**
+<a name="line136"></a>     * Returns if the current config file must be compiled
+<a name="line137"></a>     *
+<a name="line138"></a>     * It does compare the timestamps of config source and the compiled config and checks the force compile configuration
+<a name="line139"></a>     *
+<a name="line140"></a>     * @return boolean true if the file must be compiled
+<a name="line141"></a>     */
+<a name="line142"></a>    public function mustCompile()
+<a name="line143"></a>    {
+<a name="line144"></a>        return $this->mustCompile === null ?
+<a name="line145"></a>            $this->mustCompile = ($this->smarty->force_compile || $this->getCompiledTimestamp () === false || $this->smarty->compile_check && $this->getCompiledTimestamp () < $this->source->timestamp):
+<a name="line146"></a>            $this->mustCompile;
+<a name="line147"></a>    }
+<a name="line148"></a>
+<a name="line149"></a>    /**
+<a name="line150"></a>     * Returns the compiled config file
+<a name="line151"></a>     *
+<a name="line152"></a>     * It checks if the config file must be compiled or just read the compiled version
+<a name="line153"></a>     *
+<a name="line154"></a>     * @return string the compiled config file
+<a name="line155"></a>     */
+<a name="line156"></a>    public function getCompiledConfig()
+<a name="line157"></a>    {
+<a name="line158"></a>        if ($this->compiled_config === null) {
+<a name="line159"></a>            // see if template needs compiling.
+<a name="line160"></a>            if ($this->mustCompile()) {
+<a name="line161"></a>                $this->compileConfigSource();
+<a name="line162"></a>            } else {
+<a name="line163"></a>                $this->compiled_config = file_get_contents($this->getCompiledFilepath());
+<a name="line164"></a>            }
+<a name="line165"></a>        }
+<a name="line166"></a>        return $this->compiled_config;
+<a name="line167"></a>    }
+<a name="line168"></a>
+<a name="line169"></a>    /**
+<a name="line170"></a>     * Compiles the config files
+<a name="line171"></a>     *
+<a name="line172"></a>     * @throws Exception
+<a name="line173"></a>     */
+<a name="line174"></a>    public function compileConfigSource()
+<a name="line175"></a>    {
+<a name="line176"></a>        // compile template
+<a name="line177"></a>        if (!is_object($this->compiler_object)) {
+<a name="line178"></a>            // load compiler
+<a name="line179"></a>            $this->compiler_object = new Smarty_Internal_Config_File_Compiler($this->smarty);
+<a name="line180"></a>        }
+<a name="line181"></a>        // compile locking
+<a name="line182"></a>        if ($this->smarty->compile_locking) {
+<a name="line183"></a>            if ($saved_timestamp = $this->getCompiledTimestamp()) {
+<a name="line184"></a>                touch($this->getCompiledFilepath());
+<a name="line185"></a>            }
+<a name="line186"></a>        }
+<a name="line187"></a>        // call compiler
+<a name="line188"></a>        try {
+<a name="line189"></a>            $this->compiler_object->compileSource($this);
+<a name="line190"></a>        } catch (Exception $e) {
+<a name="line191"></a>            // restore old timestamp in case of error
+<a name="line192"></a>            if ($this->smarty->compile_locking && $saved_timestamp) {
+<a name="line193"></a>                touch($this->getCompiledFilepath(), $saved_timestamp);
+<a name="line194"></a>            }
+<a name="line195"></a>            throw $e;
+<a name="line196"></a>        }
+<a name="line197"></a>        // compiling succeded
+<a name="line198"></a>        // write compiled template
+<a name="line199"></a>        Smarty_Internal_Write_File::writeFile($this->getCompiledFilepath(), $this->getCompiledConfig(), $this->smarty);
+<a name="line200"></a>    }
+<a name="line201"></a>
+<a name="line202"></a>    /**
+<a name="line203"></a>     * load config variables
+<a name="line204"></a>     *
+<a name="line205"></a>     * @param mixed $sections array of section names, single section or null
+<a name="line206"></a>     * @param object $scope global,parent or local
+<a name="line207"></a>     */
+<a name="line208"></a>    public function loadConfigVars($sections = null, $scope = 'local')
+<a name="line209"></a>    {
+<a name="line210"></a>        if ($this->data instanceof Smarty_Internal_Template) {
+<a name="line211"></a>            $this->data->properties['file_dependency'][sha1($this->source->filepath)] = array($this->source->filepath, $this->source->timestamp, 'file');
+<a name="line212"></a>        }
+<a name="line213"></a>        if ($this->mustCompile()) {
+<a name="line214"></a>            $this->compileConfigSource();
+<a name="line215"></a>        }
+<a name="line216"></a>        // pointer to scope
+<a name="line217"></a>        if ($scope == 'local') {
+<a name="line218"></a>            $scope_ptr = $this->data;
+<a name="line219"></a>        } elseif ($scope == 'parent') {
+<a name="line220"></a>            if (isset($this->data->parent)) {
+<a name="line221"></a>                $scope_ptr = $this->data->parent;
+<a name="line222"></a>            } else {
+<a name="line223"></a>                $scope_ptr = $this->data;
+<a name="line224"></a>            }
+<a name="line225"></a>        } elseif ($scope == 'root' || $scope == 'global') {
+<a name="line226"></a>            $scope_ptr = $this->data;
+<a name="line227"></a>            while (isset($scope_ptr->parent)) {
+<a name="line228"></a>                $scope_ptr = $scope_ptr->parent;
+<a name="line229"></a>            }
+<a name="line230"></a>        }
+<a name="line231"></a>        $_config_vars = array();
+<a name="line232"></a>        include($this->getCompiledFilepath());
+<a name="line233"></a>        // copy global config vars
+<a name="line234"></a>        foreach ($_config_vars['vars'] as $variable => $value) {
+<a name="line235"></a>            if ($this->smarty->config_overwrite || !isset($scope_ptr->config_vars[$variable])) {
+<a name="line236"></a>                $scope_ptr->config_vars[$variable] = $value;
+<a name="line237"></a>            } else {
+<a name="line238"></a>                $scope_ptr->config_vars[$variable] = array_merge((array) $scope_ptr->config_vars[$variable], (array) $value);
+<a name="line239"></a>            }
+<a name="line240"></a>        }
+<a name="line241"></a>        // scan sections
+<a name="line242"></a>        if (!empty($sections)) {
+<a name="line243"></a>            $sections = array_flip((array) $sections);
+<a name="line244"></a>            foreach ($_config_vars['sections'] as $this_section => $dummy) {
+<a name="line245"></a>                if (isset($sections[$this_section])) {
+<a name="line246"></a>                    foreach ($_config_vars['sections'][$this_section]['vars'] as $variable => $value) {
+<a name="line247"></a>                        if ($this->smarty->config_overwrite || !isset($scope_ptr->config_vars[$variable])) {
+<a name="line248"></a>                            $scope_ptr->config_vars[$variable] = $value;
+<a name="line249"></a>                        } else {
+<a name="line250"></a>                            $scope_ptr->config_vars[$variable] = array_merge((array) $scope_ptr->config_vars[$variable], (array) $value);
+<a name="line251"></a>                        }
+<a name="line252"></a>                    }
+<a name="line253"></a>                }
+<a name="line254"></a>            }
+<a name="line255"></a>        }
+<a name="line256"></a>    }
+<a name="line257"></a>
+<a name="line258"></a>    /**
+<a name="line259"></a>     * set Smarty property in template context
+<a name="line260"></a>     *
+<a name="line261"></a>     * @param string $property_name property name
+<a name="line262"></a>     * @param mixed  $value         value
+<a name="line263"></a>     * @throws SmartyException if $property_name is not valid
+<a name="line264"></a>     */
+<a name="line265"></a>    public function __set($property_name, $value)
+<a name="line266"></a>    {
+<a name="line267"></a>        switch ($property_name) {
+<a name="line268"></a>            case 'source':
+<a name="line269"></a>            case 'compiled':
+<a name="line270"></a>                $this->$property_name = $value;
+<a name="line271"></a>                return;
+<a name="line272"></a>        }
+<a name="line273"></a>
+<a name="line274"></a>        throw new SmartyException("invalid config property '$property_name'.");
+<a name="line275"></a>    }
+<a name="line276"></a>
+<a name="line277"></a>    /**
+<a name="line278"></a>     * get Smarty property in template context
+<a name="line279"></a>     *
+<a name="line280"></a>     * @param string $property_name property name
+<a name="line281"></a>     * @throws SmartyException if $property_name is not valid
+<a name="line282"></a>     */
+<a name="line283"></a>    public function __get($property_name)
+<a name="line284"></a>    {
+<a name="line285"></a>        switch ($property_name) {
+<a name="line286"></a>            case 'source':
+<a name="line287"></a>                if (empty($this->config_resource)) {
+<a name="line288"></a>                    throw new SmartyException("Unable to parse resource name \"{$this->config_resource}\"");
+<a name="line289"></a>                }
+<a name="line290"></a>                $this->source = Smarty_Resource::config($this);
+<a name="line291"></a>                return $this->source;
+<a name="line292"></a>
+<a name="line293"></a>            case 'compiled':
+<a name="line294"></a>                $this->compiled = $this->source->getCompiled($this);
+<a name="line295"></a>                return $this->compiled;
+<a name="line296"></a>        }
+<a name="line297"></a>
+<a name="line298"></a>        throw new SmartyException("config attribute '$property_name' does not exist.");
+<a name="line299"></a>    }
+<a name="line300"></a>
+<a name="line301"></a>}
+<a name="line302"></a>
+<a name="line303"></a>?></pre>
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/sysplugins/smarty_internal_config.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>

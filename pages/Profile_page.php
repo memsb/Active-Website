@@ -1,14 +1,14 @@
 <?php
 
-require_once PAGES . 'Profile.php';
+require_once LIB . 'Profile.php';
 require_once PAGES . 'Users_page.php';
 require_once PAGES . 'Profile_page.php';
 require_once LIB . 'Workouts.php';
 
-/*
+/**
  * @author Martin Buckley - MBuckley@gmail.com
- *
- *
+ * Profile page displays information on the user specified by GET.
+ * @namespace active
  */
 class Profile_page extends Profile {
 

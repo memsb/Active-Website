@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
-<meta name="when" content="Wed, 07 Mar 2012 14:34:43 +0000">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
 
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
 <link rel="start" href="../../overview-summary.html">
@@ -38,77 +38,78 @@
 
 <a name="line1"></a><pre><?php
 <a name="line2"></a>
-<a name="line3"></a>require_once PAGES . 'Page.php';
+<a name="line3"></a>require_once LIB . 'Page.php';
 <a name="line4"></a>require_once PAGES . 'Workouts_page.php';
 <a name="line5"></a>require_once LIB . 'Workout.php';
 <a name="line6"></a>
-<a name="line7"></a>/*
+<a name="line7"></a>/**
 <a name="line8"></a> * @author Martin Buckley - MBuckley@gmail.com
 <a name="line9"></a> * Allows a user to Delete their own workout
-<a name="line10"></a> */
-<a name="line11"></a>class Workout_Delete_page extends Page{
-<a name="line12"></a>
-<a name="line13"></a>	/*
-<a name="line14"></a>	 * Page name
-<a name="line15"></a>	 * Printed in page title and used to link to this page
-<a name="line16"></a>	 */
-<a name="line17"></a>	const PAGE_NAME = 'Delete_Workout';
-<a name="line18"></a>
-<a name="line19"></a>	/*
-<a name="line20"></a>	 * Page constructor
-<a name="line21"></a>	 * Calls constructor on Page
-<a name="line22"></a>	 */
-<a name="line23"></a>	public function __construct(){
-<a name="line24"></a>		parent::__construct();
-<a name="line25"></a>	}
-<a name="line26"></a>
-<a name="line27"></a>	/*
-<a name="line28"></a>	 * Post request on page
-<a name="line29"></a>	 * Allows a logged in user to delete their own workout
-<a name="line30"></a>	 * @param Array of parameters
-<a name="line31"></a>	 */
-<a name="line32"></a>	public function post($data){
-<a name="line33"></a>		if ( ! $this->valid_arg( $data['id'] ) )
-<a name="line34"></a>			return;
-<a name="line35"></a>		
-<a name="line36"></a>		if ( ! $this->user->isLoggedIn() )
-<a name="line37"></a>			return;
-<a name="line38"></a>		
-<a name="line39"></a>		$id = $data['id'];
-<a name="line40"></a>		$workout = $this->load_workout($id);
-<a name="line41"></a>		if( $workout->user_id = $this->user->user_id )
-<a name="line42"></a>			$response = $this->xmlDELETE(EXERCISER . "workouts/$id");
-<a name="line43"></a>	}
-<a name="line44"></a>
-<a name="line45"></a>	/*
-<a name="line46"></a>	 * Forwards the visiter back to the workouts page
-<a name="line47"></a>	 */
-<a name="line48"></a>	public function visit(){
-<a name="line49"></a>		header("Location: " . Workouts_page::PAGE_NAME);
-<a name="line50"></a>		exit();
-<a name="line51"></a>	}
-<a name="line52"></a>
-<a name="line53"></a>	/*
-<a name="line54"></a>	 * Loads a workout based on the ID given
-<a name="line55"></a>	 * @param Int the workout ID
-<a name="line56"></a>	 */
-<a name="line57"></a>	private function load_workout($id){
-<a name="line58"></a>		$workout = new Workout();
-<a name="line59"></a>		$response = $this->xmlGET(EXERCISER . "workouts/$id");		
-<a name="line60"></a>		switch ($response['code']) {
-<a name="line61"></a>			case 200:
-<a name="line62"></a>				$workout->parse($response['body']);
-<a name="line63"></a>				break;
-<a name="line64"></a>			default:
-<a name="line65"></a>				throw new Exception('Unable to load workout');
-<a name="line66"></a>				break;
-<a name="line67"></a>		}
-<a name="line68"></a>		return $workout;
-<a name="line69"></a>	}
-<a name="line70"></a>}
-<a name="line71"></a>
-<a name="line72"></a>?>
-<a name="line73"></a></pre>
+<a name="line10"></a> * @namespace active
+<a name="line11"></a> */
+<a name="line12"></a>class Workout_Delete_page extends Page{
+<a name="line13"></a>
+<a name="line14"></a>	/*
+<a name="line15"></a>	 * Page name
+<a name="line16"></a>	 * Printed in page title and used to link to this page
+<a name="line17"></a>	 */
+<a name="line18"></a>	const PAGE_NAME = 'Delete_Workout';
+<a name="line19"></a>
+<a name="line20"></a>	/*
+<a name="line21"></a>	 * Page constructor
+<a name="line22"></a>	 * Calls constructor on Page
+<a name="line23"></a>	 */
+<a name="line24"></a>	public function __construct(){
+<a name="line25"></a>		parent::__construct();
+<a name="line26"></a>	}
+<a name="line27"></a>
+<a name="line28"></a>	/*
+<a name="line29"></a>	 * Post request on page
+<a name="line30"></a>	 * Allows a logged in user to delete their own workout
+<a name="line31"></a>	 * @param Array of parameters
+<a name="line32"></a>	 */
+<a name="line33"></a>	public function post($data){
+<a name="line34"></a>		if ( ! $this->valid_arg( $data['id'] ) )
+<a name="line35"></a>			return;
+<a name="line36"></a>		
+<a name="line37"></a>		if ( ! $this->user->isLoggedIn() )
+<a name="line38"></a>			return;
+<a name="line39"></a>		
+<a name="line40"></a>		$id = $data['id'];
+<a name="line41"></a>		$workout = $this->load_workout($id);
+<a name="line42"></a>		if( $workout->user_id = $this->user->user_id )
+<a name="line43"></a>			$response = $this->xmlDELETE(EXERCISER . "workouts/$id");
+<a name="line44"></a>	}
+<a name="line45"></a>
+<a name="line46"></a>	/*
+<a name="line47"></a>	 * Forwards the visiter back to the workouts page
+<a name="line48"></a>	 */
+<a name="line49"></a>	public function visit(){
+<a name="line50"></a>		header("Location: " . Workouts_page::PAGE_NAME);
+<a name="line51"></a>		exit();
+<a name="line52"></a>	}
+<a name="line53"></a>
+<a name="line54"></a>	/*
+<a name="line55"></a>	 * Loads a workout based on the ID given
+<a name="line56"></a>	 * @param Int the workout ID
+<a name="line57"></a>	 */
+<a name="line58"></a>	private function load_workout($id){
+<a name="line59"></a>		$workout = new Workout();
+<a name="line60"></a>		$response = $this->xmlGET(EXERCISER . "workouts/$id");		
+<a name="line61"></a>		switch ($response['code']) {
+<a name="line62"></a>			case 200:
+<a name="line63"></a>				$workout->parse($response['body']);
+<a name="line64"></a>				break;
+<a name="line65"></a>			default:
+<a name="line66"></a>				throw new Exception('Unable to load workout');
+<a name="line67"></a>				break;
+<a name="line68"></a>		}
+<a name="line69"></a>		return $workout;
+<a name="line70"></a>	}
+<a name="line71"></a>}
+<a name="line72"></a>
+<a name="line73"></a>?>
+<a name="line74"></a></pre>
 <div class="header">
 <h1>PHPDoctor</h1>
 <ul>

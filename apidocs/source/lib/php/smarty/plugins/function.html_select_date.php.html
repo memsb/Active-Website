@@ -1,0 +1,456 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="generator" content="PHPDoctor 2RC4 (http://peej.github.com/phpdoctor/)">
+<meta name="when" content="Thu, 08 Mar 2012 21:01:27 +0000">
+
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css">
+<link rel="start" href="../../../../../overview-summary.html">
+
+<title>lib/php/Smarty/plugins/function.html_select_date.php (PHPDoctor)</title>
+
+</head>
+<body id="file" onload="parent.document.title=document.title;">
+
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/plugins/function.html_select_date.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<h1>lib/php/Smarty/plugins/function.html_select_date.php</h1>
+<div class="comment" id="overview_description"><p>Smarty plugin</p></div>
+
+<hr>
+
+<a name="line1"></a><pre><?php
+<a name="line2"></a>/**
+<a name="line3"></a> * Smarty plugin
+<a name="line4"></a> * 
+<a name="line5"></a> * @package Smarty
+<a name="line6"></a> * @subpackage PluginsFunction
+<a name="line7"></a> */
+<a name="line8"></a>
+<a name="line9"></a>/**
+<a name="line10"></a> * @ignore
+<a name="line11"></a> */
+<a name="line12"></a>require_once(SMARTY_PLUGINS_DIR . 'shared.escape_special_chars.php');
+<a name="line13"></a>/**
+<a name="line14"></a> * @ignore
+<a name="line15"></a> */
+<a name="line16"></a>require_once(SMARTY_PLUGINS_DIR . 'shared.make_timestamp.php');
+<a name="line17"></a>
+<a name="line18"></a>/**
+<a name="line19"></a> * Smarty {html_select_date} plugin
+<a name="line20"></a> * 
+<a name="line21"></a> * Type:     function<br>
+<a name="line22"></a> * Name:     html_select_date<br>
+<a name="line23"></a> * Purpose:  Prints the dropdowns for date selection.
+<a name="line24"></a> * 
+<a name="line25"></a> * ChangeLog:
+<a name="line26"></a> * <pre>
+<a name="line27"></a> *            - 1.0 initial release
+<a name="line28"></a> *            - 1.1 added support for +/- N syntax for begin
+<a name="line29"></a> *              and end year values. (Monte)
+<a name="line30"></a> *            - 1.2 added support for yyyy-mm-dd syntax for
+<a name="line31"></a> *              time value. (Jan Rosier)
+<a name="line32"></a> *            - 1.3 added support for choosing format for
+<a name="line33"></a> *              month values (Gary Loescher)
+<a name="line34"></a> *            - 1.3.1 added support for choosing format for
+<a name="line35"></a> *              day values (Marcus Bointon)
+<a name="line36"></a> *            - 1.3.2 support negative timestamps, force year
+<a name="line37"></a> *              dropdown to include given date unless explicitly set (Monte)
+<a name="line38"></a> *            - 1.3.4 fix behaviour of 0000-00-00 00:00:00 dates to match that
+<a name="line39"></a> *              of 0000-00-00 dates (cybot, boots)
+<a name="line40"></a> *            - 2.0 complete rewrite for performance,  
+<a name="line41"></a> *              added attributes month_names, *_id
+<a name="line42"></a> * </pre>
+<a name="line43"></a> * 
+<a name="line44"></a> * @link http://www.smarty.net/manual/en/language.function.html.select.date.php {html_select_date}
+<a name="line45"></a> *      (Smarty online manual)
+<a name="line46"></a> * @version 2.0
+<a name="line47"></a> * @author Andrei Zmievski 
+<a name="line48"></a> * @author Monte Ohrt <monte at ohrt dot com> 
+<a name="line49"></a> * @author Rodney Rehm
+<a name="line50"></a> * @param array                    $params   parameters
+<a name="line51"></a> * @param Smarty_Internal_Template $template template object
+<a name="line52"></a> * @return string 
+<a name="line53"></a> */
+<a name="line54"></a>function smarty_function_html_select_date($params, $template)
+<a name="line55"></a>{
+<a name="line56"></a>    // generate timestamps used for month names only
+<a name="line57"></a>    static $_month_timestamps = null;
+<a name="line58"></a>    static $_current_year = null;
+<a name="line59"></a>    if ($_month_timestamps === null) {
+<a name="line60"></a>        $_current_year = date('Y');
+<a name="line61"></a>        $_month_timestamps = array();
+<a name="line62"></a>        for ($i = 1; $i <= 12; $i++) {
+<a name="line63"></a>            $_month_timestamps[$i] = mktime(0, 0, 0, $i, 1, 2000);
+<a name="line64"></a>        }
+<a name="line65"></a>    }
+<a name="line66"></a>
+<a name="line67"></a>    /* Default values. */
+<a name="line68"></a>    $prefix = "Date_";
+<a name="line69"></a>    $start_year = null;
+<a name="line70"></a>    $end_year = null;
+<a name="line71"></a>    $display_days = true;
+<a name="line72"></a>    $display_months = true;
+<a name="line73"></a>    $display_years = true;
+<a name="line74"></a>    $month_format = "%B";
+<a name="line75"></a>    /* Write months as numbers by default  GL */
+<a name="line76"></a>    $month_value_format = "%m";
+<a name="line77"></a>    $day_format = "%02d";
+<a name="line78"></a>    /* Write day values using this format MB */
+<a name="line79"></a>    $day_value_format = "%d";
+<a name="line80"></a>    $year_as_text = false;
+<a name="line81"></a>    /* Display years in reverse order? Ie. 2000,1999,.... */
+<a name="line82"></a>    $reverse_years = false;
+<a name="line83"></a>    /* Should the select boxes be part of an array when returned from PHP?
+<a name="line84"></a>       e.g. setting it to "birthday", would create "birthday[Day]",
+<a name="line85"></a>       "birthday[Month]" & "birthday[Year]". Can be combined with prefix */
+<a name="line86"></a>    $field_array = null;
+<a name="line87"></a>    /* <select size>'s of the different <select> tags.
+<a name="line88"></a>       If not set, uses default dropdown. */
+<a name="line89"></a>    $day_size = null;
+<a name="line90"></a>    $month_size = null;
+<a name="line91"></a>    $year_size = null;
+<a name="line92"></a>    /* Unparsed attributes common to *ALL* the <select>/<input> tags.
+<a name="line93"></a>       An example might be in the template: all_extra ='class ="foo"'. */
+<a name="line94"></a>    $all_extra = null;
+<a name="line95"></a>    /* Separate attributes for the tags. */
+<a name="line96"></a>    $day_extra = null;
+<a name="line97"></a>    $month_extra = null;
+<a name="line98"></a>    $year_extra = null;
+<a name="line99"></a>    /* Order in which to display the fields.
+<a name="line100"></a>       "D" -> day, "M" -> month, "Y" -> year. */
+<a name="line101"></a>    $field_order = 'MDY';
+<a name="line102"></a>    /* String printed between the different fields. */
+<a name="line103"></a>    $field_separator = "\n";
+<a name="line104"></a>    $option_separator = "\n";
+<a name="line105"></a>    $time = null;
+<a name="line106"></a>    // $all_empty = null;
+<a name="line107"></a>    // $day_empty = null;
+<a name="line108"></a>    // $month_empty = null;
+<a name="line109"></a>    // $year_empty = null;
+<a name="line110"></a>    $extra_attrs = '';
+<a name="line111"></a>    $all_id = null;
+<a name="line112"></a>    $day_id = null;
+<a name="line113"></a>    $month_id = null;
+<a name="line114"></a>    $year_id = null;
+<a name="line115"></a>
+<a name="line116"></a>    foreach ($params as $_key => $_value) {
+<a name="line117"></a>        switch ($_key) {
+<a name="line118"></a>            case 'time':
+<a name="line119"></a>                if (!is_array($_value) && $_value !== null) {
+<a name="line120"></a>                    $time = smarty_make_timestamp($_value);
+<a name="line121"></a>                }
+<a name="line122"></a>                break;
+<a name="line123"></a>                
+<a name="line124"></a>            case 'month_names':
+<a name="line125"></a>                if (is_array($_value) && count($_value) == 12) {
+<a name="line126"></a>                    $$_key = $_value;
+<a name="line127"></a>                } else {
+<a name="line128"></a>                    trigger_error("html_select_date: month_names must be an array of 12 strings", E_USER_NOTICE);
+<a name="line129"></a>                }
+<a name="line130"></a>                break;
+<a name="line131"></a>                
+<a name="line132"></a>            case 'prefix':
+<a name="line133"></a>            case 'field_array':
+<a name="line134"></a>            case 'start_year':
+<a name="line135"></a>            case 'end_year':
+<a name="line136"></a>            case 'day_format':
+<a name="line137"></a>            case 'day_value_format':
+<a name="line138"></a>            case 'month_format':
+<a name="line139"></a>            case 'month_value_format':
+<a name="line140"></a>            case 'day_size':
+<a name="line141"></a>            case 'month_size':
+<a name="line142"></a>            case 'year_size':
+<a name="line143"></a>            case 'all_extra':
+<a name="line144"></a>            case 'day_extra':
+<a name="line145"></a>            case 'month_extra':
+<a name="line146"></a>            case 'year_extra':
+<a name="line147"></a>            case 'field_order':
+<a name="line148"></a>            case 'field_separator':
+<a name="line149"></a>            case 'option_separator':
+<a name="line150"></a>            case 'all_empty':
+<a name="line151"></a>            case 'month_empty':
+<a name="line152"></a>            case 'day_empty':
+<a name="line153"></a>            case 'year_empty':
+<a name="line154"></a>            case 'all_id':
+<a name="line155"></a>            case 'month_id':
+<a name="line156"></a>            case 'day_id':
+<a name="line157"></a>            case 'year_id':
+<a name="line158"></a>                $$_key = (string)$_value;
+<a name="line159"></a>                break;
+<a name="line160"></a>
+<a name="line161"></a>            case 'display_days':
+<a name="line162"></a>            case 'display_months':
+<a name="line163"></a>            case 'display_years':
+<a name="line164"></a>            case 'year_as_text':
+<a name="line165"></a>            case 'reverse_years':
+<a name="line166"></a>                $$_key = (bool)$_value;
+<a name="line167"></a>                break;
+<a name="line168"></a>
+<a name="line169"></a>            default:
+<a name="line170"></a>                if (!is_array($_value)) {
+<a name="line171"></a>                    $extra_attrs .= ' ' . $_key . '="' . smarty_function_escape_special_chars($_value) . '"';
+<a name="line172"></a>                } else {
+<a name="line173"></a>                    trigger_error("html_select_date: extra attribute '$_key' cannot be an array", E_USER_NOTICE);
+<a name="line174"></a>                } 
+<a name="line175"></a>                break;
+<a name="line176"></a>        } 
+<a name="line177"></a>    }
+<a name="line178"></a>    
+<a name="line179"></a>    // Note: date() is faster than strftime()
+<a name="line180"></a>    // Note: explode(date()) is faster than date() date() date()
+<a name="line181"></a>    if (isset($params['time']) && is_array($params['time'])) {
+<a name="line182"></a>        if (isset($params['time'][$prefix . 'Year'])) {
+<a name="line183"></a>            // $_REQUEST[$field_array] given
+<a name="line184"></a>            foreach (array('Y' => 'Year',  'm' => 'Month', 'd' => 'Day') as $_elementKey => $_elementName) {
+<a name="line185"></a>                $_variableName = '_' . strtolower($_elementName);
+<a name="line186"></a>                $$_variableName = isset($params['time'][$prefix . $_elementName])
+<a name="line187"></a>                    ? $params['time'][$prefix . $_elementName]
+<a name="line188"></a>                    : date($_elementKey);
+<a name="line189"></a>            }
+<a name="line190"></a>            $time = mktime(0, 0, 0, $_month, $_day, $_year);
+<a name="line191"></a>        } elseif (isset($params['time'][$field_array][$prefix . 'Year'])) {
+<a name="line192"></a>            // $_REQUEST given
+<a name="line193"></a>            foreach (array('Y' => 'Year',  'm' => 'Month', 'd' => 'Day') as $_elementKey => $_elementName) {
+<a name="line194"></a>                $_variableName = '_' . strtolower($_elementName);
+<a name="line195"></a>                $$_variableName = isset($params['time'][$field_array][$prefix . $_elementName])
+<a name="line196"></a>                    ? $params['time'][$field_array][$prefix . $_elementName]
+<a name="line197"></a>                    : date($_elementKey);
+<a name="line198"></a>            }
+<a name="line199"></a>            $time = mktime(0, 0, 0, $_month, $_day, $_year);
+<a name="line200"></a>        } else {
+<a name="line201"></a>            // no date found, use NOW
+<a name="line202"></a>            list($_year, $_month, $_day) = $time = explode('-', date('Y-m-d'));
+<a name="line203"></a>        }
+<a name="line204"></a>    } elseif ($time === null) {
+<a name="line205"></a>        if (array_key_exists('time', $params)) {
+<a name="line206"></a>            $_year = $_month = $_day = $time = null;
+<a name="line207"></a>        } else {
+<a name="line208"></a>            list($_year, $_month, $_day) = $time = explode('-', date('Y-m-d'));
+<a name="line209"></a>        }
+<a name="line210"></a>    } else {
+<a name="line211"></a>        list($_year, $_month, $_day) = $time = explode('-', date('Y-m-d', $time));
+<a name="line212"></a>    }
+<a name="line213"></a>
+<a name="line214"></a>    // make syntax "+N" or "-N" work with $start_year and $end_year
+<a name="line215"></a>    // Note preg_match('!^(\+|\-)\s*(\d+)$!', $end_year, $match) is slower than trim+substr
+<a name="line216"></a>    foreach (array('start', 'end') as $key) {
+<a name="line217"></a>        $key .= '_year';
+<a name="line218"></a>        $t = $$key;
+<a name="line219"></a>        if ($t === null) {
+<a name="line220"></a>            $$key = (int)$_current_year;
+<a name="line221"></a>        } else if ($t[0] == '+') {
+<a name="line222"></a>            $$key = (int)($_current_year + trim(substr($t, 1)));
+<a name="line223"></a>        } else if ($t[0] == '-') {
+<a name="line224"></a>            $$key = (int)($_current_year - trim(substr($t, 1)));
+<a name="line225"></a>        } else {
+<a name="line226"></a>            $$key = (int)$$key;
+<a name="line227"></a>        }
+<a name="line228"></a>    }
+<a name="line229"></a>
+<a name="line230"></a>    // flip for ascending or descending
+<a name="line231"></a>    if (($start_year > $end_year && !$reverse_years) || ($start_year < $end_year && $reverse_years)) {
+<a name="line232"></a>        $t = $end_year;
+<a name="line233"></a>        $end_year = $start_year;
+<a name="line234"></a>        $start_year = $t;
+<a name="line235"></a>    }
+<a name="line236"></a>
+<a name="line237"></a>    // generate year <select> or <input>
+<a name="line238"></a>    if ($display_years) {
+<a name="line239"></a>        $_html_years = '';
+<a name="line240"></a>        $_extra = '';
+<a name="line241"></a>        $_name = $field_array ? ($field_array . '[' . $prefix . 'Year]') : ($prefix . 'Year');
+<a name="line242"></a>        if ($all_extra) {
+<a name="line243"></a>            $_extra .= ' ' . $all_extra;
+<a name="line244"></a>        } 
+<a name="line245"></a>        if ($year_extra) {
+<a name="line246"></a>            $_extra .= ' ' . $year_extra;
+<a name="line247"></a>        }
+<a name="line248"></a>        
+<a name="line249"></a>        if ($year_as_text) {
+<a name="line250"></a>            $_html_years = '<input type="text" name="' . $_name . '" value="' . $_year . '" size="4" maxlength="4"' . $_extra . $extra_attrs . ' />';
+<a name="line251"></a>        } else {
+<a name="line252"></a>            $_html_years = '<select name="' . $_name . '"';
+<a name="line253"></a>            if ($year_id !== null || $all_id !== null) {
+<a name="line254"></a>                $_html_years .= ' id="' . smarty_function_escape_special_chars( 
+<a name="line255"></a>                    $year_id !== null ? ( $year_id ? $year_id : $_name ) : ( $all_id ? ($all_id . $_name) : $_name ) 
+<a name="line256"></a>                ) . '"';
+<a name="line257"></a>            }
+<a name="line258"></a>            if ($year_size) {
+<a name="line259"></a>                $_html_years .= ' size="' . $year_size . '"';
+<a name="line260"></a>            } 
+<a name="line261"></a>            $_html_years .= $_extra . $extra_attrs . '>' . $option_separator;
+<a name="line262"></a>            
+<a name="line263"></a>            if (isset($year_empty) || isset($all_empty)) {
+<a name="line264"></a>                $_html_years .= '<option value="">' . ( isset($year_empty) ? $year_empty : $all_empty ) . '</option>' . $option_separator;
+<a name="line265"></a>            }
+<a name="line266"></a>            
+<a name="line267"></a>            $op = $start_year > $end_year ? -1 : 1;
+<a name="line268"></a>            for ($i=$start_year; $op > 0 ? $i <= $end_year : $i >= $end_year; $i += $op) {
+<a name="line269"></a>                $_html_years .= '<option value="' . $i . '"'
+<a name="line270"></a>                    . ($_year == $i ? ' selected="selected"' : '')
+<a name="line271"></a>                    . '>' . $i . '</option>' . $option_separator;
+<a name="line272"></a>            }
+<a name="line273"></a>            
+<a name="line274"></a>            $_html_years .= '</select>';
+<a name="line275"></a>        }
+<a name="line276"></a>    }
+<a name="line277"></a>    
+<a name="line278"></a>    // generate month <select> or <input>
+<a name="line279"></a>    if ($display_months) {
+<a name="line280"></a>        $_html_month = '';
+<a name="line281"></a>        $_extra = '';
+<a name="line282"></a>        $_name = $field_array ? ($field_array . '[' . $prefix . 'Month]') : ($prefix . 'Month');
+<a name="line283"></a>        if ($all_extra) {
+<a name="line284"></a>            $_extra .= ' ' . $all_extra;
+<a name="line285"></a>        } 
+<a name="line286"></a>        if ($month_extra) {
+<a name="line287"></a>            $_extra .= ' ' . $month_extra;
+<a name="line288"></a>        }
+<a name="line289"></a>        
+<a name="line290"></a>        $_html_months = '<select name="' . $_name . '"';
+<a name="line291"></a>        if ($month_id !== null || $all_id !== null) {
+<a name="line292"></a>            $_html_months .= ' id="' . smarty_function_escape_special_chars( 
+<a name="line293"></a>                $month_id !== null ? ( $month_id ? $month_id : $_name ) : ( $all_id ? ($all_id . $_name) : $_name ) 
+<a name="line294"></a>            ) . '"';
+<a name="line295"></a>        }
+<a name="line296"></a>        if ($month_size) {
+<a name="line297"></a>            $_html_months .= ' size="' . $month_size . '"';
+<a name="line298"></a>        } 
+<a name="line299"></a>        $_html_months .= $_extra . $extra_attrs . '>' . $option_separator;
+<a name="line300"></a>        
+<a name="line301"></a>        if (isset($month_empty) || isset($all_empty)) {
+<a name="line302"></a>            $_html_months .= '<option value="">' . ( isset($month_empty) ? $month_empty : $all_empty ) . '</option>' . $option_separator;
+<a name="line303"></a>        }
+<a name="line304"></a>        
+<a name="line305"></a>        for ($i = 1; $i <= 12; $i++) {
+<a name="line306"></a>            $_val = sprintf('%02d', $i);
+<a name="line307"></a>            $_text = isset($month_names) ? smarty_function_escape_special_chars($month_names[$i]) : ($month_format == "%m" ? $_val : strftime($month_format, $_month_timestamps[$i]));
+<a name="line308"></a>            $_value = $month_value_format == "%m" ? $_val : strftime($month_value_format, $_month_timestamps[$i]);
+<a name="line309"></a>            $_html_months .= '<option value="' . $_value . '"'
+<a name="line310"></a>                . ($_val == $_month ? ' selected="selected"' : '')
+<a name="line311"></a>                . '>' . $_text . '</option>' . $option_separator;
+<a name="line312"></a>        }
+<a name="line313"></a>        
+<a name="line314"></a>        $_html_months .= '</select>';
+<a name="line315"></a>    }
+<a name="line316"></a>    
+<a name="line317"></a>    // generate day <select> or <input>
+<a name="line318"></a>    if ($display_days) {
+<a name="line319"></a>        $_html_day = '';
+<a name="line320"></a>        $_extra = '';
+<a name="line321"></a>        $_name = $field_array ? ($field_array . '[' . $prefix . 'Day]') : ($prefix . 'Day');
+<a name="line322"></a>        if ($all_extra) {
+<a name="line323"></a>            $_extra .= ' ' . $all_extra;
+<a name="line324"></a>        } 
+<a name="line325"></a>        if ($day_extra) {
+<a name="line326"></a>            $_extra .= ' ' . $day_extra;
+<a name="line327"></a>        }
+<a name="line328"></a>        
+<a name="line329"></a>        $_html_days = '<select name="' . $_name . '"';
+<a name="line330"></a>        if ($day_id !== null || $all_id !== null) {
+<a name="line331"></a>            $_html_days .= ' id="' . smarty_function_escape_special_chars( 
+<a name="line332"></a>                $day_id !== null ? ( $day_id ? $day_id : $_name ) : ( $all_id ? ($all_id . $_name) : $_name ) 
+<a name="line333"></a>            ) . '"';
+<a name="line334"></a>        }
+<a name="line335"></a>        if ($day_size) {
+<a name="line336"></a>            $_html_days .= ' size="' . $day_size . '"';
+<a name="line337"></a>        } 
+<a name="line338"></a>        $_html_days .= $_extra . $extra_attrs . '>' . $option_separator;
+<a name="line339"></a>        
+<a name="line340"></a>        if (isset($day_empty) || isset($all_empty)) {
+<a name="line341"></a>            $_html_days .= '<option value="">' . ( isset($day_empty) ? $day_empty : $all_empty ) . '</option>' . $option_separator;
+<a name="line342"></a>        }
+<a name="line343"></a>        
+<a name="line344"></a>        for ($i = 1; $i <= 31; $i++) {
+<a name="line345"></a>            $_val = sprintf('%02d', $i);
+<a name="line346"></a>            $_text = $day_format == '%02d' ? $_val : sprintf($day_format, $i);
+<a name="line347"></a>            $_value = $day_value_format ==  '%02d' ? $_val : sprintf($day_value_format, $i);
+<a name="line348"></a>            $_html_days .= '<option value="' . $_value . '"'
+<a name="line349"></a>                . ($_val == $_day ? ' selected="selected"' : '')
+<a name="line350"></a>                . '>' . $_text . '</option>' . $option_separator;
+<a name="line351"></a>        }
+<a name="line352"></a>        
+<a name="line353"></a>        $_html_days .= '</select>';
+<a name="line354"></a>    }
+<a name="line355"></a>
+<a name="line356"></a>    // order the fields for output
+<a name="line357"></a>    $_html = '';
+<a name="line358"></a>    for ($i=0; $i <= 2; $i++) {
+<a name="line359"></a>        switch ($field_order[$i]) {
+<a name="line360"></a>            case 'Y':
+<a name="line361"></a>            case 'y':
+<a name="line362"></a>                if (isset($_html_years)) {
+<a name="line363"></a>                    if ($_html) {
+<a name="line364"></a>                        $_html .= $field_separator;
+<a name="line365"></a>                    }
+<a name="line366"></a>                    $_html .= $_html_years;
+<a name="line367"></a>                }
+<a name="line368"></a>            break;
+<a name="line369"></a>            
+<a name="line370"></a>            case 'm':
+<a name="line371"></a>            case 'M':
+<a name="line372"></a>                if (isset($_html_months)) {
+<a name="line373"></a>                    if ($_html) {
+<a name="line374"></a>                        $_html .= $field_separator;
+<a name="line375"></a>                    }
+<a name="line376"></a>                    $_html .= $_html_months;
+<a name="line377"></a>                }
+<a name="line378"></a>            break;
+<a name="line379"></a>            
+<a name="line380"></a>            case 'd':
+<a name="line381"></a>            case 'D':
+<a name="line382"></a>                if (isset($_html_days)) {
+<a name="line383"></a>                    if ($_html) {
+<a name="line384"></a>                        $_html .= $field_separator;
+<a name="line385"></a>                    }
+<a name="line386"></a>                    $_html .= $_html_days;
+<a name="line387"></a>                }
+<a name="line388"></a>            break;
+<a name="line389"></a>        }
+<a name="line390"></a>    }
+<a name="line391"></a>    return $_html;
+<a name="line392"></a>}
+<a name="line393"></a>
+<a name="line394"></a>?></pre>
+<div class="header">
+<h1>PHPDoctor</h1>
+<ul>
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li>Package</li><li>Class</li><li>Tree</li><li><a href="../../../../../overview-files.html">Files</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../todo-list.html">Todo</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+</ul>
+</div>
+
+<div class="small_links">
+<a href="../../../../../index.html" target="_top">Frames</a>
+<a href="../../../../../source/lib/php/smarty/plugins/function.html_select_date.php.html" target="_top">No frames</a>
+</div>
+<hr>
+
+<p id="footer">This document was generated by <a href="http://peej.github.com/phpdoctor/">PHPDoctor: The PHP Documentation Creator</a></p>
+
+</body>
+
+</html>
